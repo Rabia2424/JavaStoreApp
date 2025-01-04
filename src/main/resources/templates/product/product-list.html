@@ -1,0 +1,146 @@
+<html
+        xmlns:th="http://thymeleaf.org"
+        xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+        layout:decorate="~{layout}">
+<head>
+    <title>Products</title>
+    <style>
+        .product-card {
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin-bottom: 20px;
+            background-color: #f9f9f9;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        }
+
+        .product-card .image-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+        }
+
+        .product-card img {
+            max-width: 80%;
+            height: 300px;
+            border-radius: 10px;
+        }
+
+        .product-card .content-info {
+            display: flex;
+            flex-direction: column; /* Metinleri dikey hizala */
+            align-items: flex-start; /* Metinleri üstten hizala */
+            margin-left: 45px;
+        }
+
+        .product-card .product-name {
+            font-size: 1.5rem;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .product-card .product-description {
+            font-size: 1rem;
+            color: #666;
+            margin-bottom: 15px;
+        }
+
+        .product-card .product-price {
+            font-size: 1.2rem;
+            color: #007bff;
+        }
+    </style>
+</head>
+<body class="d-flex flex-column h-100">
+<main class="flex-shrink-0">
+    <section layout:fragment="body" class="py-5">
+        <div class="container px-5 my-5">
+            <div th:if="${param.success}" class="alert alert-success">
+                You are registered successfully!
+            </div>
+            <div class="text-center mb-5">
+                <h1 class="fw-bolder">Find Your Interest</h1>
+                <p class="lead fw-normal text-muted mb-0">Explore products tailored to your needs</p>
+            </div>
+            <div class="row gx-5">
+                <div class="my-4">
+                    <form th:action="@{/products/search}" class="form-inline my-2 my-lg-0 mb-3">
+                        <div class="d-flex align-items-center gap-3 w-100">
+                            <!-- Arama Kutusu -->
+                            <input
+                                    name="query"
+                                    id="search"
+                                    class="search form-control flex-grow-1"
+                                    type="search"
+                                    placeholder="Search product name or description"
+                                    aria-label="Search"
+                                    th:value="${param.query}">
+                            <button class="btn btn-info ml-2" type="submit">Search</button>
+                            <button class="btn btn-info" type="button" onclick="clearSearch()">Reset</button>
+                        </div>
+                    </form>
+                </div>
+                <div th:each="product :${products}" class="col-lg-6 mb-4">
+                    <div class="product-card">
+                        <div class="image-container">
+                            <img th:src="${product.imageUrl}" alt="Product image" class="mb-3"/>
+                        </div>
+                        <div class="content-info">
+                            <div class="product-name">
+                                <i>Product Name:</i> <span th:text="${product.name}">[Product Name]</span>
+                            </div>
+                            <div class="product-description">
+                                <i>Product Description:</i> <span th:text="${product.description}"></span>
+                            </div>
+                            <div class="product-price">
+                                <i>Product Price:</i> <span th:text="'$' + ${product.price}"></span>
+                            </div>
+                            <div class="button">
+                                <a class="btn btn-primary" th:href="@{/products/{productId}(productId=${product.id})}">View Details</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <div th:if="${totalPages > 1}">
+            <div class="row col-sm-10">
+                <div class="col-sm-2">
+                    Total Rows: [[${totalItems}]]
+                </div>
+                <div class="col-sm-1">
+            <span th:each="i: ${#numbers.sequence(1, totalPages)}">
+      <a th:if="${currentPage != i-1}" th:href="@{'/products/page/' + ${i - 1}}">[[${i}]]</a>
+      <span th:unless="${currentPage != i-1}">[[${i}]]</span> &nbsp; &nbsp;
+            </span>
+                </div>
+                <div class="col-sm-1">
+                    <a th:if="${currentPage < totalPages - 1}" th:href="@{'/products/page/' + ${currentPage + 1}}">Next</a>
+                    <span th:unless="${currentPage < totalPages - 1}">Next</span>
+                </div>
+
+                <div class="col-sm-1">
+                    <a th:if="${currentPage < totalPages - 1}" th:href="@{'/products/page/' + ${totalPages -1}}">Last</a>
+                    <span th:unless="${currentPage < totalPages - 1}">Last</span>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+</body>
+</html>
+<script>
+    function clearSearch() {
+        document.querySelector(".search").value = "";
+        location.replace("/products/list");
+    }
+</script>
