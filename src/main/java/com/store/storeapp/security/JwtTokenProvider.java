@@ -1,4 +1,5 @@
 package com.store.storeapp.security;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -23,6 +24,7 @@ public class JwtTokenProvider {
     public String generateToken(Authentication authentication){
 
         String username = authentication.getName();
+
 
         Date currentDate = new Date();
 
@@ -54,13 +56,17 @@ public class JwtTokenProvider {
     }
 
     public Date getExpirationDate(String token){
-
-        return Jwts.parser()
-                .verifyWith((SecretKey) key())
-                .build()
-                .parseSignedClaims(token)
-                .getPayload()
-                .getExpiration();
+        try{
+            return Jwts.parser()
+                    .verifyWith((SecretKey) key())
+                    .build()
+                    .parseSignedClaims(token)
+                    .getPayload()
+                    .getExpiration();
+        }catch(ExpiredJwtException e){
+            //This indicates that even error occurs you can return expiration date.
+            return e.getClaims().getExpiration();
+        }
     }
 
     // validate JWT token

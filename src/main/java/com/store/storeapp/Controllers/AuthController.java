@@ -11,6 +11,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletResponse;
+
 @AllArgsConstructor
 @Controller
 @RequestMapping("/auth")
@@ -40,12 +43,28 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public String login(LoginDto loginDto){
+    public String login(LoginDto loginDto, HttpServletResponse response){
         String token  = authService.login(loginDto);
-        JwtAuthResponse jwtAuthResponse = new JwtAuthResponse();
-        jwtAuthResponse.setAccessToken(token);
-        jwtAuthResponse.setExpiresIn(jwtTokenProvider.getExpirationDate(token));
 
+        // Token'ı bir HTTP-Only Cookie'ye ekle
+        Cookie jwtCookie = new Cookie("jwt", token);
+        jwtCookie.setHttpOnly(true);
+        jwtCookie.setSecure(true); // HTTPS kullanıyorsanız true olmalı
+        jwtCookie.setPath("/");
+        jwtCookie.setMaxAge((int) jwtTokenProvider.getExpirationDate(token).getTime() / 1000);
+        response.addCookie(jwtCookie);
+
+        return "redirect:/products/list";
+    }
+
+    @GetMapping("/logout")
+    public String logout(HttpServletResponse response){
+        Cookie cookie = new Cookie("jwt", null);
+        cookie.setHttpOnly(true);
+        cookie.setSecure(true);  // HTTPS kullanıyorsanız true olmalı
+        cookie.setPath("/"); // Cookie'nin geçerli olduğu path
+        cookie.setMaxAge(0); // Cookie'yi hemen silmek için Max-Age'i 0 yapıyoruz
+        response.addCookie(cookie);
         return "redirect:/products/list";
     }
 

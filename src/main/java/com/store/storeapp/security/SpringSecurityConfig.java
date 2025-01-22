@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -30,6 +31,9 @@ public class SpringSecurityConfig {
     private JwtAuthenticationEntryPoint authenticationEntryPoint;
 
     @Autowired
+    private CustomAccessDeniedHandler accessDeniedHandler;
+
+    @Autowired
     private JwtAuthenticationFilter authenticationFilter;
 
     @Bean
@@ -40,26 +44,24 @@ public class SpringSecurityConfig {
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
-        http.csrf(csrf -> csrf.disable())
+        http.csrf().disable()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS) // Stateless sessions
                 .and()
-                .authorizeHttpRequests((authorize) -> {
-                      // Allow access to static resources
-                      authorize.antMatchers("/assets/**","/css/**", "/js/**", "/images/**").permitAll();
-                      authorize.antMatchers("/","/auth/**", "/products/list").permitAll();
-//                    authorize.requestMatchers(HttpMethod.POST, "/api/**").hasRole("ADMIN");
-//                    authorize.requestMatchers(HttpMethod.PUT, "/api/**").hasRole("ADMIN");
-//                    authorize.requestMatchers(HttpMethod.DELETE, "/api/**").hasRole("ADMIN");
-//                    authorize.requestMatchers(HttpMethod.GET, "/api/**").hasAnyRole("ADMIN", "USER");
-//                    authorize.requestMatchers(HttpMethod.PATCH, "/api/**").hasAnyRole("ADMIN", "USER");
-                      //authorize.anyRequest().authenticated();
-                      authorize.anyRequest().permitAll();
-                }).httpBasic(Customizer.withDefaults());
-
-        http.exceptionHandling(exception -> exception
-                .authenticationEntryPoint(authenticationEntryPoint));
-
-        http.addFilterBefore(authenticationFilter, UsernamePasswordAuthenticationFilter.class);
+                .authorizeRequests(authorize -> {
+                    // Allow access to static resources
+                    authorize.antMatchers("/assets/**", "/css/**", "/js/**", "/images/**").permitAll();
+                    authorize.antMatchers("/", "/auth/**", "/products/list", "/errorPage").permitAll();
+                    authorize.antMatchers("/category/new", "/products/new").hasRole("ADMIN");
+                    authorize.antMatchers(HttpMethod.DELETE, "/api/**").hasRole("ADMIN");
+                    authorize.antMatchers(HttpMethod.GET, "/api/**").hasAnyRole("ADMIN", "USER");
+                    authorize.antMatchers(HttpMethod.PATCH, "/api/**").hasAnyRole("ADMIN", "USER");
+                    authorize.anyRequest().authenticated(); // Tüm diğer isteklerde kimlik doğrulaması yapılır
+                })
+                .exceptionHandling()
+                .authenticationEntryPoint(authenticationEntryPoint) // 401 Unauthorized işlemi
+                .accessDeniedHandler(accessDeniedHandler) // 403 Forbidden işlemi
+                .and()
+                .addFilterBefore(authenticationFilter, UsernamePasswordAuthenticationFilter.class); // JWT Filter ekleniyor
 
         return http.build();
     }
