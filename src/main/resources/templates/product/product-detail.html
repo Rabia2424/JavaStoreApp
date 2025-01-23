@@ -36,8 +36,11 @@
                         <p class="card-text" th:text="${productDto.description}"></p>
                         <p class="card-text" th:text="'$'+ ${productDto.price}"></p>
                         <p class="card-text" th:text="${productDto.stockQuantity}"></p>
-                        <p class="card-text" th:text="${productDto.categoryName}"></p>
+                        <p class="card-text" th:text="${productDto.category.name}"></p>
                     </div>
+                    <form method="post" th:action="@{/cart/add/{id}(id=${productDto.id})}">
+                        <button type="submit" class="btn btn-success" >Add to Cart</button>
+                    </form>
                 </div>
                 <!-- Pagination-->
                 <nav aria-label="Pagination">

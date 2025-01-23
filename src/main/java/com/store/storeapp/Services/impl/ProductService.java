@@ -47,9 +47,24 @@ public class ProductService {
                 .imageUrl(product.getImageUrl())
                 .createdOn(product.getCreatedOn())
                 .updatedOn(product.getUpdatedOn())
-                .categoryName(product.getCategory().getName())
+                .category(product.getCategory())
                 .build();
         return productDto;
+    }
+
+    public Product mapToProduct(ProductDto productDto){
+        Product product = Product.builder()
+                .id(productDto.getId())
+                .name(productDto.getName())
+                .description(productDto.getDescription())
+                .price(productDto.getPrice())
+                .stockQuantity(productDto.getStockQuantity())
+                .imageUrl(productDto.getImageUrl())
+                .createdOn(productDto.getCreatedOn())
+                .updatedOn(productDto.getUpdatedOn())
+                .category(productDto.getCategory())
+                .build();
+        return product;
     }
 
     public Page<Product> findAll(Pageable pageable) {

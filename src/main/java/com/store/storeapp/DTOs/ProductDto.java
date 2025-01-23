@@ -1,5 +1,6 @@
 package com.store.storeapp.DTOs;
 
+import com.store.storeapp.Models.Category;
 import lombok.Builder;
 import lombok.Data;
 import java.time.LocalDateTime;
@@ -16,5 +17,5 @@ public class ProductDto {
     private LocalDateTime createdOn;
     private LocalDateTime updatedOn;
 
-    private String categoryName;
+    private Category category;
 }
