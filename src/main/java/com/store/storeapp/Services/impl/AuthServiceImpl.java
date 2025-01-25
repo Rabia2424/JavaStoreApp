@@ -15,6 +15,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.CookieValue;
 
 import java.util.Arrays;
 
@@ -69,4 +70,14 @@ public class AuthServiceImpl implements AuthService {
 
         return userRepository.save(user);
     }
+
+    //General function I have used in all crud operation.
+    @Override
+    public Long getUserIdFromToken(String token) {
+        if(token == null && token.isEmpty()){
+            throw new IllegalArgumentException("Jwt Token not found in cookie");
+        }
+        return jwtTokenProvider.getUserId(token);
+    }
+
 }

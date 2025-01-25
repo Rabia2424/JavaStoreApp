@@ -7,4 +7,5 @@ import com.store.storeapp.Models.User;
 public interface AuthService {
     String login(LoginDto loginDto);
     User register(RegisterDto registerDto);
+    Long getUserIdFromToken(String token);
 }

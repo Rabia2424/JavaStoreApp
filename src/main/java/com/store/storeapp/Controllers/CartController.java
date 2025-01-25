@@ -3,6 +3,7 @@ package com.store.storeapp.Controllers;
 import com.store.storeapp.DTOs.ProductDto;
 import com.store.storeapp.Models.Cart;
 import com.store.storeapp.Models.Product;
+import com.store.storeapp.Services.AuthService;
 import com.store.storeapp.Services.impl.CartService;
 import com.store.storeapp.Services.impl.ProductService;
 import com.store.storeapp.security.JwtTokenProvider;
@@ -24,17 +25,12 @@ public class CartController {
 
     @Autowired
     private CartService cartService;
+    @Autowired
+    private AuthService authService;
 
-    //General function I have used in all crud operation.
-    public Long getUserIdFromToken(@CookieValue("jwt") String token){
-        if(token == null && token.isEmpty()){
-            throw new IllegalArgumentException("Jwt Token not found in cookie");
-        }
-        return jwtTokenProvider.getUserId(token);
-    }
     @GetMapping("/list")
     public String getCart(@CookieValue("jwt") String token, Model model){
-        Long userId = getUserIdFromToken(token);
+        Long userId = authService.getUserIdFromToken(token);
         Cart cart = cartService.getCartByUserId(userId);
         if(cart == null){
             cart = new Cart();
@@ -47,7 +43,7 @@ public class CartController {
 
     @PostMapping("/add/{id}")
     public String addToCart(@CookieValue("jwt") String token, @PathVariable("id") Long productId){
-        Long userId = getUserIdFromToken(token);
+        Long userId = authService.getUserIdFromToken(token);
         ProductDto productDto = productService.getProductById(productId);
         Product product = productService.mapToProduct(productDto);
         cartService.addToCart(userId, product);
@@ -56,7 +52,7 @@ public class CartController {
 
     @PostMapping("/remove/{productId}")
     public String deleteFromCart(@CookieValue("jwt") String token, @PathVariable("productId") Long productId) throws Exception {
-        Long userId = getUserIdFromToken(token);
+        Long userId = authService.getUserIdFromToken(token);
         ProductDto productDto = productService.getProductById(productId);
         Product product = productService.mapToProduct(productDto);
         cartService.deleteCartItemFromCart(userId, product);
@@ -65,7 +61,7 @@ public class CartController {
 
     @PostMapping("/removeOneItem/{productId}")
     public String deleteOneItemFromCartItems(@CookieValue("jwt") String token, @PathVariable("productId") Long productId) throws Exception {
-        Long userId = getUserIdFromToken(token);
+        Long userId = authService.getUserIdFromToken(token);
         ProductDto productDto = productService.getProductById(productId);
         Product product = productService.mapToProduct(productDto);
         cartService.deleteOneItemFromCartItem(userId, product);

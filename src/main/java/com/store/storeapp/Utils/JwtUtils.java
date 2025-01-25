@@ -22,7 +22,7 @@ public class JwtUtils {
                     .getPayload();
 
             return claims != null;
-        } catch (IllegalArgumentException e) {
+        } catch (Exception e) {
             return false;
         }
     }

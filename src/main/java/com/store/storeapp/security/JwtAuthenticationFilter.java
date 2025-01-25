@@ -48,6 +48,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         if (servletPath.equals("/") ||
                 servletPath.equals("/auth/login") ||
                 servletPath.equals("/auth/register") ||
+                servletPath.equals("/auth/logout") ||
                 servletPath.equals("/products/list") ||
                 servletPath.startsWith("/assets/") ||
                 servletPath.startsWith("/css/") ||
@@ -149,7 +150,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private boolean isPathValid(String path) {
         // Controller'larınızı kontrol etmek için burada gerekli mantığı uygulayın
-        return path.matches("/auth/.*|/products/.*|/category/.*|/cart/.*");
+        return path.matches("/auth/.*|/products/.*|/category/.*|/cart/.*|/order/.*");
     }
 
     private boolean isTokenExpired(String token){
