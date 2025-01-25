@@ -17,6 +17,9 @@ public class CartService {
     @Autowired
     private CartRepository cartRepository;
 
+    @Autowired
+    private CartItemRepository cartItemRepository;
+
     public Cart getCartByUserId(Long userId){
         return cartRepository.getCartByUserId(userId)
                 .orElse(null);
@@ -86,6 +89,7 @@ public class CartService {
                     .totalPrice(product.getPrice())
                     .build();
 
+            //cartItemRepository.getCartItemsByCartId(cart.getCartId()).add(cartItem);
             cart.getCartItems().add(cartItem);
         }
 
@@ -94,7 +98,7 @@ public class CartService {
     }
 
     public Optional<CartItem> cartItemExistOrNot(Cart cart, Product product){
-        if(cart.getCartItems() != null){
+        if(cartItemRepository.getCartItemsByCartId(cart.getCartId()) != null){
             return cart.getCartItems().stream()
                     .filter(cartItem -> cartItem.getProduct().getId().equals(product.getId()))
                     .findFirst();

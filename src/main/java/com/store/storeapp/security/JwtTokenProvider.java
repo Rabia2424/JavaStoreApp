@@ -94,7 +94,6 @@ public class JwtTokenProvider {
                 .build()
                 .parse(token);
         return true;
-
     }
 }
 

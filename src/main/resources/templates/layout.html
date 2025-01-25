@@ -25,10 +25,11 @@
                 <li class="nav-item"><a class="nav-link" th:href="@{/clubs}">Find Clubs</a></li>
                 <li class="nav-item"><a class="nav-link" th:href="@{/category/new}">Create Category</a></li>
                 <li class="nav-item"><a class="nav-link" th:href="@{/products/new}">Create Product</a></li>
-                <li sec:authorize="!isAuthenticated()"  class="nav-item"><a class="nav-link me-3 " th:href="@{/auth/login}">Login</a></li>
-                <li sec:authorize="!isAuthenticated()"  class="nav-item"><a class="nav-link " th:href="@{/auth/register}">Register</a></li>
-                <li sec:authorize="isAuthenticated()" class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" id="navbarDropdownPortfolio" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Welcome</a>
+                <li th:if="${!isAuthenticated}" class="nav-item"><a class="nav-link me-3 " th:href="@{/auth/login}">Login</a></li>
+                <li th:if="${isAuthenticated}"  class="nav-item"><a class="nav-link me-3 " th:href="@{/auth/logout}">Logout</a></li>
+                <li th:if="${!isAuthenticated}" class="nav-item"><a class="nav-link " th:href="@{/auth/register}">Register</a></li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" id="navbarDropdownPortfolio" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Welcome <span th:text="${isAuthenticated ? username : 'Guest'}"></span>!</a>
                     <ul  class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdownPortfolio">
                         <li><a class="dropdown-item" th:href="@{/cart/list}">Cart</a></li>
                         <li><a class="dropdown-item" th:href="@{/auth/logout}">Logout</a></li>

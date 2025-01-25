@@ -122,7 +122,7 @@
         if(!control){
             alert("no match found!");
         }else{
-            let text = lastCardBody.innerHTML;
+            let text = lastCardBody.innerHTML.replace(/<mark>(.*?)<\/mark>/g, '$1');
             let re = new RegExp(searchTerm,"g"); // search for all instances
             let newText = text.replace(re, `<mark>${searchTerm}</mark>`);
             lastCardBody.innerHTML = newText;

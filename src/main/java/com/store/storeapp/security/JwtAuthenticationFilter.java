@@ -6,6 +6,7 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.store.storeapp.Utils.JwtUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -27,11 +28,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private JwtTokenProvider jwtTokenProvider;
 
     private UserDetailsService userDetailsService;
+    private JwtUtils jwtUtils;
 
     @Autowired
-    public JwtAuthenticationFilter(JwtTokenProvider jwtTokenProvider, UserDetailsService userDetailsService) {
+    public JwtAuthenticationFilter(JwtTokenProvider jwtTokenProvider, UserDetailsService userDetailsService, JwtUtils jwtUtils) {
         this.jwtTokenProvider = jwtTokenProvider;
         this.userDetailsService = userDetailsService;
+        this.jwtUtils = jwtUtils;
     }
 
     @Override
@@ -51,6 +54,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 servletPath.startsWith("/js/") ||
                 servletPath.startsWith("/images/") ||
                 servletPath.equals("/errorPage")) {
+            isAuthenticatedWithJwtFromCookie(request);
             filterChain.doFilter(request, response);
             return;
         }
@@ -88,6 +92,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             return; // Stop further processing
         }
 
+        isAuthenticatedWithJwtFromCookie(request);//This is for checking isAuthenticated actually with control they have claims in jwt.
         filterChain.doFilter(request, response);
     }
 
@@ -108,6 +113,28 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             }
         }
         return null;
+    }
+
+    private void isAuthenticatedWithJwtFromCookie(HttpServletRequest request) {
+        Cookie[] cookies = request.getCookies();
+        String jwt = null;
+        String username = null;
+        if(cookies != null){
+            for(Cookie cookie: cookies){
+                if("jwt".equals(cookie.getName())){
+                    jwt = cookie.getValue();
+                    break;
+                }
+            }
+        }
+
+        if(jwt != null && jwtUtils.isAuthenticated(jwt)){
+            username = jwtTokenProvider.getUsername(jwt);
+            request.setAttribute("isAuthenticated", true);
+            request.setAttribute("username", username);
+        }else{
+            request.setAttribute("isAuthenticated", false);
+        }
     }
 
 //    private String getTokenFromRequest(HttpServletRequest request){
