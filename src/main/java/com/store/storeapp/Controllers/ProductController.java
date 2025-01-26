@@ -10,6 +10,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -38,7 +39,13 @@ public class ProductController {
 //        List<ProductDto> products = productService.findAllProducts();
 //        model.addAttribute("products", products);
 //        return "product/product-list";
-        return getAllProducts(0,"id",false, model);
+        return getAllProducts(0,"id",false, model, null);
+    }
+
+    @GetMapping("/list/{categoryId}")
+    public String listProductsByCategoryId(Model model, @PathVariable Long categoryId){
+
+        return getAllProducts(0,"id",false, model, categoryId);
     }
 
     @GetMapping ("/search")
@@ -46,28 +53,6 @@ public class ProductController {
         List<ProductDto> products = productService.searchProducts(query);
         model.addAttribute("products", products);
         return "product/product-list";
-    }
-
-    @GetMapping("/new")
-    public String createProductForm(Model model){
-        Product product = new Product();
-        List<Category> categories = categoryService.findAllCategory();
-        model.addAttribute("product", product);
-        model.addAttribute("categories", categories);
-        return "product/product-create";
-    }
-
-    @PostMapping("/new")
-    public String saveProduct(@ModelAttribute("product") Product product,@RequestParam("file") MultipartFile file) throws IOException {
-        String UPLOAD_DIRECTORY = System.getProperty("user.dir") + "/src/main/resources/static/images";
-
-        Path fileNameAndPath = Paths.get(UPLOAD_DIRECTORY, file.getOriginalFilename());
-        System.out.println(fileNameAndPath);
-        Files.write(fileNameAndPath, file.getBytes());
-
-        product.setImageUrl("/images/"+ file.getOriginalFilename());
-        productService.saveProduct(product);
-        return "redirect:/products/list";
     }
 
     @GetMapping("/{productId}")
@@ -84,17 +69,27 @@ public class ProductController {
             @PathVariable("page_no") int page_no,
             @RequestParam(defaultValue = "id") String sortBy,
             @RequestParam(defaultValue = "false") boolean ascending,
-            Model model
+            Model model,
+            @RequestParam(value="category_id",required = false) Long categoryId
     ) {
         Sort sort = ascending ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
         int pageSize = 4;
         Pageable pageable = PageRequest.of(page_no, pageSize, sort);
-        Page<Product> page2 = productService.findAll(pageable);
-        List<ProductDto> products = page2.getContent().stream().map(product -> productService.mapToProductDto(product)).collect(Collectors.toList());
+        Page<Product> page2 = null;
+        if(categoryId != null){
+            page2 = productService.findAllByCategoryId(pageable, categoryId);
+        }else{
+            page2 = productService.findAll(pageable);
+        }
+        List<ProductDto> products = page2.getContent()
+                .stream()
+                .map((product) -> productService.mapToProductDto(product))
+                .collect(Collectors.toList());
         model.addAttribute("products", products);
         model.addAttribute("currentPage", page_no);
         model.addAttribute("totalPages", page2.getTotalPages());
         model.addAttribute("totalItems", page2.getTotalElements());
+        model.addAttribute("categoryId", categoryId);
         return "product/product-list";
     }
 

@@ -52,7 +52,7 @@ public class SpringSecurityConfig {
                     authorize.antMatchers("/assets/**", "/css/**", "/js/**", "/images/**").permitAll();
                     authorize.antMatchers("/", "/auth/**", "/products/list", "/errorPage").permitAll();
                     authorize.antMatchers("/category/new", "/products/new").hasRole("ADMIN");
-                    authorize.antMatchers(HttpMethod.DELETE, "/api/**").hasRole("ADMIN");
+                    authorize.antMatchers("/admin/**").hasRole("ADMIN");
                     authorize.antMatchers(HttpMethod.GET, "/api/**").hasAnyRole("ADMIN", "USER");
                     authorize.antMatchers(HttpMethod.PATCH, "/api/**").hasAnyRole("ADMIN", "USER");
                     authorize.anyRequest().authenticated(); // Tüm diğer isteklerde kimlik doğrulaması yapılır

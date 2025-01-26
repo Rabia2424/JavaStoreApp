@@ -1,5 +1,6 @@
 package com.store.storeapp.Models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -30,5 +31,7 @@ public class Product {
 
     @ManyToOne
     @JoinColumn(name="category_id", nullable = false)
+    @JsonIgnore
+    @ToString.Exclude
     private Category category;
 }

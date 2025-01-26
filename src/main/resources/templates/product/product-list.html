@@ -119,17 +119,22 @@
                 </div>
                 <div class="col-sm-1">
             <span th:each="i: ${#numbers.sequence(1, totalPages)}">
-      <a th:if="${currentPage != i-1}" th:href="@{'/products/page/' + ${i - 1}}">[[${i}]]</a>
-      <span th:unless="${currentPage != i-1}">[[${i}]]</span> &nbsp; &nbsp;
+      <a th:if="${currentPage != i - 1}" th:href="@{'/products/page/' + ${i - 1}} + '?category_id=' + ${categoryId != null ? categoryId:''}">[[${i}]]</a>
+      <span th:unless="${currentPage != i - 1}">[[${i}]]</span> &nbsp; &nbsp;
             </span>
                 </div>
                 <div class="col-sm-1">
-                    <a th:if="${currentPage < totalPages - 1}" th:href="@{'/products/page/' + ${currentPage + 1}}">Next</a>
+                    <a th:if="${currentPage < totalPages && currentPage > 0}" th:href="@{'/products/page/' + ${currentPage - 1} + '?category_id=' + ${categoryId != null ? categoryId:''}}">Before</a>
+                    <span th:unless="${currentPage < totalPages && currentPage > 0}">Before</span>
+                </div>
+
+                <div class="col-sm-1">
+                    <a th:if="${currentPage < totalPages - 1}" th:href="@{'/products/page/' + ${currentPage + 1} + '?category_id=' + ${categoryId != null ? categoryId:''}}">Next</a>
                     <span th:unless="${currentPage < totalPages - 1}">Next</span>
                 </div>
 
                 <div class="col-sm-1">
-                    <a th:if="${currentPage < totalPages - 1}" th:href="@{'/products/page/' + ${totalPages -1}}">Last</a>
+                    <a th:if="${currentPage < totalPages - 1}" th:href="@{'/products/page/' + ${totalPages - 1} + '?category_id=' + ${categoryId != null ? categoryId:''}}">Last</a>
                     <span th:unless="${currentPage < totalPages - 1}">Last</span>
                 </div>
             </div>

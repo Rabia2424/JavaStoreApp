@@ -37,6 +37,14 @@ public class ProductService {
         return productRepository.save(product);
     }
 
+    public void updateProduct(Product product){
+        productRepository.save(product);
+    }
+
+    public void deleteProduct(Long productId){
+        productRepository.deleteById(productId);
+    }
+
     public ProductDto mapToProductDto(Product product){
         ProductDto productDto = ProductDto.builder()
                 .id(product.getId())
@@ -70,4 +78,6 @@ public class ProductService {
     public Page<Product> findAll(Pageable pageable) {
         return productRepository.findAll(pageable);
     }
+
+    public Page<Product> findAllByCategoryId(Pageable pageable, Long categoryId) { return productRepository.getProductsByCategoryId(categoryId,pageable);}
 }

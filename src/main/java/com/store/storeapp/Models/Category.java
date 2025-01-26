@@ -29,5 +29,6 @@ public class Category {
 
     @OneToMany(mappedBy = "category", cascade = CascadeType.REMOVE)
     @JsonIgnore
+    @ToString.Exclude
     private List<Product> products = new ArrayList<>();
 }
