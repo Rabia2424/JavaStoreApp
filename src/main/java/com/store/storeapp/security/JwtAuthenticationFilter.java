@@ -150,7 +150,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private boolean isPathValid(String path) {
         // Controller'larınızı kontrol etmek için burada gerekli mantığı uygulayın
-        return path.matches("/auth/.*|/products/.*|/category/.*|/cart/.*|/order/.*|/admin/.*");
+        return path.matches("/auth/.*|/products/.*|/category/.*|/cart/.*|/order/.*|/admin/.*|/payment/.*");
     }
 
     private boolean isTokenExpired(String token){

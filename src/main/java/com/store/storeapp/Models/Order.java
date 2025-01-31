@@ -1,5 +1,6 @@
 package com.store.storeapp.Models;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -19,6 +20,7 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 @Entity
+@Table(name="orders")
 public class Order {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,6 +32,7 @@ public class Order {
     @Enumerated(EnumType.STRING)
     private OrderStatus status;
     private String shippingAddress;
+    private String phoneNumber;
     private String billingAddress;
     private Double shippingCost;
     @Nullable

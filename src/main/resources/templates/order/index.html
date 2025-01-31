@@ -45,6 +45,8 @@
 <div layout:fragment="body" class="form-container" >
     <h1>Order Form</h1>
     <form method="post" th:action="@{/order/add}" th:object="${order}">
+        <!-- User Id -->
+        <input th:field="*{userId}" class="form-control" id="userId" hidden/>
         <!-- Order Status -->
         <div class="mb-3">
             <label for="orderStatus" class="form-label">Order Status</label>
@@ -64,6 +66,11 @@
         <div class="mb-3">
             <label for="shippingAddress" class="form-label">Shipping Address</label>
             <textarea class="form-control" th:field="*{shippingAddress}" id="shippingAddress" rows="3" placeholder="Enter your shipping address"></textarea>
+        </div>
+        <!-- Phone Number -->
+        <div class="mb-3">
+            <label for="phoneNumber" class="form-label">Phone Number</label>
+            <input type="text" class="form-control" th:field="*{phoneNumber}" id="phoneNumber" placeholder="Enter your phone number">
         </div>
         <!-- Billing Address -->
         <div class="mb-3">
