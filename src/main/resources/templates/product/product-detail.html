@@ -10,6 +10,11 @@
             max-height: 500px; /* Maksimum yükseklik */
             object-fit: cover; /* Resmin orantılı şekilde yerleşmesini sağlar */
         }
+        .add-to-cart-btn {
+            background-color: #034993;
+            color:white;
+            margin:10px;
+        }
     </style>
 </head>
 <body class="d-flex flex-column">
@@ -39,7 +44,7 @@
                         <p class="card-text" th:text="${productDto.category.name}"></p>
                     </div>
                     <form method="post" th:action="@{/cart/add/{id}(id=${productDto.id})}">
-                        <button type="submit" class="btn btn-success" >Add to Cart</button>
+                        <button type="submit" class="btn add-to-cart-btn">Add to Cart</button>
                     </form>
                 </div>
                 <!-- Pagination-->
@@ -65,7 +70,7 @@
                     <div class="card-body">
                         <div class="input-group">
                             <input id="query" class="form-control" type="text" placeholder="Enter search term..." aria-label="Enter search term..." aria-describedby="button-search" />
-                            <button class="btn btn-primary" id="button-search" type="button" onclick="search()">Go!</button>
+                            <button class="btn" id="button-search" style="background-color: #034993; color:white;" type="button" onclick="search()">Go!</button>
                         </div>
                     </div>
                 </div>
@@ -117,15 +122,19 @@
         }
         const content = lastCardBody.textContent.toLocaleLowerCase();
         const searchTerm = input.value.trim().toLocaleLowerCase();
-        //console.log(searchTerm);
-        let control = content.includes(searchTerm);
-        if(!control){
-            alert("no match found!");
+        if(searchTerm != ""){
+            //console.log(searchTerm);
+            let control = content.includes(searchTerm);
+            if(!control){
+                alert("no match found!");
+            }else{
+                let text = lastCardBody.innerHTML.replace(/<mark>(.*?)<\/mark>/g, '$1');
+                let re = new RegExp(searchTerm,"g"); // search for all instances
+                let newText = text.replace(re, `<mark>${searchTerm}</mark>`);
+                lastCardBody.innerHTML = newText;
+            }
         }else{
-            let text = lastCardBody.innerHTML.replace(/<mark>(.*?)<\/mark>/g, '$1');
-            let re = new RegExp(searchTerm,"g"); // search for all instances
-            let newText = text.replace(re, `<mark>${searchTerm}</mark>`);
-            lastCardBody.innerHTML = newText;
+            alert("There is no search term found!")
         }
     }
 </script>

@@ -55,6 +55,24 @@ public class ProductController {
         return "product/product-list";
     }
 
+    @GetMapping("/filter")
+    public String filterProducts(@RequestParam(required = false) Category category,
+                                 @RequestParam(required = false) Double minPrice,
+                                 @RequestParam(required = false) Double maxPrice,
+                                 Model model){
+        List<ProductDto> products = productService.findAllProducts();
+        List<Category> categories = categoryService.findAllCategory();
+        products = products.stream()
+                    .filter(product -> category == null || product.getCategory().equals(category))
+                    .filter(product -> minPrice == null || product.getPrice() >= minPrice)
+                    .filter(product -> maxPrice == null || product.getPrice() <= maxPrice)
+                    .collect(Collectors.toList());
+
+        model.addAttribute("products", products);
+        model.addAttribute("categories", categories);
+        return "product/product-list";
+    }
+
     @GetMapping("/{productId}")
     public String getProductById(@PathVariable("productId") Long id,Model model){
         List<Category> categories = categoryService.findAllCategory();
@@ -85,6 +103,9 @@ public class ProductController {
                 .stream()
                 .map((product) -> productService.mapToProductDto(product))
                 .collect(Collectors.toList());
+
+        List<Category> categories = categoryService.findAllCategory();
+        model.addAttribute("categories", categories);
         model.addAttribute("products", products);
         model.addAttribute("currentPage", page_no);
         model.addAttribute("totalPages", page2.getTotalPages());

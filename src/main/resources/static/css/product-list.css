@@ -1,0 +1,155 @@
+.product-card {
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    margin-bottom: 20px;
+    background-color: #f9f9f9;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.product-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+.product-card .image-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+}
+
+.product-card img {
+    max-width: 80%;
+    height: 300px;
+    border-radius: 10px;
+}
+
+.product-card .content-info {
+    display: flex;
+    flex-direction: column; /* Metinleri dikey hizala */
+    align-items: flex-start; /* Metinleri üstten hizala */
+    margin-left: 45px;
+}
+
+.product-card .product-name {
+    font-size: 1.5rem;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.product-card .product-description {
+    font-size: 1rem;
+    color: #666;
+    margin-bottom: 15px;
+}
+
+.product-card .product-price {
+    font-size: 1.2rem;
+    color: #034993;
+}
+
+/* Form Konteyneri */
+.filter-form {
+    display: flex;
+    align-items: center;
+    gap: 15px; /* Elemanlar arası boşluk */
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 4px 4px 8px rgba(0, 0, 255, 0.2);
+}
+
+/* Form Elemanları */
+.filter-form .form-group {
+    display: flex;
+    flex-direction: column;
+    align-items: start;
+    gap: 5px;
+}
+
+/* Input ve Select Alanları */
+.filter-form input,
+.filter-form select {
+    min-width: 160px; /* Genişlik ayarı */
+    padding: 8px;
+    border: 2px solid #007bff; /* Mavi kenarlık */
+    border-radius: 5px;
+    outline: none;
+    transition: 0.3s;
+    flex-grow:1;
+}
+
+/* Hover ve Focus Efektleri */
+.filter-form input:hover,
+.filter-form select:hover,
+.filter-form input:focus,
+.filter-form select:focus {
+    border-color: #0056b3; /* Koyu mavi */
+    box-shadow: 0px 0px 8px rgba(0, 0, 255, 0.3);
+}
+
+/* Label Stili */
+.filter-form label {
+    font-weight: bold;
+    color: #0056b3; /* Mavi renk */
+}
+
+.view-add-buttons {
+    display: flex;
+    justify-content: space-between;
+    width: 60%;
+}
+
+/* Buton Stili */
+.filter-form button,
+.detail-button,
+.filter-btn {
+    background-color: #034993;
+    color: white;
+    border: none;
+    padding: 8px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: 0.3s;
+    margin-top: 24px;
+    text-decoration:none;
+}
+
+.filter-form button:hover,
+.detail-button:hover,
+.filter-btn:hover {
+    color:white;
+    background-color: #0056b3;
+}
+
+.btn-color{
+    display:flex;
+    gap:4px;
+    color:white;
+    background-color: #034993;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.btn-color:hover{
+    color:white;
+    background-color: #034993;
+    box-shadow: 0px 0px 8px rgba(0, 0, 255, 0.3);
+}
+
+.page-btn{
+    color:white;
+    background-color: #034993;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 5px;
+    transition: 0.3s;
+    text-decoration:none;
+}
+
+.page-btn:hover {
+    color:white;
+    box-shadow: 4px 4px 8px rgba(0, 0, 255, 0.3);
+    text-decoration:none;
+}

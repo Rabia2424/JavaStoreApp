@@ -6,9 +6,14 @@ import com.store.storeapp.Models.CartStatus;
 import com.store.storeapp.Models.Product;
 import com.store.storeapp.Repositories.CartItemRepository;
 import com.store.storeapp.Repositories.CartRepository;
+import com.store.storeapp.Services.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.CookieValue;
 
+import javax.transaction.Transactional;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -20,9 +25,16 @@ public class CartService {
     @Autowired
     private CartItemRepository cartItemRepository;
 
+    @Autowired
+    private AuthService authService;
+
     public Cart getCartByUserId(Long userId){
         return cartRepository.getCartByUserId(userId)
                 .orElse(null);
+    }
+
+    public Cart updateCart(Cart cart){
+        return cartRepository.save(cart);
     }
 
     public Cart deleteCartItemFromCart(Long userId, Product product) throws Exception {
@@ -49,14 +61,27 @@ public class CartService {
         existingCartItem = cartItemExistOrNot(cart, product);
         if(existingCartItem.isPresent()){
             CartItem cartItem = existingCartItem.get();
-            cartItem.setQuantity(cartItem.getQuantity() - 1);
-            cartItem.setTotalPrice(cartItem.getTotalPrice() - product.getPrice());
+            if(cartItem.getQuantity() == 1){
+                cart.getCartItems().remove(cartItem);
+            }else{
+                cartItem.setQuantity(cartItem.getQuantity() - 1);
+                cartItem.setTotalPrice(cartItem.getTotalPrice() - product.getPrice());
+            }
+
         }else{
             throw new Exception("Cart Item not found related this product");
         }
 
         cart.calculateTotalPayment(cart.getCartItems());
         return cartRepository.save(cart);
+    }
+
+    @Transactional
+    public void deleteAllCartItems(Cart cart) throws Exception {
+        List<CartItem> cartItemsCopy = new ArrayList<>(cart.getCartItems());
+        for(CartItem cartItem : cartItemsCopy){
+            deleteCartItemFromCart(cart.getUserId(), cartItem.getProduct());
+        }
     }
 
     public Cart addToCart(Long userId, Product product){
@@ -93,6 +118,7 @@ public class CartService {
             cart.getCartItems().add(cartItem);
         }
 
+        cart.setStatus(CartStatus.ACTIVE);
         cart.calculateTotalPayment(cart.getCartItems());
         return cartRepository.save(cart);
     }

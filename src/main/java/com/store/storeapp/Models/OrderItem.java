@@ -20,6 +20,7 @@ public class OrderItem {
     private Long id;
     @ManyToOne
     @JoinColumn(name="order_id", nullable = false)
+    @ToString.Exclude
     private Order order;
 
     @ManyToOne

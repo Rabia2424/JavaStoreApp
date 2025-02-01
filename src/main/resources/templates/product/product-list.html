@@ -4,59 +4,7 @@
         layout:decorate="~{layout}">
 <head>
     <title>Products</title>
-    <style>
-        .product-card {
-            border: 1px solid #ddd;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            padding: 20px;
-            margin-bottom: 20px;
-            background-color: #f9f9f9;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-        }
-
-        .product-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-        }
-
-        .product-card .image-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            width: 100%;
-        }
-
-        .product-card img {
-            max-width: 80%;
-            height: 300px;
-            border-radius: 10px;
-        }
-
-        .product-card .content-info {
-            display: flex;
-            flex-direction: column; /* Metinleri dikey hizala */
-            align-items: flex-start; /* Metinleri üstten hizala */
-            margin-left: 45px;
-        }
-
-        .product-card .product-name {
-            font-size: 1.5rem;
-            color: #333;
-            margin-bottom: 10px;
-        }
-
-        .product-card .product-description {
-            font-size: 1rem;
-            color: #666;
-            margin-bottom: 15px;
-        }
-
-        .product-card .product-price {
-            font-size: 1.2rem;
-            color: #007bff;
-        }
-    </style>
+    <link rel="stylesheet" th:href="@{/css/product-list.css}">
 </head>
 <body class="d-flex flex-column h-100">
 <main class="flex-shrink-0">
@@ -71,9 +19,8 @@
             </div>
             <div class="row gx-5">
                 <div class="my-4">
-                    <form th:action="@{/products/search}" class="form-inline my-2 my-lg-0 mb-3">
+                    <form th:action="@{/products/search}" class="form-inline my-2 my-lg-0 mb-3 filter-form">
                         <div class="d-flex align-items-center gap-3 w-100">
-                            <!-- Arama Kutusu -->
                             <input
                                     name="query"
                                     id="search"
@@ -82,9 +29,33 @@
                                     placeholder="Search product name or description"
                                     aria-label="Search"
                                     th:value="${param.query}">
-                            <button class="btn btn-info ml-2" type="submit">Search</button>
-                            <button class="btn btn-info" type="button" onclick="clearSearch()">Reset</button>
+                            <button class="btn ml-2 btn-color mt-1" type="submit">Search <i class="bi bi-search"></i></button>
+                            <button class="btn btn-color mt-1" type="button" onclick="clearSearch()">Reset <i class="bi bi-x-circle"></i></button>
                         </div>
+                    </form>
+                </div>
+                <div class="my-4">
+                    <form method="get" th:action="@{/products/filter}" class="filter-form">
+                        <div class="form-group">
+                            <label>Select Category: </label>
+                            <select name="category" th:value="${param.category}">
+                                <option value="">Select</option>
+                                <option th:each="category : ${categories}"
+                                        th:value="${category.id}"
+                                        th:text="${category.name}">
+                                </option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Min Price: </label>
+                            <input type="number" class="form-control" name="minPrice" th:value="${param.minPrice}">
+                        </div>
+                        <div class="form-group">
+                            <label>Max Price: </label>
+                            <input type="number" class="form-control" name="maxPrice" th:value="${param.maxPrice}">
+                        </div>
+                        <button type="submit">Filter <i class="bi bi-filter-circle"></i></button>
+                        <a class="filter-btn" th:href="@{/products/list}">Clear <i class="bi bi-x-circle"></i></a>
                     </form>
                 </div>
                 <div th:each="product :${products}" class="col-lg-6 mb-4">
@@ -102,8 +73,14 @@
                             <div class="product-price">
                                 <i>Product Price:</i> <span th:text="'$' + ${product.price}"></span>
                             </div>
-                            <div class="button">
-                                <a class="btn btn-primary" th:href="@{/products/{productId}(productId=${product.id})}">View Details</a>
+                            <div class="view-add-buttons">
+                                <a class="btn detail-button" th:href="@{/products/{productId}(productId=${product.id})}">View
+                                    Details</a>
+                                <form method="post" th:action="@{/cart/add/{id}(id=${product.id})}">
+                                    <button class="btn detail-button">Add
+                                        To Cart <i class="bi bi-cart-plus-fill"></i>
+                                    </button>
+                                </form>
                             </div>
                         </div>
                     </div>
@@ -119,22 +96,26 @@
                 </div>
                 <div class="col-sm-1">
             <span th:each="i: ${#numbers.sequence(1, totalPages)}">
-      <a th:if="${currentPage != i - 1}" th:href="@{'/products/page/' + ${i - 1}} + '?category_id=' + ${categoryId != null ? categoryId:''}">[[${i}]]</a>
+      <a th:if="${currentPage != i - 1}"
+         th:href="@{'/products/page/' + ${i - 1}} + '?category_id=' + ${categoryId != null ? categoryId:''}" class="page-btn">[[${i}]]</a>
       <span th:unless="${currentPage != i - 1}">[[${i}]]</span> &nbsp; &nbsp;
             </span>
                 </div>
                 <div class="col-sm-1">
-                    <a th:if="${currentPage < totalPages && currentPage > 0}" th:href="@{'/products/page/' + ${currentPage - 1} + '?category_id=' + ${categoryId != null ? categoryId:''}}">Before</a>
+                    <a th:if="${currentPage < totalPages && currentPage > 0}"
+                       th:href="@{'/products/page/' + ${currentPage - 1} + '?category_id=' + ${categoryId != null ? categoryId:''}}" class="page-btn">Before</a>
                     <span th:unless="${currentPage < totalPages && currentPage > 0}">Before</span>
                 </div>
 
                 <div class="col-sm-1">
-                    <a th:if="${currentPage < totalPages - 1}" th:href="@{'/products/page/' + ${currentPage + 1} + '?category_id=' + ${categoryId != null ? categoryId:''}}">Next</a>
+                    <a th:if="${currentPage < totalPages - 1}"
+                       th:href="@{'/products/page/' + ${currentPage + 1} + '?category_id=' + ${categoryId != null ? categoryId:''}}" class="page-btn">Next</a>
                     <span th:unless="${currentPage < totalPages - 1}">Next</span>
                 </div>
 
                 <div class="col-sm-1">
-                    <a th:if="${currentPage < totalPages - 1}" th:href="@{'/products/page/' + ${totalPages - 1} + '?category_id=' + ${categoryId != null ? categoryId:''}}">Last</a>
+                    <a th:if="${currentPage < totalPages - 1}"
+                       th:href="@{'/products/page/' + ${totalPages - 1} + '?category_id=' + ${categoryId != null ? categoryId:''}}" class="page-btn">Last</a>
                     <span th:unless="${currentPage < totalPages - 1}">Last</span>
                 </div>
             </div>

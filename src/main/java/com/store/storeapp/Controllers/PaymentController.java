@@ -16,10 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -41,7 +38,7 @@ public class PaymentController {
     @PostMapping("/process-payment")
     public String processPayment(@RequestParam("orderJson") String orderJson, @ModelAttribute CardInfo paymentCardInfo,
                                               BindingResult result,
-                                              Model model) throws JsonProcessingException {
+                                              Model model) throws Exception {
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());
         //System.out.println("Generated JSON: " + orderJson);
@@ -107,7 +104,9 @@ public class PaymentController {
 
         List<BasketItem> basketItems = new ArrayList<BasketItem>();
 
-        for (CartItem cartItem: cartService.getCartByUserId(order.getUserId()).getCartItems()){
+        Cart cart = cartService.getCartByUserId(order.getUserId());
+
+        for (CartItem cartItem: cart.getCartItems()){
             BasketItem basketItem = new BasketItem();
             basketItem.setId(cartItem.getId().toString());
             basketItem.setName(cartItem.getProduct().getName());
@@ -132,8 +131,14 @@ public class PaymentController {
         if ("success".equals(iyzicoPaymentResponse.getStatus())) {
             payment.setStatus("SUCCESS");
             payment.setIyzicoPaymentId(iyzicoPaymentResponse.getPaymentId());
+
             orderService.save(order);
             paymentService.savePayment(payment);
+
+            cartService.deleteAllCartItems(cart);
+            cart.setTotalPayment(cart.getTotalPayment());
+            cart.setStatus(CartStatus.COMPLETED);
+            cartService.updateCart(cart);
             return "payment/confirmation";
         } else {
             payment.setStatus("FAILURE");

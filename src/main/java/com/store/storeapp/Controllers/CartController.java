@@ -2,6 +2,7 @@ package com.store.storeapp.Controllers;
 
 import com.store.storeapp.DTOs.ProductDto;
 import com.store.storeapp.Models.Cart;
+import com.store.storeapp.Models.CartItem;
 import com.store.storeapp.Models.Product;
 import com.store.storeapp.Services.AuthService;
 import com.store.storeapp.Services.impl.CartService;
@@ -13,6 +14,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
+import java.util.List;
 
 @Controller
 @RequestMapping("/cart")
@@ -67,4 +69,5 @@ public class CartController {
         cartService.deleteOneItemFromCartItem(userId, product);
         return "redirect:/cart/list";
     }
+
 }

@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletResponse;
 import com.store.storeapp.Utils.JwtUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -44,7 +45,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         String servletPath = request.getServletPath();
 
-        // Direkt eşleşen yollar
         if (servletPath.equals("/") ||
                 servletPath.equals("/auth/login") ||
                 servletPath.equals("/auth/register") ||
@@ -87,10 +87,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
             SecurityContextHolder.getContext().setAuthentication(authenticationToken);
         }else {
-            // Token is null or empty, respond with an error
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.getWriter().write("Unauthorized: Please log in to access this resource.");
-            return; // Stop further processing
+            throw new AuthenticationException("Unauthorized"){};
         }
 
         isAuthenticatedWithJwtFromCookie(request);//This is for checking isAuthenticated actually with control they have claims in jwt.
