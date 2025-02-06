@@ -102,7 +102,9 @@
                                 Add <i class="bi bi-bag-plus-fill"></i>
                             </button>
                         </form>
-                        <form method="post" th:action="@{/cart/removeOneItem/{productId}(productId=${cartItem.product.id})}">
+                        <form method="post" th:action="@{/cart/removeOneItem}">
+                            <input type="hidden" name="id" th:value="${cartItem.product.id}">
+                            <input type="hidden" name="price" th:value="${cartItem.totalPrice / cartItem.quantity}">
                             <button type="submit" class="btn btn-sm btn-custom">
                                 <i style="font-size: 30px" class="bi bi-file-minus-fill"></i>
                             </button>

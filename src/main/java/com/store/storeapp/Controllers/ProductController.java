@@ -3,7 +3,9 @@ package com.store.storeapp.Controllers;
 import com.store.storeapp.DTOs.ProductDto;
 import com.store.storeapp.Models.Category;
 import com.store.storeapp.Models.Product;
+import com.store.storeapp.Models.ProductDiscount;
 import com.store.storeapp.Services.impl.CategoryService;
+import com.store.storeapp.Services.impl.ProductDiscountService;
 import com.store.storeapp.Services.impl.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -29,6 +31,9 @@ public class ProductController {
     @Autowired
     private CategoryService categoryService;
     private ProductService productService;
+
+    @Autowired
+    private ProductDiscountService discountService;
 
     public ProductController(ProductService productService){
         this.productService = productService;
@@ -56,17 +61,17 @@ public class ProductController {
     }
 
     @GetMapping("/filter")
-    public String filterProducts(@RequestParam(required = false) Category category,
+    public String filterProducts(@RequestParam(required = false) Long categoryId,
                                  @RequestParam(required = false) Double minPrice,
                                  @RequestParam(required = false) Double maxPrice,
                                  Model model){
         List<ProductDto> products = productService.findAllProducts();
         List<Category> categories = categoryService.findAllCategory();
         products = products.stream()
-                    .filter(product -> category == null || product.getCategory().equals(category))
-                    .filter(product -> minPrice == null || product.getPrice() >= minPrice)
-                    .filter(product -> maxPrice == null || product.getPrice() <= maxPrice)
-                    .collect(Collectors.toList());
+                .filter(product -> categoryId == null || product.getCategory().getId().equals(categoryId))
+                .filter(product -> minPrice == null || product.getPrice() >= minPrice)
+                .filter(product -> maxPrice == null || product.getPrice() <= maxPrice)
+                .collect(Collectors.toList());
 
         model.addAttribute("products", products);
         model.addAttribute("categories", categories);
@@ -77,8 +82,10 @@ public class ProductController {
     public String getProductById(@PathVariable("productId") Long id,Model model){
         List<Category> categories = categoryService.findAllCategory();
         ProductDto productDto = productService.getProductById(id);
+        ProductDiscount discount = discountService.getValidDiscountByProductId(id);
         model.addAttribute("productDto", productDto);
         model.addAttribute("categories", categories);
+        model.addAttribute("discount", discount);
         return "product/product-detail";
     }
 
@@ -101,7 +108,16 @@ public class ProductController {
         }
         List<ProductDto> products = page2.getContent()
                 .stream()
-                .map((product) -> productService.mapToProductDto(product))
+                .map((product) -> {
+                    ProductDiscount productDiscount = discountService.getValidDiscountByProductId(product.getId());
+                    ProductDto productDto =  productService.mapToProductDto(product);
+                    if(productDiscount != null){
+                        productDto.setDiscountRate(productDiscount.getDiscountRate());
+                    }else{
+                        productDto.setDiscountRate(0.0);
+                    }
+                    return productDto;
+                })
                 .collect(Collectors.toList());
 
         List<Category> categories = categoryService.findAllCategory();

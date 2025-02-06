@@ -33,7 +33,7 @@ public class Cart {
     public void calculateTotalPayment(List<CartItem> cartItems){
         totalPayment = 0.0;
         for(CartItem cartItem: cartItems){
-            totalPayment += cartItem.getProduct().getPrice() * cartItem.getQuantity();
+            totalPayment += cartItem.getTotalPrice();
         }
     }
 }

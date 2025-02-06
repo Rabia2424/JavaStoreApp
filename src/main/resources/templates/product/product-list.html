@@ -38,11 +38,12 @@
                     <form method="get" th:action="@{/products/filter}" class="filter-form">
                         <div class="form-group">
                             <label>Select Category: </label>
-                            <select name="category" th:value="${param.category}">
+                            <select name="categoryId" th:value="${param.categoryId}">
                                 <option value="">Select</option>
                                 <option th:each="category : ${categories}"
                                         th:value="${category.id}"
-                                        th:text="${category.name}">
+                                        th:text="${category.name}"
+                                        th:selected="${category.id == categoryId}">
                                 </option>
                             </select>
                         </div>
@@ -62,6 +63,10 @@
                     <div class="product-card">
                         <div class="image-container">
                             <img th:src="${product.imageUrl}" alt="Product image" class="mb-3"/>
+                        </div>
+                        <div th:if="${!product.discountRate.equals(0.0)}" class="discount-info">
+                            <span class="discount-label" th:text="'%' + ${product.discountRate} + ' OFF'"></span>
+                            <span class="surprise-icon" title="Surprise Discount!">🎉</span>
                         </div>
                         <div class="content-info">
                             <div class="product-name">
@@ -89,7 +94,7 @@
             </div>
         </div>
 
-        <div th:if="${totalPages > 1}">
+        <div th:if="${totalPages > 1}" class="pagination">
             <div class="row col-sm-10">
                 <div class="col-sm-2">
                     Total Rows: [[${totalItems}]]

@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 
 import jakarta.servlet.http.HttpServletRequest.*;
 import java.io.IOException;
+import java.io.PrintWriter;
 
 @Component
 public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
@@ -20,7 +21,14 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
                          AuthenticationException authException) throws IOException, ServletException {
 
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-        response.getWriter().write("Unauthorized: Please log in to access this resource.");
+
+        response.setContentType("text/html");// Send to as html type
+        PrintWriter writer = response.getWriter();
+        writer.write("<html><body>");
+        writer.write("<h2>Unauthorized Access</h2>");
+        writer.write("<p>You need to <a href='/auth/login'>log in</a> to access this resource.</p>");
+        writer.write("</body></html>");
+
     }
 
 }

@@ -6,6 +6,9 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.store.storeapp.Models.Role;
+import com.store.storeapp.Models.User;
+import com.store.storeapp.Services.impl.UserService;
 import com.store.storeapp.Utils.JwtUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -19,6 +22,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Date;
 
 // Execute Before Executing Spring Security Filters
@@ -30,12 +34,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private UserDetailsService userDetailsService;
     private JwtUtils jwtUtils;
+    private UserService userService;
 
     @Autowired
-    public JwtAuthenticationFilter(JwtTokenProvider jwtTokenProvider, UserDetailsService userDetailsService, JwtUtils jwtUtils) {
+    public JwtAuthenticationFilter(JwtTokenProvider jwtTokenProvider, UserDetailsService userDetailsService, JwtUtils jwtUtils, UserService userService) {
         this.jwtTokenProvider = jwtTokenProvider;
         this.userDetailsService = userDetailsService;
         this.jwtUtils = jwtUtils;
+        this.userService = userService;
     }
 
     @Override
@@ -55,7 +61,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 servletPath.startsWith("/js/") ||
                 servletPath.startsWith("/images/") ||
                 servletPath.equals("/errorPage")) {
-            isAuthenticatedWithJwtFromCookie(request);
+            try {
+                isAuthenticatedWithJwtFromCookie(request);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
             filterChain.doFilter(request, response);
             return;
         }
@@ -90,7 +100,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             throw new AuthenticationException("Unauthorized"){};
         }
 
-        isAuthenticatedWithJwtFromCookie(request);//This is for checking isAuthenticated actually with control they have claims in jwt.
+        try {
+            isAuthenticatedWithJwtFromCookie(request);//This is for checking isAuthenticated actually with control they have claims in jwt.
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
         filterChain.doFilter(request, response);
     }
 
@@ -113,10 +127,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         return null;
     }
 
-    private void isAuthenticatedWithJwtFromCookie(HttpServletRequest request) {
+    private void isAuthenticatedWithJwtFromCookie(HttpServletRequest request) throws Exception {
         Cookie[] cookies = request.getCookies();
         String jwt = null;
         String username = null;
+        User user = null;
+        boolean containsAdminRole = false;
         if(cookies != null){
             for(Cookie cookie: cookies){
                 if("jwt".equals(cookie.getName())){
@@ -128,8 +144,19 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         if(jwt != null && jwtUtils.isAuthenticated(jwt)){
             username = jwtTokenProvider.getUsername(jwt);
+            user = userService.getUserById(jwtTokenProvider.getUserId(jwt)).orElseThrow(()-> new Exception("Error happened!"));
+            for(Role role : user.getRoles()){
+                if(role.getName().equals("ROLE_ADMIN")){
+                    containsAdminRole = true;
+                    break;
+                }else{
+                    containsAdminRole = false;
+                }
+            }
+
             request.setAttribute("isAuthenticated", true);
             request.setAttribute("username", username);
+            request.setAttribute("hasAdminRole", containsAdminRole);
         }else{
             request.setAttribute("isAuthenticated", false);
         }

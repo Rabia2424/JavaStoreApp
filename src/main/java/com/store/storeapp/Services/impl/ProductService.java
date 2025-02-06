@@ -5,6 +5,7 @@ import com.store.storeapp.Models.Product;
 import com.store.storeapp.Repositories.ProductRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -31,6 +32,10 @@ public class ProductService {
     public List<ProductDto> searchProducts(String query){
         List<Product> products = productRepository.searchProducts(query);
         return products.stream().map((product) -> mapToProductDto(product)).collect(Collectors.toList());
+    }
+
+    public Page<Product> getPopularProducts(Pageable pageable){
+        return productRepository.getPopularProducts(pageable);
     }
 
     public Product saveProduct(Product product){
@@ -80,4 +85,11 @@ public class ProductService {
     }
 
     public Page<Product> findAllByCategoryId(Pageable pageable, Long categoryId) { return productRepository.getProductsByCategoryId(categoryId,pageable);}
+
+    public Page<Product> findFilteredProducts(Pageable pageable,
+                                              @Param("categoryId") Long categoryId,
+                                              @Param("minPrice") Double minPrice,
+                                              @Param("maxPrice") Double maxPrice){
+        return productRepository.findFilteredProducts(categoryId, minPrice, maxPrice, pageable);
+    }
 }

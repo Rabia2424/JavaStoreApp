@@ -5,15 +5,43 @@
 <head>
     <title>Product Detail</title>
     <style>
+        .custom-img-container{
+            display: flex;
+            justify-content: center;
+        }
         .custom-img {
             width: 100%; /* Resmi konteynır genişliğine göre ayarla */
-            max-height: 500px; /* Maksimum yükseklik */
-            object-fit: cover; /* Resmin orantılı şekilde yerleşmesini sağlar */
+            height: 500px; /* Maksimum yükseklik */
+            max-width: 350px;
+            object-fit: contain;
         }
+
         .add-to-cart-btn {
             background-color: #034993;
-            color:white;
-            margin:10px;
+            color: white;
+            margin: 10px;
+        }
+        .discount-info {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: #034993;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 10px;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .discount-label {
+            font-weight: bold;
+        }
+
+        .surprise-icon {
+            font-size: 20px;
+            margin-left: 8px;
         }
     </style>
 </head>
@@ -34,7 +62,10 @@
             <div class="col-lg-7">
                 <!-- Featured blog post-->
                 <div class="card mb-4">
-                    <a href="#!"><img class="card-img-top custom-img" th:src="${productDto.imageUrl}" alt="..." /></a>
+                    <div class="custom-img-container">
+                        <a href="#!"><img class="card-img-top custom-img" th:src="${productDto.imageUrl}"
+                                          alt="..."/></a>
+                    </div>
                     <div class="card-body">
                         <div class="small text-muted" th:text="${productDto.createdOn}"></div>
                         <h2 class="card-title">Find your interest</h2>
@@ -43,15 +74,20 @@
                         <p class="card-text" th:text="${productDto.stockQuantity}"></p>
                         <p class="card-text" th:text="${productDto.category.name}"></p>
                     </div>
+                    <div th:if="${discount != null}" class="discount-info">
+                        <span class="discount-label" th:text="'%' + ${discount.discountRate} + ' OFF'"></span>
+                        <span class="surprise-icon" title="Surprise Discount!">🎉</span>
+                    </div>
                     <form method="post" th:action="@{/cart/add/{id}(id=${productDto.id})}">
                         <button type="submit" class="btn add-to-cart-btn">Add to Cart</button>
                     </form>
                 </div>
                 <!-- Pagination-->
                 <nav aria-label="Pagination">
-                    <hr class="my-0" />
+                    <hr class="my-0"/>
                     <ul class="pagination justify-content-center my-4">
-                        <li class="page-item disabled"><a class="page-link" href="#" tabindex="-1" aria-disabled="true">Newer</a></li>
+                        <li class="page-item disabled"><a class="page-link" href="#" tabindex="-1" aria-disabled="true">Newer</a>
+                        </li>
                         <li class="page-item active" aria-current="page"><a class="page-link" href="#!">1</a></li>
                         <li class="page-item"><a class="page-link" href="#!">2</a></li>
                         <li class="page-item"><a class="page-link" href="#!">3</a></li>
@@ -69,8 +105,11 @@
                     <div class="card-header">Search</div>
                     <div class="card-body">
                         <div class="input-group">
-                            <input id="query" class="form-control" type="text" placeholder="Enter search term..." aria-label="Enter search term..." aria-describedby="button-search" />
-                            <button class="btn" id="button-search" style="background-color: #034993; color:white;" type="button" onclick="search()">Go!</button>
+                            <input id="query" class="form-control" type="text" placeholder="Enter search term..."
+                                   aria-label="Enter search term..." aria-describedby="button-search"/>
+                            <button class="btn" id="button-search" style="background-color: #034993; color:white;"
+                                    type="button" onclick="search()">Go!
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -81,7 +120,8 @@
                         <div class="row">
                             <div class="col-sm-6">
                                 <ul th:each="category :${categories}" class="list-unstyled mb-0">
-                                    <li><a th:href="@{/products/list/{categoryId}(categoryId= ${category.id})}" th:text="${category.name}"></a></li>
+                                    <li><a th:href="@{/products/list/{categoryId}(categoryId= ${category.id})}"
+                                           th:text="${category.name}"></a></li>
                                 </ul>
                             </div>
                         </div>
@@ -90,8 +130,12 @@
                 <!-- Side widget-->
                 <div class="card mb-4">
                     <div class="card-header">Side Widget</div>
-                    <div class="card-body">You can put anything you want inside of these side widgets. They are easy to use, and feature the Bootstrap 5 card component!
-                    <hr style="color:#0f0;height: 3px">You can put anything you want inside of these side widgets. They are easy to use, and feature the Bootstrap 5 card component!</div>
+                    <div class="card-body">You can put anything you want inside of these side widgets. They are easy to
+                        use, and feature the Bootstrap 5 card component!
+                        <hr style="color:#0f0;height: 3px">
+                        You can put anything you want inside of these side widgets. They are easy to use, and feature
+                        the Bootstrap 5 card component!
+                    </div>
                 </div>
             </div>
         </div>
@@ -101,39 +145,40 @@
 </html>
 <script>
     let input = document.getElementById("query");
-    input.addEventListener("keyup",(e) => {
-        if(input.value.trim() === ""){
+    input.addEventListener("keyup", (e) => {
+        if (input.value.trim() === "") {
             targets = document.querySelectorAll("mark");
             for (let target of targets) {
-                target.outerHTML=target.innerHTML;
+                target.outerHTML = target.innerHTML;
             }
             location.replace(`/products/${productDto.id}`);
-        }else if(e.key === "Enter"){
+        } else if (e.key === "Enter") {
             search();
         }
     })
-    function search(){
+
+    function search() {
         const cardBodies = document.querySelectorAll(".card-body");
         const lastCardBody = cardBodies[cardBodies.length - 1];
-        if(lastCardBody){
+        if (lastCardBody) {
             console.log(lastCardBody.textContent);
-        }else{
+        } else {
             console.log("No card-body elements found!");
         }
         const content = lastCardBody.textContent.toLocaleLowerCase();
         const searchTerm = input.value.trim().toLocaleLowerCase();
-        if(searchTerm != ""){
+        if (searchTerm != "") {
             //console.log(searchTerm);
             let control = content.includes(searchTerm);
-            if(!control){
+            if (!control) {
                 alert("no match found!");
-            }else{
+            } else {
                 let text = lastCardBody.innerHTML.replace(/<mark>(.*?)<\/mark>/g, '$1');
-                let re = new RegExp(searchTerm,"g"); // search for all instances
+                let re = new RegExp(searchTerm, "g"); // search for all instances
                 let newText = text.replace(re, `<mark>${searchTerm}</mark>`);
                 lastCardBody.innerHTML = newText;
             }
-        }else{
+        } else {
             alert("There is no search term found!")
         }
     }

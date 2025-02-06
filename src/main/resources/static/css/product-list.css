@@ -6,6 +6,7 @@
     margin-bottom: 20px;
     background-color: #f9f9f9;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
+    position:relative;
 }
 
 .product-card:hover {
@@ -28,8 +29,8 @@
 
 .product-card .content-info {
     display: flex;
-    flex-direction: column; /* Metinleri dikey hizala */
-    align-items: flex-start; /* Metinleri üstten hizala */
+    flex-direction: column;
+    align-items: flex-start;
     margin-left: 45px;
 }
 
@@ -54,10 +55,11 @@
 .filter-form {
     display: flex;
     align-items: center;
-    gap: 15px; /* Elemanlar arası boşluk */
+    gap: 15px;
     padding: 15px;
     border-radius: 8px;
     box-shadow: 4px 4px 8px rgba(0, 0, 255, 0.2);
+    flex-wrap: wrap; /* Allow form elements to wrap in smaller screens */
 }
 
 /* Form Elemanları */
@@ -71,13 +73,13 @@
 /* Input ve Select Alanları */
 .filter-form input,
 .filter-form select {
-    min-width: 160px; /* Genişlik ayarı */
+    min-width: 160px;
     padding: 8px;
-    border: 2px solid #007bff; /* Mavi kenarlık */
+    border: 2px solid #007bff;
     border-radius: 5px;
     outline: none;
     transition: 0.3s;
-    flex-grow:1;
+    flex-grow: 1;
 }
 
 /* Hover ve Focus Efektleri */
@@ -85,14 +87,14 @@
 .filter-form select:hover,
 .filter-form input:focus,
 .filter-form select:focus {
-    border-color: #0056b3; /* Koyu mavi */
+    border-color: #0056b3;
     box-shadow: 0px 0px 8px rgba(0, 0, 255, 0.3);
 }
 
 /* Label Stili */
 .filter-form label {
     font-weight: bold;
-    color: #0056b3; /* Mavi renk */
+    color: #0056b3;
 }
 
 .view-add-buttons {
@@ -113,43 +115,148 @@
     cursor: pointer;
     transition: 0.3s;
     margin-top: 24px;
-    text-decoration:none;
+    text-decoration: none;
 }
 
 .filter-form button:hover,
 .detail-button:hover,
 .filter-btn:hover {
-    color:white;
+    color: white;
     background-color: #0056b3;
 }
 
-.btn-color{
-    display:flex;
-    gap:4px;
-    color:white;
+.btn-color {
+    display: flex;
+    gap: 4px;
+    color: white;
     background-color: #034993;
     cursor: pointer;
     transition: 0.3s;
 }
 
-.btn-color:hover{
-    color:white;
+.btn-color:hover {
+    color: white;
     background-color: #034993;
     box-shadow: 0px 0px 8px rgba(0, 0, 255, 0.3);
 }
 
-.page-btn{
-    color:white;
+.page-btn {
+    color: white;
     background-color: #034993;
     cursor: pointer;
     padding: 4px;
     border-radius: 5px;
     transition: 0.3s;
-    text-decoration:none;
+    text-decoration: none;
 }
 
 .page-btn:hover {
-    color:white;
+    color: white;
     box-shadow: 4px 4px 8px rgba(0, 0, 255, 0.3);
-    text-decoration:none;
+    text-decoration: none;
+}
+
+.discount-info {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background-color: #034993;
+    color: white;
+    padding: 8px 15px;
+    border-radius: 10px;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.discount-label {
+    font-weight: bold;
+}
+
+.surprise-icon {
+    font-size: 20px;
+    margin-left: 8px;
+}
+
+/* Responsive Design for Smaller Screens */
+@media (max-width: 768px) {
+    .product-card {
+        margin: 10px 0;
+    }
+
+    .product-card .image-container {
+        justify-content: flex-start;
+    }
+
+    .product-card .content-info {
+        margin-left: 0;
+        align-items: center;
+    }
+
+    .product-card img {
+        max-width: 100%;
+        height: auto;
+    }
+
+    .view-add-buttons{
+        flex-direction: column;
+        width: 100%;
+        align-items: center;
+    }
+
+    .filter-form {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .filter-form .form-group {
+        width: 100%;
+    }
+
+    .filter-form input,
+    .filter-form select {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+
+    .filter-form button,
+    .detail-button,
+    .filter-btn {
+        width: 100%;
+        margin-top: 10px;
+    }
+
+    .view-add-buttons button {
+        width: 100%;
+        margin-top: 10px;
+    }
+}
+
+@media (max-width: 480px) {
+    .product-card {
+        padding: 15px;
+    }
+
+    .product-card .product-name,
+    .product-card .product-description,
+    .product-card .product-price {
+        font-size: 1rem;
+    }
+
+    .filter-form {
+        gap: 10px;
+    }
+
+    .filter-form input,
+    .filter-form select {
+        padding: 10px;
+    }
+
+    .filter-form button,
+    .detail-button,
+    .filter-btn {
+        padding: 10px;
+    }
 }
