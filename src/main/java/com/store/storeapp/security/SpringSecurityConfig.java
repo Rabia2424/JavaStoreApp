@@ -50,7 +50,7 @@ public class SpringSecurityConfig {
                 .authorizeRequests(authorize -> {
                     // Allow access to static resources
                     authorize.antMatchers("/assets/**", "/css/**", "/js/**", "/images/**").permitAll();
-                    authorize.antMatchers("/", "/auth/**", "/products/list", "/errorPage").permitAll();
+                    authorize.antMatchers("/", "/auth/**", "/products/list", "/errorPage", "/admin/products/new").permitAll();
                     authorize.antMatchers("/category/new", "/products/new").hasRole("ADMIN");
                     authorize.antMatchers("/admin/**").hasRole("ADMIN");
                     authorize.antMatchers(HttpMethod.GET, "/api/**").hasAnyRole("ADMIN", "USER");
@@ -58,10 +58,10 @@ public class SpringSecurityConfig {
                     authorize.anyRequest().authenticated(); // Tüm diğer isteklerde kimlik doğrulaması yapılır
                 })
                 .exceptionHandling()
-                .authenticationEntryPoint(authenticationEntryPoint) // 401 Unauthorized işlemi
-                .accessDeniedHandler(accessDeniedHandler) // 403 Forbidden işlemi
+                .authenticationEntryPoint(authenticationEntryPoint) // 401 Unauthorized
+                .accessDeniedHandler(accessDeniedHandler) // 403 Forbidden
                 .and()
-                .addFilterBefore(authenticationFilter, UsernamePasswordAuthenticationFilter.class); // JWT Filter ekleniyor
+                .addFilterBefore(authenticationFilter, UsernamePasswordAuthenticationFilter.class); // JWT Filter added
 
         return http.build();
     }

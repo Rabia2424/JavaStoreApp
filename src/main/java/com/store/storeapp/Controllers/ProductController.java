@@ -55,7 +55,8 @@ public class ProductController {
 
     @GetMapping ("/search")
     public String searchProducts(@RequestParam("query") String query, Model model){
-        List<ProductDto> products = productService.searchProducts(query);
+        List<Product> searchedProducts = productService.searchProducts(query);
+        List<ProductDto> products = productService.mapToProductDtoWithDiscounts(searchedProducts);
         model.addAttribute("products", products);
         return "product/product-list";
     }
@@ -65,7 +66,7 @@ public class ProductController {
                                  @RequestParam(required = false) Double minPrice,
                                  @RequestParam(required = false) Double maxPrice,
                                  Model model){
-        List<ProductDto> products = productService.findAllProducts();
+        List<Product> products = productService.findAllProducts().stream().map(productDto -> productService.mapToProduct(productDto)).collect(Collectors.toList());
         List<Category> categories = categoryService.findAllCategory();
         products = products.stream()
                 .filter(product -> categoryId == null || product.getCategory().getId().equals(categoryId))
@@ -73,7 +74,10 @@ public class ProductController {
                 .filter(product -> maxPrice == null || product.getPrice() <= maxPrice)
                 .collect(Collectors.toList());
 
-        model.addAttribute("products", products);
+        List<ProductDto> productsWithDiscounts = productService.mapToProductDtoWithDiscounts(products);
+
+
+        model.addAttribute("products", productsWithDiscounts);
         model.addAttribute("categories", categories);
         return "product/product-list";
     }
@@ -106,19 +110,7 @@ public class ProductController {
         }else{
             page2 = productService.findAll(pageable);
         }
-        List<ProductDto> products = page2.getContent()
-                .stream()
-                .map((product) -> {
-                    ProductDiscount productDiscount = discountService.getValidDiscountByProductId(product.getId());
-                    ProductDto productDto =  productService.mapToProductDto(product);
-                    if(productDiscount != null){
-                        productDto.setDiscountRate(productDiscount.getDiscountRate());
-                    }else{
-                        productDto.setDiscountRate(0.0);
-                    }
-                    return productDto;
-                })
-                .collect(Collectors.toList());
+        List<ProductDto> products = productService.mapToProductDtoWithDiscounts(page2.getContent());
 
         List<Category> categories = categoryService.findAllCategory();
         model.addAttribute("categories", categories);

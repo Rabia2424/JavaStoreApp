@@ -124,13 +124,9 @@ public class CartService {
     }
 
     public Optional<CartItem> cartItemExistOrNot(Cart cart, Product product){
-        if(cartItemRepository.getCartItemsByCartId(cart.getCartId()) != null){
             return cart.getCartItems().stream()
                     .filter(cartItem -> cartItem.getProduct().getId().equals(product.getId()))
                     .findFirst();
-        }else{
-            return Optional.empty();
-        }
     }
 
 }

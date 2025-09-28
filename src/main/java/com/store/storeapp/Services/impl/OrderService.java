@@ -6,6 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -17,6 +19,8 @@ public class OrderService {
     private OrderRepository orderRepository;
     @Autowired
     private CartService cartService;
+    @Autowired
+    private InventoryService inventoryService;
 
     public Order getOrderObject(Cart cart){
         Order order = new Order();
@@ -43,7 +47,11 @@ public class OrderService {
                 .collect(Collectors.toList());
         return orders;
     }
+
+    @Transactional
     public Order save(Order order){
+        orderRepository.save(order);
+
         List<CartItem> cartItemList = cartService.getCartByUserId(order.getUserId()).getCartItems();
         List<OrderItem> orderItemList = cartItemList.stream().map(cartItem -> {
             OrderItem orderItem = new OrderItem();
@@ -53,6 +61,10 @@ public class OrderService {
             orderItem.setQuantity(cartItem.getQuantity());
             orderItem.setUnitPrice(cartItem.getProduct().getPrice());
             orderItem.setTotalPrice(cartItem.getTotalPrice());
+
+            Duration ttl = Duration.ofMinutes(20);
+            inventoryService.reserveForOrder(order.getOrderId(),orderItem.getProduct().getId(),
+                    orderItem.getQuantity(),ttl);
             return orderItem;
         }).collect(Collectors.toList());
         order.setOrderItems(orderItemList);

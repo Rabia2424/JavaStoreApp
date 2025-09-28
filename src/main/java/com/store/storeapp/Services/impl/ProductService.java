@@ -2,7 +2,9 @@ package com.store.storeapp.Services.impl;
 
 import com.store.storeapp.DTOs.ProductDto;
 import com.store.storeapp.Models.Product;
+import com.store.storeapp.Models.ProductDiscount;
 import com.store.storeapp.Repositories.ProductRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.repository.query.Param;
@@ -14,6 +16,11 @@ import java.util.stream.Collectors;
 @Service
 public class ProductService {
     private ProductRepository productRepository;
+    @Autowired
+    private ProductDiscountService discountService;
+
+    @Autowired
+    private CategoryService categoryService;
 
     public ProductService(ProductRepository productRepository){
         this.productRepository = productRepository;
@@ -29,9 +36,9 @@ public class ProductService {
         return mapToProductDto(product);
     }
 
-    public List<ProductDto> searchProducts(String query){
+    public List<Product> searchProducts(String query){
         List<Product> products = productRepository.searchProducts(query);
-        return products.stream().map((product) -> mapToProductDto(product)).collect(Collectors.toList());
+        return products;
     }
 
     public Page<Product> getPopularProducts(Pageable pageable){
@@ -63,6 +70,20 @@ public class ProductService {
                 .category(product.getCategory())
                 .build();
         return productDto;
+    }
+
+    public List<ProductDto> mapToProductDtoWithDiscounts(List<Product> products){
+        return products.stream()
+                .map((product) -> {
+                    ProductDiscount productDiscount = discountService.getValidDiscountByProductId(product.getId());
+                    ProductDto productDto =  mapToProductDto(product);
+                    if(productDiscount != null){
+                        productDto.setDiscountRate(productDiscount.getDiscountRate());
+                    }else{
+                        productDto.setDiscountRate(0.0);
+                    }
+                    return productDto;
+                }).collect(Collectors.toList());
     }
 
     public Product mapToProduct(ProductDto productDto){

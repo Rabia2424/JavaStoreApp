@@ -8,10 +8,7 @@ import com.iyzipay.model.*;
 import com.iyzipay.model.Payment;
 import com.iyzipay.request.CreatePaymentRequest;
 import com.store.storeapp.Models.*;
-import com.store.storeapp.Services.impl.CartService;
-import com.store.storeapp.Services.impl.OrderService;
-import com.store.storeapp.Services.impl.PaymentService;
-import com.store.storeapp.Services.impl.UserService;
+import com.store.storeapp.Services.impl.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -34,6 +31,8 @@ public class PaymentController {
     private OrderService orderService;
     @Autowired
     private UserService userService;
+    @Autowired
+    private InventoryService inventoryService;
 
     @PostMapping("/process-payment")
     public String processPayment(@RequestParam("orderJson") String orderJson, @ModelAttribute CardInfo paymentCardInfo,
@@ -135,6 +134,8 @@ public class PaymentController {
             orderService.save(order);
             paymentService.savePayment(payment);
 
+            inventoryService.consumeReservations(order.getOrderId());
+
             cartService.deleteAllCartItems(cart);
             cart.setTotalPayment(cart.getTotalPayment());
             cart.setStatus(CartStatus.COMPLETED);
@@ -143,6 +144,9 @@ public class PaymentController {
         } else {
             payment.setStatus("FAILURE");
             payment.setErrorMessage(iyzicoPaymentResponse.getErrorMessage());
+
+            inventoryService.releaseReservations(order.getOrderId());
+
             return "payment/failure";
         }
     }

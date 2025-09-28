@@ -60,6 +60,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 servletPath.startsWith("/css/") ||
                 servletPath.startsWith("/js/") ||
                 servletPath.startsWith("/images/") ||
+                servletPath.startsWith("/admin/products/new") ||
                 servletPath.equals("/errorPage")) {
             try {
                 isAuthenticatedWithJwtFromCookie(request);

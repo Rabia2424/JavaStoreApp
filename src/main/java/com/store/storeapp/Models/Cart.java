@@ -30,6 +30,11 @@ public class Cart {
     @JsonIgnore
     private List<CartItem> cartItems = new ArrayList<>();
 
+    public List<CartItem> getCartItems() {
+        if (cartItems == null) cartItems = new ArrayList<>();
+        return cartItems;
+    }
+
     public void calculateTotalPayment(List<CartItem> cartItems){
         totalPayment = 0.0;
         for(CartItem cartItem: cartItems){
