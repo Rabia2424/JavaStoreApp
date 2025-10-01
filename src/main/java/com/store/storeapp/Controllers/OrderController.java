@@ -34,10 +34,11 @@ public class OrderController {
 
     @PostMapping("/add")
     public String saveOrder(@ModelAttribute Order order, Model model) throws JsonProcessingException {
+        Order newOrder = orderService.save(order);
         // Order nesnesini JSON formatına dönüştür
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule()); // Register Java 8 DateTime modules.
-        String orderJson = objectMapper.writeValueAsString(order);
+        String orderJson = objectMapper.writeValueAsString(newOrder);
         //System.out.println("Generated JSON: " + orderJson);
         CardInfo paymentCard = new CardInfo();
         model.addAttribute("orderJson", orderJson);

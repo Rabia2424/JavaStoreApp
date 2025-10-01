@@ -40,9 +40,10 @@ public class InventoryService {
         res.setQty(qty);
         res.setExpiresAt(LocalDateTime.now().plus(ttl));
         res.setStatus(ReservationStatus.ACTIVE);
-        reservationRepo.save(res);
 
-        System.out.println(reservationRepo.save(res));
+        Reservation saved = reservationRepo.save(res);
+
+        System.out.println("Reservation created: " + saved);
     }
 
     @Transactional
@@ -97,8 +98,17 @@ public class InventoryService {
             Inventory inv = inventoryRepo.findForUpdate(r.getProduct().getId())
                     .orElseThrow(() -> new IllegalStateException("Inventory not found"));
 
+            System.out.println("Debug reserved=" + inv.getReserved()
+                    + ", onHand=" + inv.getOnHand()
+                    + ", qty=" + r.getQty()
+                    );
+
             inv.setReserved(inv.getReserved() - r.getQty());
             inventoryRepo.save(inv);
+
+            System.out.println("After reserved=" + inv.getReserved()
+                    + ", onHand=" + inv.getOnHand()
+                    );
 
             r.setStatus(ReservationStatus.RELEASED);
         }

@@ -1,8 +1,9 @@
 package com.store.storeapp.Models;
 
 public enum OrderStatus {
+    CREATED,
     PENDING,
-    CONFIRMED,
     SHIPPED,
-    DELIVERED
+    DELIVERED,
+    CANCELLED
 }

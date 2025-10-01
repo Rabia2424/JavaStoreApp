@@ -27,7 +27,7 @@ public class OrderService {
         order.setUserId(cart.getUserId());
         order.setTotalAmount(cart.getTotalPayment());
         order.setOrderDate(LocalDateTime.now());
-        order.setStatus(OrderStatus.PENDING);
+        order.setStatus(OrderStatus.CREATED);
         return order;
     }
 
@@ -73,5 +73,15 @@ public class OrderService {
 
     public void update(Order order){
         orderRepository.save(order);
+    }
+
+    @Transactional
+    public void markPending(Long orderId, OrderStatus status){
+        orderRepository.updateStatus(orderId,status);
+    }
+
+    @Transactional
+    public void markCancelled(Long orderId, OrderStatus status){
+        orderRepository.updateStatus(orderId, status);
     }
 }

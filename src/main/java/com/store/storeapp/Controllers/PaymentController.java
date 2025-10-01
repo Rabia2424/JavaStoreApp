@@ -66,14 +66,15 @@ public class PaymentController {
         paymentCard.setExpireYear(paymentCardInfo.getExpireYear());
         paymentCard.setCvc(paymentCardInfo.getCvc());
         paymentCard.setRegisterCard(0);
+
         request.setPaymentCard(paymentCard);
 
         User user = userService.getUserById(order.getUserId()).orElse(null);
 
         Buyer buyer = new Buyer();
         buyer.setId(user.getId().toString());
-        buyer.setName(user.getName());
-        buyer.setSurname(user.getName());
+        buyer.setName("Alya");
+        buyer.setSurname("Alya");
         buyer.setIdentityNumber("111111111111");
         buyer.setEmail(user.getEmail());
         buyer.setRegistrationDate("2013-04-21 15:12:09");
@@ -86,7 +87,7 @@ public class PaymentController {
 
 
         Address shippingAddress = new Address();
-        shippingAddress.setContactName("John Anderson");
+        shippingAddress.setContactName(paymentCard.getCardHolderName());
         shippingAddress.setCity("Istanbul");
         shippingAddress.setCountry("Turkey");
         shippingAddress.setZipCode("34742");
@@ -94,7 +95,7 @@ public class PaymentController {
         request.setShippingAddress(shippingAddress);
 
         Address billingAddress = new Address();
-        billingAddress.setContactName("John Anderson");
+        billingAddress.setContactName(paymentCard.getCardHolderName());
         billingAddress.setCity("Istanbul");
         billingAddress.setCountry("Turkey");
         billingAddress.setZipCode("34742");
@@ -131,7 +132,7 @@ public class PaymentController {
             payment.setStatus("SUCCESS");
             payment.setIyzicoPaymentId(iyzicoPaymentResponse.getPaymentId());
 
-            orderService.save(order);
+            orderService.markPending(order.getOrderId(), OrderStatus.PENDING);
             paymentService.savePayment(payment);
 
             inventoryService.consumeReservations(order.getOrderId());
@@ -145,6 +146,8 @@ public class PaymentController {
             payment.setStatus("FAILURE");
             payment.setErrorMessage(iyzicoPaymentResponse.getErrorMessage());
 
+            orderService.markCancelled(order.getOrderId(), OrderStatus.CANCELLED);
+            paymentService.savePayment(payment);
             inventoryService.releaseReservations(order.getOrderId());
 
             return "payment/failure";
