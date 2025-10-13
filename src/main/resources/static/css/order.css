@@ -1,0 +1,28 @@
+:root{
+    --brand:#026aa7; --brand-dark:#014c78; --muted:#6b7a86; --card-bg: rgba(255,255,255,0.82);
+}
+body{
+    min-height:100vh;
+    background: radial-gradient(1200px 800px at 20% 10%, #ebf8ff 0%, #e0f7fa 40%, #d6ecfa 100%);
+    font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", sans-serif;
+}
+.container-xl{max-width:1200px}
+.page-head{ display:flex; gap:18px; align-items:center; margin:28px 0 18px; }
+.page-head .badge{ background: linear-gradient(90deg, var(--brand), #00a0d2); box-shadow: 0 6px 18px rgba(2,106,167,.25); }
+.stepper{ display:flex; gap:14px; align-items:center; color:var(--muted); font-size:.95rem; }
+.stepper .dot{ width:28px;height:28px;border-radius:50%; display:grid;place-items:center;background:#fff;border:2px solid var(--brand); color:var(--brand); font-weight:600; }
+.glass{ background: var(--card-bg); backdrop-filter: blur(8px); border:1px solid rgba(2,106,167,.12); border-radius:16px; box-shadow: 0 10px 30px rgba(2,106,167,.12); }
+.section-title{ color:var(--brand-dark); font-weight:700; letter-spacing:.2px; }
+.addr-card{ position:relative; border:1.5px solid transparent; transition:all .15s ease; border-radius:14px; background:#fff; cursor:pointer; }
+.addr-card:hover{ transform: translateY(-2px); box-shadow:0 10px 22px rgba(0,0,0,.06) }
+.addr-card.active{ border-color: var(--brand) }
+.addr-card .title{ font-weight:650 }
+.addr-meta{ color:var(--muted); font-size:.95rem }
+.hint{ color:var(--muted); font-size:.92rem }
+.divider{ height:1px; background:linear-gradient(90deg, transparent, rgba(2,106,167,.2), transparent); margin:12px 0 18px; }
+.summary-row{ display:flex; justify-content:space-between; gap:12px; font-size:.98rem; }
+.summary-row.total{ font-size:1.08rem; font-weight:700; color:#0b3b59 }
+.btn-brand{ background:linear-gradient(90deg, var(--brand), #00a0d2); border:none; color:#fff; font-weight:700; letter-spacing:.3px; box-shadow: 0 12px 26px rgba(2,106,167,.25); }
+.btn-brand:hover{ filter:brightness(.95) }
+.chip{ display:inline-flex; align-items:center; gap:6px; padding:6px 10px; border-radius:999px; background:#eef7ff; color:#0b3b59; font-weight:600; font-size:.86rem; }
+.empty-note{ padding:14px 12px; border-radius:12px; background:#f7fbff; color:#4a6572; border:1px dashed #cfe8ff; }
