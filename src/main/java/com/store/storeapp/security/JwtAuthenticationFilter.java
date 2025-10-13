@@ -71,12 +71,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             return;
         }
 
-        if (!isPathValid(servletPath) ) {
-            // 302 Redirect ile başka bir URL'ye yönlendir
-            response.sendRedirect("/errorPage"); // İstediğiniz URL'yi burada belirleyin
-            return; // Sonlandırıyoruz, token doğrulamasına geçmiyoruz
-        }
-
         System.out.println("JwtAuthenticationFilter çalıştı");
         // Get JWT token from HTTP request
         String token = getTokenFromCookie(request, response);
@@ -173,10 +167,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 //        return null;
 //    }
 
-    private boolean isPathValid(String path) {
-        // Controller'larınızı kontrol etmek için burada gerekli mantığı uygulayın
-        return path.matches("/auth/.*|/products/.*|/category/.*|/cart/.*|/order/.*|/admin/.*|/payment/.*");
-    }
 
     private boolean isTokenExpired(String token){
         long expireTime = jwtTokenProvider.getExpirationDate(token).getTime(); // Millisaniye cinsinden

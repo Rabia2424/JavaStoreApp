@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Controller
 @RequestMapping("/admin/order")
@@ -29,13 +30,16 @@ public class AdminOrderController {
     public String updateOrder(@PathVariable Long id,
                                 Model model,
                                 @RequestParam("status") String status) {
-        Order order = orderService.getOrderById(id);
+        Optional<Order> optionalOrder = orderService.getOrderById(id);
         try{
-            OrderStatus orderStatus = OrderStatus.valueOf(status);
-            order.setStatus(orderStatus);
-            orderService.update(order);
+            if(optionalOrder.isPresent()){
+                Order order = optionalOrder.get();
+                OrderStatus orderStatus = OrderStatus.valueOf(status);
+                order.setStatus(orderStatus);
+                orderService.update(order);
+            }
         }catch(IllegalArgumentException e){
-            model.addAttribute("order", order);
+            model.addAttribute("order", optionalOrder.orElse(null));
             model.addAttribute("error", "Invalid status value!");
             return "order/order-list";
         }

@@ -15,144 +15,51 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Controller
 @RequestMapping("/payment")
 public class PaymentController {
     @Autowired
-    private CartService cartService;
-    @Autowired
     private PaymentService paymentService;
+
     @Autowired
     private OrderService orderService;
-    @Autowired
-    private UserService userService;
-    @Autowired
-    private InventoryService inventoryService;
 
-    @PostMapping("/process-payment")
-    public String processPayment(@RequestParam("orderJson") String orderJson, @ModelAttribute CardInfo paymentCardInfo,
-                                              BindingResult result,
-                                              Model model) throws Exception {
-        ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.registerModule(new JavaTimeModule());
-        //System.out.println("Generated JSON: " + orderJson);
-        Order order = objectMapper.readValue(orderJson, Order.class);
-
-        Options options = new Options();
-        options.setApiKey("sandbox-fBfRZFHKRQVy36bnntrP9DLbtBRQRoP4");
-        options.setSecretKey("sandbox-n4lxh7iwqjDLq45AUjC28Stutb2BMw7e");
-        options.setBaseUrl("https://sandbox-api.iyzipay.com");
-
-        CreatePaymentRequest request = new CreatePaymentRequest();
-        request.setLocale(Locale.TR.getValue());
-        request.setConversationId("123456789");
-        request.setPrice(new BigDecimal(order.getTotalAmount()));
-        request.setPaidPrice(new BigDecimal(order.getTotalAmount()));
-        request.setCurrency(Currency.TRY.name());
-        request.setInstallment(1);
-        request.setBasketId(String.valueOf(cartService.getCartByUserId(order.getUserId()).getCartId()));
-        request.setPaymentChannel(PaymentChannel.WEB.name());
-        request.setPaymentGroup(PaymentGroup.PRODUCT.name());
-
-        PaymentCard paymentCard = new PaymentCard();
-        paymentCard.setCardHolderName(paymentCardInfo.getCardHolderName());
-        paymentCard.setCardNumber(paymentCardInfo.getCardNumber());
-        paymentCard.setExpireMonth(paymentCardInfo.getExpireMonth());
-        paymentCard.setExpireYear(paymentCardInfo.getExpireYear());
-        paymentCard.setCvc(paymentCardInfo.getCvc());
-        paymentCard.setRegisterCard(0);
-
-        request.setPaymentCard(paymentCard);
-
-        User user = userService.getUserById(order.getUserId()).orElse(null);
-
-        Buyer buyer = new Buyer();
-        buyer.setId(user.getId().toString());
-        buyer.setName("Alya");
-        buyer.setSurname("Alya");
-        buyer.setIdentityNumber("111111111111");
-        buyer.setEmail(user.getEmail());
-        buyer.setRegistrationDate("2013-04-21 15:12:09");
-        buyer.setRegistrationAddress(order.getShippingAddress());
-        buyer.setIp("85.34.78.112");
-        buyer.setCity("Istanbul");
-        buyer.setCountry("Turkey");
-        buyer.setZipCode("34732");
-        request.setBuyer(buyer);
-
-
-        Address shippingAddress = new Address();
-        shippingAddress.setContactName(paymentCard.getCardHolderName());
-        shippingAddress.setCity("Istanbul");
-        shippingAddress.setCountry("Turkey");
-        shippingAddress.setZipCode("34742");
-        shippingAddress.setAddress(order.getShippingAddress());
-        request.setShippingAddress(shippingAddress);
-
-        Address billingAddress = new Address();
-        billingAddress.setContactName(paymentCard.getCardHolderName());
-        billingAddress.setCity("Istanbul");
-        billingAddress.setCountry("Turkey");
-        billingAddress.setZipCode("34742");
-        billingAddress.setAddress(order.getBillingAddress());
-        request.setBillingAddress(billingAddress);
-
-        List<BasketItem> basketItems = new ArrayList<BasketItem>();
-
-        Cart cart = cartService.getCartByUserId(order.getUserId());
-
-        for (CartItem cartItem: cart.getCartItems()){
-            BasketItem basketItem = new BasketItem();
-            basketItem.setId(cartItem.getId().toString());
-            basketItem.setName(cartItem.getProduct().getName());
-            basketItem.setCategory1(cartItem.getProduct().getCategory().getId().toString());
-            basketItem.setItemType(BasketItemType.PHYSICAL.name());
-            basketItem.setPrice(new BigDecimal(cartItem.getTotalPrice()));
-            basketItems.add(basketItem);
+    @GetMapping("/index")
+    public String paymentIndex(@RequestParam Long orderId, Model model){
+        Optional<Order> optionalOrder = orderService.getOrderById(orderId);
+        if(optionalOrder.isPresent()){
+            Order order = optionalOrder.get();
+            model.addAttribute("orderId", orderId);
+            model.addAttribute("orderTotal", order.getTotalAmount());
         }
-
-        request.setBasketItems(basketItems);
-
-        Payment iyzicoPaymentResponse = Payment.create(request, options);
-
-        com.store.storeapp.Models.Payment payment = new com.store.storeapp.Models.Payment();
-        payment.setOrder(order);
-        payment.setPaymentDate(LocalDateTime.now());
-        payment.setPaymentMethod(PaymentMethod.CREDIT_CARD);
-        payment.setTotalPaid(order.getTotalAmount());
-        payment.setCurrency(iyzicoPaymentResponse.getCurrency());
-        payment.setConversationId(iyzicoPaymentResponse.getConversationId());
-
-        if ("success".equals(iyzicoPaymentResponse.getStatus())) {
-            payment.setStatus("SUCCESS");
-            payment.setIyzicoPaymentId(iyzicoPaymentResponse.getPaymentId());
-
-            orderService.markPending(order.getOrderId(), OrderStatus.PENDING);
-            paymentService.savePayment(payment);
-
-            inventoryService.consumeReservations(order.getOrderId());
-
-            cartService.deleteAllCartItems(cart);
-            cart.setTotalPayment(cart.getTotalPayment());
-            cart.setStatus(CartStatus.COMPLETED);
-            cartService.updateCart(cart);
-            return "payment/confirmation";
-        } else {
-            payment.setStatus("FAILURE");
-            payment.setErrorMessage(iyzicoPaymentResponse.getErrorMessage());
-
-            orderService.markCancelled(order.getOrderId(), OrderStatus.CANCELLED);
-            paymentService.savePayment(payment);
-            inventoryService.releaseReservations(order.getOrderId());
-
-            return "payment/failure";
-        }
+        return "payment/index";
     }
 
+
+    @PostMapping("/process-payment")
+    public String processPayment(@RequestParam Long orderId, @Valid @ModelAttribute CardInfo paymentCardInfo,
+                                              BindingResult result,
+                                              Model model) throws Exception {
+
+        if(result.hasErrors()){
+            model.addAttribute("orderId", orderId);
+            return "payment/index";
+        }
+
+        boolean successOrNot = paymentService.processPayment(orderId, paymentCardInfo);
+        if(successOrNot == true){
+            return "payment/confirmation";
+        }else{
+            return "payment/failure";
+        }
+
+    }
 
 }

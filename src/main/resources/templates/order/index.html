@@ -1,111 +1,362 @@
-<!DOCTYPE HTML>
-<html
-        xmlns:th="http://www.thymeleaf.org"
-        xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-        layout:decorate="~{layout}">
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
 <head>
-    <title>Title</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css">
+    <title>Checkout</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
     <style>
-        body {
-            background-color: #e0f7fa;
-            font-family: 'Arial', sans-serif;
+        :root{
+            --brand:#026aa7; --brand-dark:#014c78; --muted:#6b7a86; --card-bg: rgba(255,255,255,0.82);
         }
-        .form-container {
-            max-width: 500px;
-            margin: 50px auto;
-            padding: 20px;
-            background: #ffffff;
-            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-            border-radius: 10px;
+        body{
+            min-height:100vh;
+            background: radial-gradient(1200px 800px at 20% 10%, #ebf8ff 0%, #e0f7fa 40%, #d6ecfa 100%);
+            font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", sans-serif;
         }
-        .form-container h1 {
-            color: #0277bd;
-            text-align: center;
-            margin-bottom: 20px;
-        }
-        .btn-primary {
-            background-color: #0277bd;
-            border: none;
-            transition: background-color 0.3s ease;
-        }
-        .btn-primary:hover {
-            background-color: #01579b;
-        }
-        .form-label {
-            color: #01579b;
-        }
-        .form-control:focus {
-            border-color: #0288d1;
-            box-shadow: 0px 0px 5px rgba(2, 136, 209, 0.5);
-        }
+        .container-xl{max-width:1200px}
+        .page-head{ display:flex; gap:18px; align-items:center; margin:28px 0 18px; }
+        .page-head .badge{ background: linear-gradient(90deg, var(--brand), #00a0d2); box-shadow: 0 6px 18px rgba(2,106,167,.25); }
+        .stepper{ display:flex; gap:14px; align-items:center; color:var(--muted); font-size:.95rem; }
+        .stepper .dot{ width:28px;height:28px;border-radius:50%; display:grid;place-items:center;background:#fff;border:2px solid var(--brand); color:var(--brand); font-weight:600; }
+        .glass{ background: var(--card-bg); backdrop-filter: blur(8px); border:1px solid rgba(2,106,167,.12); border-radius:16px; box-shadow: 0 10px 30px rgba(2,106,167,.12); }
+        .section-title{ color:var(--brand-dark); font-weight:700; letter-spacing:.2px; }
+        .addr-card{ position:relative; border:1.5px solid transparent; transition:all .15s ease; border-radius:14px; background:#fff; cursor:pointer; }
+        .addr-card:hover{ transform: translateY(-2px); box-shadow:0 10px 22px rgba(0,0,0,.06) }
+        .addr-card.active{ border-color: var(--brand) }
+        .addr-card .title{ font-weight:650 }
+        .addr-meta{ color:var(--muted); font-size:.95rem }
+        .hint{ color:var(--muted); font-size:.92rem }
+        .divider{ height:1px; background:linear-gradient(90deg, transparent, rgba(2,106,167,.2), transparent); margin:12px 0 18px; }
+        .summary-row{ display:flex; justify-content:space-between; gap:12px; font-size:.98rem; }
+        .summary-row.total{ font-size:1.08rem; font-weight:700; color:#0b3b59 }
+        .btn-brand{ background:linear-gradient(90deg, var(--brand), #00a0d2); border:none; color:#fff; font-weight:700; letter-spacing:.3px; box-shadow: 0 12px 26px rgba(2,106,167,.25); }
+        .btn-brand:hover{ filter:brightness(.95) }
+        .chip{ display:inline-flex; align-items:center; gap:6px; padding:6px 10px; border-radius:999px; background:#eef7ff; color:#0b3b59; font-weight:600; font-size:.86rem; }
+        .empty-note{ padding:14px 12px; border-radius:12px; background:#f7fbff; color:#4a6572; border:1px dashed #cfe8ff; }
     </style>
 </head>
 <body>
-<div layout:fragment="body" class="form-container" >
-    <h1>Order Form</h1>
-    <form method="post" th:action="@{/order/add}" th:object="${order}">
-        <!-- User Id -->
-        <input th:field="*{userId}" class="form-control" id="userId" hidden/>
-        <!-- Order Status -->
-        <div class="mb-3">
-            <label for="orderStatus" class="form-label">Order Status</label>
-            <input type="text" th:field="*{status}" class="form-control" id="orderStatus" placeholder="Enter total amount" readonly/>
+<div layout:fragment="body" class="container-xl">
+
+    <!-- Header / Steps -->
+    <div class="page-head">
+        <span class="badge rounded-pill px-3 py-2"><i class="bi bi-bag-check-fill me-1"></i> Secure Checkout</span>
+        <div class="stepper">
+            <span class="dot">1</span> Address
+            <i class="bi bi-chevron-right"></i>
+            <span class="dot">2</span> Review
+            <i class="bi bi-chevron-right"></i>
+            <span class="dot">3</span> Payment
         </div>
-        <!-- Order Date -->
-        <div class="mb-3">
-            <label for="orderDate" class="form-label">Order Date</label>
-            <input th:field="*{orderDate}" class="form-control" id="orderDate" readonly/>
-        </div>
-        <!-- Total Payment -->
-        <div class="mb-3">
-            <label for="totalPayment" class="form-label">Total Payment</label>
-            <input type="number" th:field="*{totalAmount}" class="form-control" id="totalPayment" placeholder="Enter total amount"/>
-        </div>
-        <!-- Shipping Address -->
-        <div class="mb-3">
-            <label for="shippingAddress" class="form-label">Shipping Address</label>
-            <textarea class="form-control" th:field="*{shippingAddress}" id="shippingAddress" rows="3" placeholder="Enter your shipping address"></textarea>
-        </div>
-        <!-- Phone Number -->
-        <div class="mb-3">
-            <label for="phoneNumber" class="form-label">Phone Number</label>
-            <input type="text" class="form-control" th:field="*{phoneNumber}" id="phoneNumber" placeholder="Enter your phone number">
-        </div>
-        <!-- Billing Address -->
-        <div class="mb-3">
-            <label for="billingAddress" class="form-label">Billing Address</label>
-            <textarea class="form-control" th:field="*{billingAddress}" id="billingAddress" rows="3" placeholder="Enter your billing address"></textarea>
-        </div>
-        <!-- Shipping Cost -->
-        <div class="mb-3">
-            <label for="shippingCost" class="form-label">Shipping Cost</label>
-            <input type="number" th:field="*{shippingCost}" class="form-control" id="shippingCost"/>
-        </div>
-        <!-- Notes -->
-        <div class="mb-3">
-            <label for="notes" class="form-label">Notes</label>
-            <textarea class="form-control" th:field="*{notes}"  id="notes" rows="2" placeholder="Additional notes (optional)"></textarea>
-        </div>
-        <!-- Submit Button -->
-        <div class="d-grid">
-            <button type="submit" class="btn btn-primary">Submit Order</button>
+    </div>
+
+    <form method="post" th:action="@{/order/add}" th:object="${order}" id="checkoutForm">
+        <!-- Hidden technical fields -->
+        <input th:field="*{userId}" type="hidden"/>
+
+        <div class="row g-4">
+            <!-- LEFT: Address selection -->
+            <div class="col-lg-7">
+                <!-- Shipping -->
+                <div class="glass p-4 mb-4">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h4 class="section-title mb-0"><i class="bi bi-geo-alt-fill me-2"></i>Shipping Address</h4>
+                        <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#newAddressModal">
+                            <i class="bi bi-plus-lg me-1"></i> Add New Address
+                        </button>
+                    </div>
+                    <p class="hint">Choose an address from your address book or add a new one. We’ll send your items here.</p>
+
+                    <div th:if="${shippingAddresses != null and !#lists.isEmpty(shippingAddresses)}" class="row row-cols-1 row-cols-md-2 g-3 mt-1">
+                        <div class="col" th:each="addr : ${shippingAddresses}">
+                            <label class="addr-card p-3 d-block h-100">
+                                <input class="form-check-input me-2 d-none" type="radio" name="shippingAddressId" required
+                                       th:value="${addr.id}"
+                                       th:attr="data-full=${addr.fullName},data-line1=${addr.line1},data-line2=${addr.line2},data-district=${addr.district},data-city=${addr.city},data-country=${addr.country},data-postal=${addr.postalCode},data-phone=${addr.phone}">
+                                <div class="d-flex align-items-start gap-3">
+                                    <div class="chip"><i class="bi bi-house-door"></i> Address</div>
+                                    <div class="ms-auto text-muted"><i class="bi bi-check2-circle"></i></div>
+                                </div>
+                                <div class="mt-2 title" th:text="${addr.fullName}">Full Name</div>
+                                <div class="addr-meta" th:text="${addr.line1 + (#strings.isEmpty(addr.line2) ? '' : ' ' + addr.line2)}">Line</div>
+                                <div class="addr-meta">
+                                    <span th:text="${addr.district}">District</span>,
+                                    <span th:text="${addr.city}">City</span>,
+                                    <span th:text="${addr.country}">Country</span>
+                                    <span>(</span><span th:text="${addr.postalCode}">ZIP</span><span>)</span>
+                                </div>
+                                <div class="addr-meta" th:text="${addr.phone}">Phone</div>
+                            </label>
+                        </div>
+                    </div>
+                    <div th:if="${shippingAddresses == null or #lists.isEmpty(shippingAddresses)}" class="empty-note mt-2">
+                        No saved shipping addresses. Please add a new one.
+                    </div>
+                </div>
+
+                <!-- Billing -->
+                <div class="glass p-4">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h4 class="section-title mb-0"><i class="bi bi-receipt me-2"></i>Billing Address</h4>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="sameAsShipping" name="sameAsShipping" checked>
+                            <label class="form-check-label" for="sameAsShipping">Billing same as shipping</label>
+                        </div>
+                    </div>
+                    <p class="hint">If you need a different billing address (for invoice), uncheck and select below.</p>
+
+                    <div th:if="${billingAddresses != null and !#lists.isEmpty(billingAddresses)}" id="billingAddressList" class="mt-2">
+                        <div class="row row-cols-1 row-cols-md-2 g-3">
+                            <div class="col" th:each="addr : ${billingAddresses}">
+                                <label class="addr-card p-3 d-block h-100">
+                                    <input class="form-check-input me-2 d-none" type="radio" name="billingAddressId"
+                                           th:value="${addr.id}"
+                                           th:attr="data-full=${addr.fullName},data-line1=${addr.line1},data-line2=${addr.line2},data-district=${addr.district},data-city=${addr.city},data-country=${addr.country},data-postal=${addr.postalCode},data-phone=${addr.phone}">
+                                    <div class="d-flex align-items-start gap-3">
+                                        <div class="chip"><i class="bi bi-file-earmark-text"></i> Billing</div>
+                                        <div class="ms-auto text-muted"><i class="bi bi-check2-circle"></i></div>
+                                    </div>
+                                    <div class="mt-2 title" th:text="${addr.fullName}">Full Name</div>
+                                    <div class="addr-meta" th:text="${addr.line1 + (#strings.isEmpty(addr.line2) ? '' : ' ' + addr.line2)}">Line</div>
+                                    <div class="addr-meta">
+                                        <span th:text="${addr.district}">District</span>,
+                                        <span th:text="${addr.city}">City</span>,
+                                        <span th:text="${addr.country}">Country</span>
+                                        <span>(</span><span th:text="${addr.postalCode}">ZIP</span><span>)</span>
+                                    </div>
+                                    <div class="addr-meta" th:text="${addr.phone}">Phone</div>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div th:if="${billingAddresses == null or #lists.isEmpty(billingAddresses)}" class="empty-note mt-2">
+                        No saved billing addresses. You can use the same as shipping.
+                    </div>
+                </div>
+            </div>
+
+            <!-- RIGHT: Order summary + hidden snapshots + submit -->
+            <div class="col-lg-5">
+                <div class="glass p-4 mb-4">
+                    <h4 class="section-title mb-2"><i class="bi bi-basket2-fill me-2"></i>Order Summary</h4>
+                    <div class="divider"></div>
+
+                    <div th:if="${cartItems != null and !#lists.isEmpty(cartItems)}">
+                        <div th:each="it : ${cartItems}" class="d-flex justify-content-between align-items-start mb-2">
+                            <div>
+                                <div th:text="${it.product.name}" class="fw-semibold">Product name</div>
+                                <div class="hint" th:text="'Qty: ' + ${it.quantity}">Qty</div>
+                            </div>
+                            <div class="fw-semibold"
+                                 th:text="${#numbers.formatDecimal((it.totalPrice != null ? it.totalPrice : 0), 1, 'COMMA', 2, 'POINT')}">
+                                0.00
+                            </div>
+
+                        </div>
+                        <div class="divider"></div>
+                    </div>
+                    <div th:if="${cartItems == null or #lists.isEmpty(cartItems)}" class="empty-note">
+                        Cart summary is not available. You can still complete the address step.
+                    </div>
+
+                    <div class="summary-row mb-1">
+                        <span>Subtotal</span>
+                        <span th:text="${#numbers.formatDecimal((order.totalAmount != null ? order.totalAmount : 0), 1, 'COMMA', 2, 'POINT')}">0.00</span>
+                    </div>
+                    <div class="summary-row mb-1">
+                        <span>Shipping</span>
+                        <span th:text="${#numbers.formatDecimal((order.shippingCost != null ? order.shippingCost : 0), 1, 'COMMA', 2, 'POINT')}">0.00</span>
+                    </div>
+                    <div class="summary-row total">
+                        <span>Total</span>
+                        <span th:text="${#numbers.formatDecimal((order.totalAmount != null ? order.totalAmount : 0) + (order.shippingCost != null ? order.shippingCost : 0), 1, 'COMMA', 2, 'POINT')}">0.00</span>
+                    </div>
+                </div>
+
+                <div class="glass p-4 mb-4">
+                    <h5 class="mb-2"><i class="bi bi-shield-lock-fill me-2"></i>Address Snapshot (what we’ll send to the payment gateway)</h5>
+                    <p class="hint mb-3">These are hidden fields posted with the form. On the backend you will map them to your Order snapshots.</p>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Shipping</label>
+                        <div class="border rounded p-2 bg-light" id="shippingPreview">Not selected</div>
+                    </div>
+                    <div class="mb-2">
+                        <label class="form-label fw-semibold">Billing</label>
+                        <div class="border rounded p-2 bg-light" id="billingPreview">Same as shipping</div>
+                    </div>
+                </div>
+
+                <div class="glass p-4">
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-brand btn-lg">
+                            <i class="bi bi-credit-card-2-front me-2"></i>Continue to Payment
+                        </button>
+                        <div class="hint text-center"><i class="bi bi-lock-fill me-1"></i>Your data is protected. We never store raw card information.</div>
+                    </div>
+                </div>
+            </div>
         </div>
     </form>
+
+
+    <div class="modal fade" id="newAddressModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <form class="modal-content" th:action="@{/address/add}" method="post">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="bi bi-plus-lg me-2"></i>Add New Address</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <label class="form-label">Full Name</label>
+                            <input name="fullName" class="form-control" required>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Address Line 1</label>
+                            <input name="line1" class="form-control" required>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Address Line 2 (optional)</label>
+                            <input name="line2" class="form-control">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">District</label>
+                            <input name="district" class="form-control" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">City</label>
+                            <input name="city" class="form-control" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Country</label>
+                            <input name="country" value="Turkey" class="form-control" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Postal Code</label>
+                            <input name="postalCode" class="form-control" required>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Phone</label>
+                            <input name="phone" class="form-control" required>
+                        </div>
+                        <div class="col-12 d-flex gap-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="defaultShipping" id="defShip">
+                                <label class="form-check-label" for="defShip">Default shipping</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="defaultBilling" id="defBill">
+                                <label class="form-check-label" for="defBill">Default billing</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-outline-secondary" data-bs-dismiss="modal" type="button">Cancel</button>
+                    <button class="btn btn-brand" type="submit">Save Address</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
 </div>
+
+<script>
+    (function () {
+        const shippingPreview = document.getElementById('shippingPreview');
+        const billingPreview  = document.getElementById('billingPreview');
+        const sameAsShipping  = document.getElementById('sameAsShipping');
+
+        const shipField = document.getElementById('shippingAddressField');
+        const shipPhone = document.getElementById('shippingPhoneField');
+        const billField = document.getElementById('billingAddressField');
+
+        function toggleActive(radio) {
+            const name = radio.getAttribute('name');
+            document.querySelectorAll('input[name="'+name+'"]').forEach(r => {
+                const card = r.closest('.addr-card');
+                if (card) card.classList.remove('active');
+            });
+            const card = radio.closest('.addr-card');
+            if (card) card.classList.add('active');
+        }
+
+        function toText(radio) {
+            const parts = [
+                radio.getAttribute('data-full') || '',
+                radio.getAttribute('data-line1') || '',
+                radio.getAttribute('data-line2') || '',
+                radio.getAttribute('data-district') || '',
+                radio.getAttribute('data-city') || '',
+                radio.getAttribute('data-country') || '',
+                '(' + (radio.getAttribute('data-postal') || '') + ')'
+            ].filter(Boolean);
+            return parts.join(', ');
+        }
+
+        // shipping select
+        document.querySelectorAll('input[name="shippingAddressId"]').forEach(r => {
+            r.addEventListener('change', (e) => {
+                toggleActive(e.target);
+                const txt = toText(e.target);
+                shippingPreview.textContent = txt;
+                shipField.value = txt;
+                shipPhone.value = e.target.getAttribute('data-phone') || '';
+
+                if (sameAsShipping.checked) {
+                    billingPreview.textContent = txt;
+                    billField.value = txt;
+                }
+            });
+            const card = r.closest('.addr-card');
+            card && card.addEventListener('click', () => r.click());
+        });
+
+        // billing select
+        document.querySelectorAll('input[name="billingAddressId"]').forEach(r => {
+            r.addEventListener('change', (e) => {
+                toggleActive(e.target);
+                const txt = toText(e.target);
+                billingPreview.textContent = txt;
+                billField.value = txt;
+            });
+            const card = r.closest('.addr-card');
+            card && card.addEventListener('click', () => r.click());
+        });
+
+        function applySameAsShippingState() {
+            const disabled = sameAsShipping.checked;
+            document.querySelectorAll('input[name="billingAddressId"]').forEach(r => {
+                r.disabled = disabled;
+                r.required = !disabled; // only required when different billing is requested
+                if (disabled) r.checked = false;
+            });
+
+            if (disabled) {
+                const sel = document.querySelector('input[name="shippingAddressId"]:checked');
+                if (sel) {
+                    const txt = toText(sel);
+                    billingPreview.textContent = txt;
+                    billField.value = txt;
+                } else {
+                    billingPreview.textContent = 'Same as shipping';
+                    billField.value = '';
+                }
+            } else {
+                billingPreview.textContent = 'Not selected';
+                billField.value = '';
+            }
+        }
+
+        sameAsShipping.addEventListener('change', applySameAsShippingState);
+        // init on load
+        applySameAsShippingState();
+    })();
+</script>
 </body>
 </html>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
-<script>
-    document.addEventListener("DOMContentLoaded", ()=>{
-        let totalAmountInput = document.getElementById("totalPayment");
-        let shippingCostInput = document.getElementById("shippingCost");
-
-        totalAmountInput = parseFloat(totalAmountInput.value)
-        if(totalAmountInput > 1000){
-            shippingCostInput.value = 0;
-        }else{
-            shippingCostInput.value = 10;
-        }
-    });
-</script>

@@ -11,6 +11,7 @@ import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -22,18 +23,8 @@ public class OrderService {
     @Autowired
     private InventoryService inventoryService;
 
-    public Order getOrderObject(Cart cart){
-        Order order = new Order();
-        order.setUserId(cart.getUserId());
-        order.setTotalAmount(cart.getTotalPayment());
-        order.setOrderDate(LocalDateTime.now());
-        order.setStatus(OrderStatus.CREATED);
-        return order;
-    }
-
-    public Order getOrderById(Long orderId){
-        return orderRepository.getOrderById(orderId)
-                .orElse(null);
+    public Optional<Order> getOrderById(Long orderId){
+        return orderRepository.getOrderById(orderId);
     }
 
     public void deleteOrderById(Long orderId){
