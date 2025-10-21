@@ -13,6 +13,7 @@ import javax.transaction.Transactional;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class InventoryService {
@@ -22,6 +23,31 @@ public class InventoryService {
     public InventoryService(InventoryRepository inventoryRepo, ReservationRepository reservationRepo) {
         this.inventoryRepo = inventoryRepo;
         this.reservationRepo = reservationRepo;
+    }
+
+    @Transactional
+    public void saveOrUpdateInventory(Product product){
+        if(product.getId() == null){
+            throw new IllegalStateException("Product must be persisted!");
+        }
+
+        int onHand  = product.getStockQuantity() != null ? product.getStockQuantity() : 0;
+
+        Inventory inv = inventoryRepo.findForUpdate(product.getId())
+                .orElseGet(() ->{
+                    Inventory i = new Inventory();
+                    i.setProduct(product);
+                    i.setReserved(0);
+                    return i;
+                });
+
+        int reserved = inv.getReserved() != null ? inv.getReserved() : 0;
+        if(onHand < reserved){
+            throw new IllegalArgumentException("On-hand ("+onHand+") cannot be less than reserved ("+reserved+").");
+        }
+
+        inv.setOnHand(onHand);
+        inventoryRepo.save(inv);
     }
 
     @Transactional

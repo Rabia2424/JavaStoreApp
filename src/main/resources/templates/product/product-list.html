@@ -19,26 +19,37 @@
             </div>
             <div class="row gx-5">
                 <div class="my-4">
-                    <form th:action="@{/products/search}" class="form-inline my-2 my-lg-0 mb-3 filter-form">
+                    <form method="get" th:action="@{/products/list}" class="form-inline my-2 my-lg-0 mb-3 filter-form">
                         <div class="d-flex align-items-center gap-3 w-100">
                             <input
-                                    name="query"
+                                    name="q"
                                     id="search"
                                     class="search form-control flex-grow-1"
                                     type="search"
                                     placeholder="Search product name or description"
                                     aria-label="Search"
-                                    th:value="${param.query}">
+                                    th:value="${q}">
+
+
+                            <input type="hidden" name="category_id" th:value="${categoryId}">
+                            <input type="hidden" name="minPrice" th:value="${minPrice}">
+                            <input type="hidden" name="maxPrice" th:value="${maxPrice}">
+                            <input type="hidden" name="size" th:value="${size}">
+                            <input type="hidden" name="sortBy" th:value="${sortBy}">
+                            <input type="hidden" name="direction" th:value="${direction}">
+
+                            <input type="hidden" name="page" value="0">
+
                             <button class="btn ml-2 btn-color mt-1" type="submit">Search <i class="bi bi-search"></i></button>
                             <button class="btn btn-color mt-1" type="button" onclick="clearSearch()">Reset <i class="bi bi-x-circle"></i></button>
                         </div>
                     </form>
                 </div>
                 <div class="my-4">
-                    <form method="get" th:action="@{/products/filter}" class="filter-form">
+                    <form method="get" th:action="@{/products/list}" class="filter-form">
                         <div class="form-group">
                             <label>Select Category: </label>
-                            <select name="categoryId" th:value="${param.categoryId}">
+                            <select name="category_id">
                                 <option value="">Select</option>
                                 <option th:each="category : ${categories}"
                                         th:value="${category.id}"
@@ -49,15 +60,49 @@
                         </div>
                         <div class="form-group">
                             <label>Min Price: </label>
-                            <input type="number" class="form-control" name="minPrice" th:value="${param.minPrice}">
+                            <input type="number" class="form-control" name="minPrice" th:value="${minPrice}">
                         </div>
                         <div class="form-group">
                             <label>Max Price: </label>
-                            <input type="number" class="form-control" name="maxPrice" th:value="${param.maxPrice}">
+                            <input type="number" class="form-control" name="maxPrice" th:value="${maxPrice}">
                         </div>
+
+                        <input type="hidden" name="q" th:value="${q}">
+                        <input type="hidden" name="size" th:value="${size}">
+                        <input type="hidden" name="sortBy" th:value="${sortBy}">
+                        <input type="hidden" name="direction" th:value="${direction}">
+
+                        <input type="hidden" name="page" value="0">
+
                         <button type="submit">Filter <i class="bi bi-filter-circle"></i></button>
                         <a class="filter-btn" th:href="@{/products/list}">Clear <i class="bi bi-x-circle"></i></a>
                     </form>
+                </div>
+                <div class="my-4">
+                    <form method="get" th:action="@{/products/list}" class="filter-form mb-3">
+                        <input type="hidden" name="q" th:value="${q}">
+                        <input type="hidden" name="category_id" th:value="${categoryId}">
+                        <input type="hidden" name="minPrice" th:value="${minPrice}">
+                        <input type="hidden" name="maxPrice" th:value="${maxPrice}">
+                        <input type="hidden" name="size" th:value="${size}">
+                        <input type="hidden" name="page" value="0">
+
+                        <label class="me-2">Sort by:</label>
+                        <select name="sortBy">
+                            <option value="id" th:selected="${sortBy=='id'}">ID</option>
+                            <option value="price" th:selected="${sortBy=='price'}">Price</option>
+                            <option value="name" th:selected="${sortBy=='name'}">Name</option>
+                        </select>
+
+                        <select name="direction">
+                            <option value="asc" th:selected="${direction=='asc'}">ASC</option>
+                            <option value="desc" th:selected="${direction=='desc'}">DESC</option>
+                        </select>
+
+                        <button type="submit" class="ms-2">Apply</button>
+                        <a class="filter-btn" th:href="@{/products/list}">Clear <i class="bi bi-x-circle"></i></a>
+                    </form>
+
                 </div>
                 <div th:each="product :${products}" class="col-lg-6 mb-4">
                     <div class="product-card">
@@ -95,6 +140,100 @@
         </div>
 
         <div th:if="${totalPages > 1}" class="pagination">
+            <div class="row col-sm-12 align-items-center">
+                <div class="col-sm-3">
+                    Total Rows: [[${totalItems}]]
+                </div>
+
+                <div class="col-sm-2">
+                    <a class="page-btn"
+                       th:if="${currentPage > 0}"
+                       th:href="@{/products/list(
+                     q=${q},
+                     category_id=${categoryId},
+                     minPrice=${minPrice},
+                     maxPrice=${maxPrice},
+                     page_no=${0},
+                     size=${size},
+                     sortBy=${sortBy},
+                     direction=${direction}
+                   )}">First</a>
+                    <span th:unless="${currentPage > 0}">First</span>
+                </div>
+
+                <div class="col-sm-2">
+                    <a class="page-btn"
+                       th:if="${currentPage > 0}"
+                       th:href="@{/products/list(
+                     q=${q},
+                     category_id=${categoryId},
+                     minPrice=${minPrice},
+                     maxPrice=${maxPrice},
+                     page_no=${currentPage - 1},
+                     size=${size},
+                     sortBy=${sortBy},
+                     direction=${direction}
+                   )}">Before</a>
+                    <span th:unless="${currentPage > 0}">Before</span>
+                </div>
+
+                <div class="col-sm-3">
+      <span th:each="i: ${#numbers.sequence(0, totalPages - 1)}">
+        <a class="page-btn"
+           th:if="${currentPage != i}"
+           th:href="@{/products/list(
+                       q=${q},
+                       category_id=${categoryId},
+                       minPrice=${minPrice},
+                       maxPrice=${maxPrice},
+                       page_no=${i},
+                       size=${size},
+                       sortBy=${sortBy},
+                       direction=${direction}
+                     )}"
+           th:text="${i + 1}"></a>
+        <span th:unless="${currentPage != i}" th:text="${i + 1}" class="active"></span>
+        &nbsp;
+      </span>
+                </div>
+
+                <div class="col-sm-2">
+                    <a class="page-btn"
+                       th:if="${currentPage < totalPages - 1}"
+                       th:href="@{/products/list(
+                     q=${q},
+                     category_id=${categoryId},
+                     minPrice=${minPrice},
+                     maxPrice=${maxPrice},
+                     page_no=${currentPage + 1},
+                     size=${size},
+                     sortBy=${sortBy},
+                     direction=${direction}
+                   )}">Next</a>
+                    <span th:unless="${currentPage < totalPages - 1}">Next</span>
+                </div>
+
+                <div class="col-sm-2">
+                    <a class="page-btn"
+                       th:if="${currentPage < totalPages - 1}"
+                       th:href="@{/products/list(
+                     q=${q},
+                     category_id=${categoryId},
+                     minPrice=${minPrice},
+                     maxPrice=${maxPrice},
+                     page_no=${totalPages - 1},
+                     size=${size},
+                     sortBy=${sortBy},
+                     direction=${direction}
+                   )}">Last</a>
+                    <span th:unless="${currentPage < totalPages - 1}">Last</span>
+                </div>
+            </div>
+        </div>
+
+
+        <!--
+        <div th:if="${totalPages > 1}" class="pagination">
             <div class="row col-sm-10">
                 <div class="col-sm-2">
                     Total Rows: [[${totalItems}]]
@@ -102,29 +241,66 @@
                 <div class="col-sm-1">
             <span th:each="i: ${#numbers.sequence(1, totalPages)}">
       <a th:if="${currentPage != i - 1}"
-         th:href="@{'/products/page/' + ${i - 1}} + '?category_id=' + ${categoryId != null ? categoryId:''}" class="page-btn">[[${i}]]</a>
+         th:href="@{/products/list(
+                     q=${q},
+                     category_id=${categoryId},
+                     minPrice=${minPrice},
+                     maxPrice=${maxPrice},
+                     page_no=${i - 1},
+                     size=${size},
+                     sortBy=${sortBy},
+                     direction=${direction}
+                   )}">[[${i}]]</a>
       <span th:unless="${currentPage != i - 1}">[[${i}]]</span> &nbsp; &nbsp;
             </span>
                 </div>
                 <div class="col-sm-1">
                     <a th:if="${currentPage < totalPages && currentPage > 0}"
-                       th:href="@{'/products/page/' + ${currentPage - 1} + '?category_id=' + ${categoryId != null ? categoryId:''}}" class="page-btn">Before</a>
-                    <span th:unless="${currentPage < totalPages && currentPage > 0}">Before</span>
+                       th:href="@{/products/list(
+                     q=${q},
+                     category_id=${categoryId},
+                     minPrice=${minPrice},
+                     maxPrice=${maxPrice},
+                     page_no=${currentPage - 1},
+                     size=${size},
+                     sortBy=${sortBy},
+                     direction=${direction}
+                   )}">Before</a>
+                       <span th:unless="${currentPage < totalPages && currentPage > 0}">Before</span>
                 </div>
 
                 <div class="col-sm-1">
                     <a th:if="${currentPage < totalPages - 1}"
-                       th:href="@{'/products/page/' + ${currentPage + 1} + '?category_id=' + ${categoryId != null ? categoryId:''}}" class="page-btn">Next</a>
-                    <span th:unless="${currentPage < totalPages - 1}">Next</span>
+                       th:href="@{/products/list(
+                     q=${q},
+                     category_id=${categoryId},
+                     minPrice=${minPrice},
+                     maxPrice=${maxPrice},
+                     page_no=${currentPage + 1},
+                     size=${size},
+                     sortBy=${sortBy},
+                     direction=${direction}
+                   )}">Next</a>
+                       <span th:unless="${currentPage < totalPages - 1}">Next</span>
                 </div>
 
                 <div class="col-sm-1">
                     <a th:if="${currentPage < totalPages - 1}"
-                       th:href="@{'/products/page/' + ${totalPages - 1} + '?category_id=' + ${categoryId != null ? categoryId:''}}" class="page-btn">Last</a>
+                       th:href="@{/products/list(
+                     q=${q},
+                     category_id=${categoryId},
+                     minPrice=${minPrice},
+                     maxPrice=${maxPrice},
+                     page_no=${totalPages - 1},
+                     size=${size},
+                     sortBy=${sortBy},
+                     direction=${direction}
+                   )}">Last</a>
                     <span th:unless="${currentPage < totalPages - 1}">Last</span>
                 </div>
             </div>
         </div>
+        -->
     </section>
 </main>
 </body>

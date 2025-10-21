@@ -52,19 +52,19 @@
     <i class="fas fa-credit-card card-icon"></i>
     <h2>Payment Informations</h2>
     <form method="post" th:action="@{/payment/process-payment}" th:object="${paymentCard}">
-        <!-- Order nesnesini JSON formatında hidden input ile gönderiyoruz -->
-        <input type="hidden" name="orderJson" th:value="${orderJson}">
-        <!-- Kart Sahibi -->
+        <input type="hidden" name="orderId" th:value="${orderId}">
+
+
         <div class="mb-3">
             <label class="form-label">Card Name</label>
             <input type="text" th:field="*{cardHolderName}" class="form-control" placeholder="Adınızı girin" required/>
         </div>
-        <!-- Kart Numarası -->
+
         <div class="mb-3">
             <label class="form-label">Card Number</label>
             <input type="text" th:field="*{cardNumber}" class="form-control" placeholder="**** **** **** ****" maxlength="16" required/>
         </div>
-        <!-- Son Kullanma Tarihi -->
+
         <div class="row">
             <div class="col-md-6 mb-3">
                 <label class="form-label">Month</label>
@@ -75,12 +75,12 @@
                 <input type="text" th:field="*{expireYear}" class="form-control" placeholder="YY" maxlength="2" required/>
             </div>
         </div>
-        <!-- CVC -->
+
         <div class="mb-3">
             <label class="form-label">CVC</label>
             <input type="password" th:field="*{cvc}" class="form-control" placeholder="***" maxlength="3" required/>
         </div>
-        <!-- Ödeme Butonu -->
+
         <div class="d-grid">
             <button type="submit" class="btn btn-primary">Proceed To Payment</button>
         </div>

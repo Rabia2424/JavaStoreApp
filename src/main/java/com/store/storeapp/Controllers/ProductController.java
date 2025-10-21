@@ -40,46 +40,63 @@ public class ProductController {
     }
 
     @GetMapping("/list")
-    public String listProducts(Model model){
-//        List<ProductDto> products = productService.findAllProducts();
-//        model.addAttribute("products", products);
-//        return "product/product-list";
-        return getAllProducts(0,"id",false, model, null);
+    public String getAllProducts(
+            @RequestParam(required = false) String q,
+            @RequestParam(name = "category_id", required = false) Long categoryId,
+            @RequestParam(required = false) Double minPrice,
+            @RequestParam(required = false) Double maxPrice,
+            @RequestParam(defaultValue = "0") int page_no,
+            @RequestParam(defaultValue = "4") int size,
+            @RequestParam(defaultValue = "id") String sortBy,
+            @RequestParam(defaultValue = "desc") String direction,
+            Model model
+    ) {
+        Page<Product> pageResult = productService.searchFilterPage(
+            q, categoryId, minPrice, maxPrice, page_no, size, sortBy, direction
+        );
+
+        List<ProductDto> products = productService.mapToProductDtoWithDiscounts(pageResult.getContent());
+        List<Category> categories = categoryService.findAllCategory();
+
+        model.addAttribute("products", products);
+        model.addAttribute("categories", categories);
+
+        model.addAttribute("currentPage", pageResult.getNumber());
+        model.addAttribute("totalPages", pageResult.getTotalPages());
+        model.addAttribute("totalItems", pageResult.getTotalElements());
+
+        model.addAttribute("q", q);
+        model.addAttribute("categoryId", categoryId);
+        model.addAttribute("minPrice", minPrice);
+        model.addAttribute("maxPrice", maxPrice);
+        model.addAttribute("sortBy", sortBy);
+        model.addAttribute("direction", direction);
+        model.addAttribute("size", size);
+
+        return "product/product-list";
     }
 
     @GetMapping("/list/{categoryId}")
-    public String listProductsByCategoryId(Model model, @PathVariable Long categoryId){
+    public String listProductsByCategoryId(@PathVariable Long categoryId){
 
-        return getAllProducts(0,"id",false, model, categoryId);
+        return "redirect:/products/list?category_id=" + categoryId;
     }
 
     @GetMapping ("/search")
-    public String searchProducts(@RequestParam("query") String query, Model model){
-        List<Product> searchedProducts = productService.searchProducts(query);
-        List<ProductDto> products = productService.mapToProductDtoWithDiscounts(searchedProducts);
-        model.addAttribute("products", products);
-        return "product/product-list";
+    public String searchProducts(@RequestParam("query") String query){
+        return "redirect:/products/list?q=" + query;
     }
 
     @GetMapping("/filter")
     public String filterProducts(@RequestParam(required = false) Long categoryId,
                                  @RequestParam(required = false) Double minPrice,
-                                 @RequestParam(required = false) Double maxPrice,
-                                 Model model){
-        List<Product> products = productService.findAllProducts().stream().map(productDto -> productService.mapToProduct(productDto)).collect(Collectors.toList());
-        List<Category> categories = categoryService.findAllCategory();
-        products = products.stream()
-                .filter(product -> categoryId == null || product.getCategory().getId().equals(categoryId))
-                .filter(product -> minPrice == null || product.getPrice() >= minPrice)
-                .filter(product -> maxPrice == null || product.getPrice() <= maxPrice)
-                .collect(Collectors.toList());
+                                 @RequestParam(required = false) Double maxPrice){
 
-        List<ProductDto> productsWithDiscounts = productService.mapToProductDtoWithDiscounts(products);
-
-
-        model.addAttribute("products", productsWithDiscounts);
-        model.addAttribute("categories", categories);
-        return "product/product-list";
+        StringBuilder sb = new StringBuilder("/products/list?");
+        if (categoryId != null) sb.append("category_id=").append(categoryId).append("&");
+        if (minPrice != null) sb.append("minPrice=").append(minPrice).append("&");
+        if (maxPrice != null) sb.append("maxPrice=").append(maxPrice).append("&");
+        return "redirect:" + sb;
     }
 
     @GetMapping("/{productId}")
@@ -93,33 +110,6 @@ public class ProductController {
         return "product/product-detail";
     }
 
-    @GetMapping("/page/{page_no}")
-    public String getAllProducts(
-            @PathVariable("page_no") int page_no,
-            @RequestParam(defaultValue = "id") String sortBy,
-            @RequestParam(defaultValue = "false") boolean ascending,
-            Model model,
-            @RequestParam(value="category_id",required = false) Long categoryId
-    ) {
-        Sort sort = ascending ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
-        int pageSize = 4;
-        Pageable pageable = PageRequest.of(page_no, pageSize, sort);
-        Page<Product> page2 = null;
-        if(categoryId != null){
-            page2 = productService.findAllByCategoryId(pageable, categoryId);
-        }else{
-            page2 = productService.findAll(pageable);
-        }
-        List<ProductDto> products = productService.mapToProductDtoWithDiscounts(page2.getContent());
 
-        List<Category> categories = categoryService.findAllCategory();
-        model.addAttribute("categories", categories);
-        model.addAttribute("products", products);
-        model.addAttribute("currentPage", page_no);
-        model.addAttribute("totalPages", page2.getTotalPages());
-        model.addAttribute("totalItems", page2.getTotalElements());
-        model.addAttribute("categoryId", categoryId);
-        return "product/product-list";
-    }
 
 }

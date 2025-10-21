@@ -11,6 +11,7 @@ import com.store.storeapp.Repositories.PaymentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import java.time.format.DateTimeFormatter;
 
 import javax.transaction.Transactional;
 import java.math.BigDecimal;
@@ -68,6 +69,8 @@ public class PaymentService {
                 .map(ci -> BigDecimal.valueOf(ci.getTotalPrice()))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
+        System.out.println(">>> Order amount: " + order.getTotalAmount());
+
         CreatePaymentRequest request = new CreatePaymentRequest();
         request.setLocale(Locale.TR.getValue());
         request.setConversationId(orderId.toString());
@@ -93,6 +96,8 @@ public class PaymentService {
         AddressSnapshot ship = order.getShipping();
         AddressSnapshot bill = order.getBilling();
 
+        DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
         Buyer buyer = new Buyer();
         buyer.setId(user.getId().toString());
         String[] nameParts = (ship.getFullName() != null ? ship.getFullName() : " ").split("\\s+", 2);
@@ -100,7 +105,7 @@ public class PaymentService {
         buyer.setSurname(nameParts.length > 1 ? nameParts[1] : " ");
         buyer.setIdentityNumber("11111111110");
         buyer.setEmail(user.getEmail());
-        buyer.setRegistrationDate(String.valueOf(LocalDateTime.now()));
+        buyer.setRegistrationDate(user.getCreatedOn().format(fmt));
         buyer.setRegistrationAddress(join(ship));
         buyer.setIp("85.34.78.112");
         buyer.setCity(ship.getCity());

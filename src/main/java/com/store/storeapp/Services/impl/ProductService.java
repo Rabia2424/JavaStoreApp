@@ -3,13 +3,18 @@ package com.store.storeapp.Services.impl;
 import com.store.storeapp.DTOs.ProductDto;
 import com.store.storeapp.Models.Product;
 import com.store.storeapp.Models.ProductDiscount;
+import com.store.storeapp.Models.ProductSpecs;
 import com.store.storeapp.Repositories.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -36,22 +41,15 @@ public class ProductService {
         return mapToProductDto(product);
     }
 
-    public List<Product> searchProducts(String query){
-        List<Product> products = productRepository.searchProducts(query);
-        return products;
-    }
-
     public Page<Product> getPopularProducts(Pageable pageable){
         return productRepository.getPopularProducts(pageable);
     }
 
+    @Transactional
     public Product saveProduct(Product product){
         return productRepository.save(product);
     }
 
-    public void updateProduct(Product product){
-        productRepository.save(product);
-    }
 
     public void deleteProduct(Long productId){
         productRepository.deleteById(productId);
@@ -101,16 +99,44 @@ public class ProductService {
         return product;
     }
 
-    public Page<Product> findAll(Pageable pageable) {
-        return productRepository.findAll(pageable);
+    public Page<Product> searchFilterPage(
+            String q,
+            Long categoryId,
+            Double minPrice,
+            Double maxPrice,
+            int page,
+            int size,
+            String sortBy,
+            String direction
+    ) {
+        Sort sort = Sort.unsorted();
+        if (sortBy != null && !sortBy.isBlank()) {
+            Sort.Direction dir = "desc".equalsIgnoreCase(direction) ? Sort.Direction.DESC : Sort.Direction.ASC;
+            sort = Sort.by(dir, sortBy);
+        }
+
+        Pageable pageable = PageRequest.of(page, size, sort);
+
+        Specification<Product> spec = Specification
+                .where(ProductSpecs.queryLike(q))
+                .and(ProductSpecs.inCategory(categoryId))
+                .and(ProductSpecs.priceBetween(minPrice, maxPrice));
+
+        return productRepository.findAll(spec, pageable);
     }
 
-    public Page<Product> findAllByCategoryId(Pageable pageable, Long categoryId) { return productRepository.getProductsByCategoryId(categoryId,pageable);}
+//    public Page<Product> findAll(Pageable pageable) {
+//        return productRepository.findAll(pageable);
+//    }
+//
+//    public Page<Product> findAllByCategoryId(Pageable pageable, Long categoryId) { return productRepository.getProductsByCategoryId(categoryId,pageable);}
+//
+//    public Page<Product> findFilteredProducts(Pageable pageable,
+//                                              @Param("categoryId") Long categoryId,
+//                                              @Param("minPrice") Double minPrice,
+//                                              @Param("maxPrice") Double maxPrice){
+//        return productRepository.findFilteredProducts(categoryId, minPrice, maxPrice, pageable);
+//    }
 
-    public Page<Product> findFilteredProducts(Pageable pageable,
-                                              @Param("categoryId") Long categoryId,
-                                              @Param("minPrice") Double minPrice,
-                                              @Param("maxPrice") Double maxPrice){
-        return productRepository.findFilteredProducts(categoryId, minPrice, maxPrice, pageable);
-    }
+
 }

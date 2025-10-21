@@ -39,6 +39,8 @@ public class PaymentController {
             model.addAttribute("orderId", orderId);
             model.addAttribute("orderTotal", order.getTotalAmount());
         }
+        CardInfo paymentCard = new CardInfo();
+        model.addAttribute("paymentCard", paymentCard);
         return "payment/index";
     }
 

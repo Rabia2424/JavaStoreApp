@@ -3,7 +3,9 @@ package com.store.storeapp.Admin.Controllers;
 import com.store.storeapp.DTOs.ProductDto;
 import com.store.storeapp.Models.Category;
 import com.store.storeapp.Models.Product;
+import com.store.storeapp.Services.impl.CatalogAppService;
 import com.store.storeapp.Services.impl.CategoryService;
+import com.store.storeapp.Services.impl.InventoryService;
 import com.store.storeapp.Services.impl.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -24,6 +26,9 @@ public class AdminProductController {
     @Autowired
     private CategoryService categoryService;
     private ProductService productService;
+
+    @Autowired
+    private CatalogAppService catalogAppService;
 
     public AdminProductController(ProductService productService){
         this.productService = productService;
@@ -47,14 +52,7 @@ public class AdminProductController {
 
     @PostMapping("/new")
     public String saveProduct(@ModelAttribute("product") Product product, @RequestParam("file") MultipartFile file) throws IOException {
-        String UPLOAD_DIRECTORY = System.getProperty("user.dir") + "/src/main/resources/static/images";
-
-        Path fileNameAndPath = Paths.get(UPLOAD_DIRECTORY, file.getOriginalFilename());
-        System.out.println(fileNameAndPath);
-        Files.write(fileNameAndPath, file.getBytes());
-
-        product.setImageUrl("/images/"+ file.getOriginalFilename());
-        productService.saveProduct(product);
+        catalogAppService.createProductWithInventory(product, file);
         return "redirect:/products/list";
     }
 
@@ -76,20 +74,7 @@ public class AdminProductController {
             model.addAttribute("product", newProduct);
             return "product/product-update";
         }
-        Product existingProduct = productService.mapToProduct(productService.getProductById(id));
-        if(file != null && !file.isEmpty()){
-            String UPLOAD_DIRECTORY = System.getProperty("user.dir") + "/src/main/resources/static/images";
-
-            Path fileNameAndPath = Paths.get(UPLOAD_DIRECTORY, file.getOriginalFilename());
-            System.out.println(fileNameAndPath);
-            Files.write(fileNameAndPath, file.getBytes());
-
-            newProduct.setImageUrl("/images/"+ file.getOriginalFilename());
-        }else{
-            newProduct.setImageUrl(existingProduct.getImageUrl());
-        }
-        newProduct.setId(id);
-        productService.updateProduct(newProduct);
+        catalogAppService.updateProductWithInventory(id, newProduct, file);
         return "redirect:/admin/products/list";
     }
 
