@@ -1,262 +1,247 @@
-.product-card {
-    border: 1px solid #ddd;
+:root{
+    --accent: #117295;
+    --bg: #01090d;
+    --ink: #ffffff;
+    --muted: rgba(255,255,255,.75);
+    --line: rgba(255,255,255,.08);
+}
+body {
+    background-color: var(--bg);
+    color: var(--ink);
+    font-family: "Inter", "Segoe UI", sans-serif;
+    letter-spacing: 0.2px;
+}
+
+/* ---- BAŞLIK BLOKU ---- */
+.text-center.mb-5 h1 {
+    color: var(--ink);
+    font-family: "Playfair Display", serif;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+.text-center.mb-5 p {
+    color: var(--muted);
+}
+
+/* ---- FORM (FİLTRELEME ALANI) ---- */
+.filter-form {
+    background-color: rgba(255,255,255,0.03);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+}
+
+.filter-form label {
+    color: var(--muted);
+    font-weight: 500;
+    font-size: 0.9rem;
+}
+
+/* Select ve input stilleri */
+.filter-form .form-control,
+.filter-form .form-select {
+    background-color: #0b1114;
+    border: 1px solid var(--line);
+    color: var(--ink);
     border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    padding: 20px;
-    margin-bottom: 20px;
-    background-color: #f9f9f9;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-    position:relative;
+    transition: all .2s ease;
+}
+
+.filter-form .form-control:focus,
+.filter-form .form-select:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(17,114,149,.25);
+}
+
+/* Option menüsü (dropdown) dark theme */
+.filter-form select option {
+    background-color: #0b1114;
+    color: #fff;
+}
+
+/* Hover/active durumları */
+.filter-form .form-select:hover,
+.filter-form .form-control:hover {
+    border-color: var(--accent);
+}
+
+.filter-form .btn {
+    border-radius: 10px;
+    font-weight: 500;
+    padding: .45rem 1.1rem;
+    transition: all .25s ease;
+}
+
+.filter-form .success-button {
+    background-color: var(--accent);
+    border: none;
+}
+.filter-form .success-button:hover {
+    filter: brightness(1.15);
+}
+
+.filter-form .danger-button {
+    background-color: rgba(189, 45, 45, 0.71);
+    border: none;
+}
+.filter-form .danger-button:hover {
+    filter: brightness(1.15);
+}
+
+/* ---- PRODUCT GRID ---- */
+#product-container {
+    margin-top: 2rem;
+}
+
+/* ==== PRODUCT CARD ==== */
+.product-card {
+    background-color: rgba(255,255,255,0.03);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 1rem;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    transition: transform .2s ease, box-shadow .25s ease, border-color .2s ease;
 }
 
 .product-card:hover {
     transform: translateY(-5px);
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    border-color: var(--accent);
+    box-shadow: 0 6px 18px rgba(17,114,149,0.25);
 }
 
-.product-card .image-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
+/* ==== IMAGE ==== */
+/* Görsel alanı */
+.image-container
+{
     width: 100%;
-}
-
-.product-card img {
-    max-width: 80%;
-    height: 300px;
-    border-radius: 10px;
-}
-
-.product-card .content-info {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    margin-left: 45px;
-}
-
-.product-card .product-name {
-    font-size: 1.5rem;
-    color: #333;
-    margin-bottom: 10px;
-}
-
-.product-card .product-description {
-    font-size: 1rem;
-    color: #666;
-    margin-bottom: 15px;
-}
-
-.product-card .product-price {
-    font-size: 1.2rem;
-    color: #034993;
-}
-
-/* Form Konteyneri */
-.filter-form {
+    height: 220px;
+    border-radius: 12px;
+    overflow: hidden;
+    background-color: #0b1114;
     display: flex;
     align-items: center;
-    gap: 15px;
-    padding: 15px;
-    border-radius: 8px;
-    box-shadow: 4px 4px 8px rgba(0, 0, 255, 0.2);
-    flex-wrap: wrap; /* Allow form elements to wrap in smaller screens */
+    justify-content: center;
+}
+.image-container img
+{
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: cover;
+    transition: transform .3s ease;
+}
+.product-card:hover img {
+    transform: scale(1.05);
 }
 
-/* Form Elemanları */
-.filter-form .form-group {
+
+/* ==== CONTENT ==== */
+.content-info {
+    flex-grow: 1;
+    text-align: center;
+    color: var(--muted);
+    padding: 1rem .5rem .5rem;
     display: flex;
     flex-direction: column;
-    align-items: start;
-    gap: 5px;
+    justify-content: space-between;
 }
 
-/* Input ve Select Alanları */
-.filter-form input,
-.filter-form select {
-    min-width: 160px;
-    padding: 8px;
-    border: 2px solid #007bff;
-    border-radius: 5px;
-    outline: none;
-    transition: 0.3s;
-    flex-grow: 1;
+/* Ürün adı */
+.product-name {
+    color: var(--ink);
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: .5rem;
+    letter-spacing: 0.3px;
 }
 
-/* Hover ve Focus Efektleri */
-.filter-form input:hover,
-.filter-form select:hover,
-.filter-form input:focus,
-.filter-form select:focus {
-    border-color: #0056b3;
-    box-shadow: 0px 0px 8px rgba(0, 0, 255, 0.3);
+/* Açıklama */
+.product-desc {
+    color: var(--muted);
+    font-size: .9rem;
+    line-height: 1.4;
+    min-height: 45px;
+    margin-bottom: .8rem;
 }
 
-/* Label Stili */
-.filter-form label {
-    font-weight: bold;
-    color: #0056b3;
+/* Fiyat */
+.product-price {
+    color: var(--accent);
+    font-size: 1.05rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    letter-spacing: 0.5px;
 }
 
+/* ==== BUTTONS ==== */
+.detail-button {
+    background: transparent;
+    color: var(--accent);
+    border: 1px solid var(--accent);
+    border-radius: 10px;
+    padding: .45rem .9rem;
+    transition: all .2s ease;
+    font-size: .9rem;
+    font-weight: 500;
+}
+.detail-button:hover {
+    background-color: var(--accent);
+    color: #fff;
+    transform: translateY(-1px);
+}
+
+
+/* Buton grubu */
 .view-add-buttons {
     display: flex;
-    justify-content: space-between;
-    width: 60%;
-}
-
-/* Buton Stili */
-.filter-form button,
-.detail-button,
-.filter-btn {
-    background-color: #034993;
-    color: white;
-    border: none;
-    padding: 8px 20px;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: 0.3s;
-    margin-top: 24px;
-    text-decoration: none;
-}
-
-.filter-form button:hover,
-.detail-button:hover,
-.filter-btn:hover {
-    color: white;
-    background-color: #0056b3;
-}
-
-.btn-color {
-    display: flex;
-    gap: 4px;
-    color: white;
-    background-color: #034993;
-    cursor: pointer;
-    transition: 0.3s;
-}
-
-.btn-color:hover {
-    color: white;
-    background-color: #034993;
-    box-shadow: 0px 0px 8px rgba(0, 0, 255, 0.3);
-}
-
-.page-btn {
-    color: white;
-    background-color: #034993;
-    cursor: pointer;
-    padding: 4px;
-    border-radius: 5px;
-    transition: 0.3s;
-    text-decoration: none;
-}
-
-.page-btn:hover {
-    color: white;
-    box-shadow: 4px 4px 8px rgba(0, 0, 255, 0.3);
-    text-decoration: none;
-}
-
-.discount-info {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    background-color: #034993;
-    color: white;
-    padding: 8px 15px;
-    border-radius: 10px;
-    font-size: 16px;
-    display: flex;
-    align-items: center;
     justify-content: center;
+    gap: .7rem;
+    margin-top: .8rem;
+}
+
+/* ---- PAGINATION ---- */
+#pagination {
+    display: flex;
+    justify-content: center;
+    text-align: center;
+    margin-top: 5rem !important;
+}
+.page-btn {
+    background-color: transparent;
+    border: 1px solid var(--accent);
+    color: var(--accent);
+    border-radius: 8px;
+    padding: .4rem .9rem;
+    font-size: .9rem;
+    transition: all .2s ease;
     cursor: pointer;
 }
-
-.discount-label {
-    font-weight: bold;
+.page-btn:hover {
+    background-color: var(--accent);
+    color: #fff;
+    transform: translateY(-1px);
+}
+.page-btn.active {
+    background-color: var(--accent);
+    color: #fff;
+}
+.page-btn.disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
 }
 
-.surprise-icon {
-    font-size: 20px;
-    margin-left: 8px;
-}
-
-/* Responsive Design for Smaller Screens */
-@media (max-width: 768px) {
+/* ---- RESPONSIVE ---- */
+@media (max-width: 992px) {
+    #product-container {
+        gap: 1.2rem;
+    }
     .product-card {
-        margin: 10px 0;
-    }
-
-    .product-card .image-container {
-        justify-content: flex-start;
-    }
-
-    .product-card .content-info {
-        margin-left: 0;
-        align-items: center;
-    }
-
-    .product-card img {
-        max-width: 100%;
-        height: auto;
-    }
-
-    .view-add-buttons{
-        flex-direction: column;
-        width: 100%;
-        align-items: center;
-    }
-
-    .filter-form {
-        flex-direction: column;
-        align-items: stretch;
-    }
-
-    .filter-form .form-group {
-        width: 100%;
-    }
-
-    .filter-form input,
-    .filter-form select {
-        width: 100%;
-        margin-bottom: 10px;
-    }
-
-    .filter-form button,
-    .detail-button,
-    .filter-btn {
-        width: 100%;
-        margin-top: 10px;
-    }
-
-    .view-add-buttons button {
-        width: 100%;
-        margin-top: 10px;
+        max-width: 280px;
     }
 }
-
-@media (max-width: 480px) {
-    .product-card {
-        padding: 15px;
-    }
-
-    .product-card .product-name,
-    .product-card .product-description,
-    .product-card .product-price {
-        font-size: 1rem;
-    }
-
-    .filter-form {
-        gap: 10px;
-    }
-
-    .filter-form input,
-    .filter-form select {
-        padding: 10px;
-    }
-
-    .filter-form button,
-    .detail-button,
-    .filter-btn {
-        padding: 10px;
-    }
+@media (max-width: 576px) {
+    .filter-form { padding: 1rem; }
+    .product-card { max-width: 100%; }
 }

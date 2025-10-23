@@ -1,0 +1,140 @@
+/* ---- GENEL ---- */
+:root{
+    --bg: #01090d;
+    --ink: #ffffff;
+    --muted: rgba(255,255,255,.72);
+    --line: rgba(255,255,255,.08);
+    --accent: #117295;
+}
+
+/* ---- 1) DUYURU BANDI ---- */
+.announcement-bar{
+    background: var(--bg);
+    color: var(--muted);
+    border-bottom: 1px solid var(--line);
+    overflow: hidden;
+    white-space: nowrap;
+}
+.announcement-track{
+    display: inline-block;
+    padding: .45rem 0;
+    animation: ticker 22s linear infinite;
+}
+.announcement-track span{ padding-left: 100%; letter-spacing:.08em; font-size:.88rem; }
+@keyframes ticker{ 0%{ transform: translateX(0); } 100%{ transform: translateX(-100%); } }
+@media (prefers-reduced-motion: reduce){ .announcement-track{ animation: none; } }
+
+/* ---- 2) ORTA ŞERİT ---- */
+.midbar{ background: var(--bg); color: var(--ink); border-bottom: 1px solid var(--line); }
+.midbar .brand-title{
+    font-size: 1.9rem;
+    letter-spacing:.02em;
+    color: var(--ink);
+    margin: .35rem 0;
+    text-decoration: none;
+}
+.midbar .brand-title:hover{ color: var(--accent); }
+
+.brand-title{
+  margin-left: 12rem !important;
+    font-size: 2.4rem !important;
+}
+
+/* Sol & Sağ bloklar */
+.midbar-left, .midbar-right{ display:flex; align-items:center; gap:.6rem; }
+.midbar .icon-btn{
+    background: transparent; border: 1px solid var(--line); color: var(--muted);
+    border-radius: 10px; padding:.4rem .55rem; line-height:1;
+}
+.midbar .icon-btn:hover{ color: var(--ink); border-color: var(--accent); }
+.icon-link{
+    color: var(--muted); font-size:1.05rem; padding:.35rem .45rem; border-radius:10px;
+}
+.icon-link:hover{ color: var(--ink); background: rgba(17,114,149,.16); }
+.username{ color: var(--muted); margin-right:.25rem; font-size:.95rem; }
+
+/* Auth butonları */
+.auth-btn{
+    background: var(--accent); color:#fff !important; border:1px solid var(--accent);
+    border-radius:10px; padding:.42rem .9rem; font-weight:500;
+}
+.auth-btn:hover{ filter: brightness(.92); }
+.auth-btn-outline{
+    background: transparent; color: var(--accent) !important; border:1px solid var(--accent);
+    border-radius:10px; padding:.42rem .9rem; font-weight:500;
+}
+.auth-btn-outline:hover{ background: var(--accent); color:#fff !important; }
+
+/* Sepet rozeti */
+.cart-badge{
+    position:absolute; top:-4px; right:-4px; min-width:18px; height:18px;
+    background:#fff; color:#000; border-radius:999px; font-size:.72rem;
+    display:inline-flex; align-items:center; justify-content:center; padding:0 4px;
+}
+
+/* Arama collapse */
+.search-collapse{ background: var(--bg); border-bottom:1px solid var(--line); }
+.search-form{ display:flex; gap:.5rem; padding:.6rem 0 1rem; }
+.search-input{
+    background:#0b1317; border:1px solid var(--line); color:#eaeaea; border-radius:12px; height:44px;
+}
+.search-input:focus{ border-color: var(--accent); box-shadow:none; }
+.search-btn{
+    background: var(--accent); color:#fff; border:none; border-radius:12px; padding:.5rem .9rem; height:44px;
+}
+.search-btn:hover{ filter: brightness(.92); }
+
+/* ---- 3) ALT MENÜ ---- */
+.menubar{ background: var(--bg); border-bottom: 1px solid var(--line); }
+.menubar .nav-link{
+    color: var(--muted);
+    letter-spacing: .16em;
+    font-size: .9rem;
+    padding: .85rem .9rem;
+    text-transform: uppercase;
+    transition: color .2s ease;
+}
+.menubar .nav-link:hover{ color: var(--ink); }
+.menubar .nav-link.active{
+    color: var(--accent);
+    position: relative;
+}
+.menubar .nav-link.active::after{
+    content:""; position:absolute; left:12%; right:12%; bottom:.45rem; height:2px; background: var(--accent);
+    border-radius:2px;
+}
+
+/* Toggler icon daha görünür */
+.navbar-dark .navbar-toggler-icon{ filter: brightness(1.1); }
+
+/* Mobil düzen */
+@media (max-width: 991.98px){
+    .midbar .brand-title{ font-size:1.6rem; }
+    .menubar .navbar-collapse{ padding-bottom:.6rem; }
+    .menubar .nav-link{ padding:.6rem .5rem; }
+}
+
+
+.fancy-font {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    color: #fff;
+    text-shadow: 0 1px 3px rgba(0,0,0,.35);
+    transition: color .3s ease;
+}
+.fancy-font:hover,
+.announcement-fancy-font{
+    color: #117295;
+}
+
+.announcement-fancy-font {
+    font-family: 'Playfair Display', serif;
+    font-weight: 400; /* normalden biraz ince */
+    font-style: italic;
+    letter-spacing: 0.5px;
+    color: rgba(255,255,255,0.85);
+    text-transform: none;
+    font-size: 0.95rem;
+}

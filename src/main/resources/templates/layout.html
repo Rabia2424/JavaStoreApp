@@ -10,36 +10,95 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="icon" type="image/x-icon" href="assets/favicon.ico" />
     <!-- Bootstrap icons-->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@1,500&display=swap" rel="stylesheet">
     <!-- Core theme CSS (includes Bootstrap)-->
     <link th:href="@{/css/styles.css}" rel="stylesheet" />
+    <link th:href="@{/css/navbar.css}" rel="stylesheet" />
     <title layout:title-pattern="$CONTENT_TITLE - $LAYOUT_TITLE">RunGroop</title>
 </head>
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-    <div class="container px-5">
-        <a class="navbar-brand" th:href="@{/}">RunGroop</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
-        <div class="collapse navbar-collapse" id="navbarSupportedContent">
-            <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
-                <li class="nav-item"><a class="nav-link" th:href="@{/products/list}">Home</a></li>
-                <li class="nav-item"><a class="nav-link" th:href="@{/clubs}">Find Clubs</a></li>
-                <li class="nav-item"><a class="nav-link" th:href="@{/category/new}">Create Category</a></li>
-                <li th:if="${hasAdminRole}" class="nav-item"><a class="nav-link" th:href="@{/admin/products/list}">Admin Products</a></li>
-                <li th:if="${hasAdminRole}" class="nav-item"><a class="nav-link" th:href="@{/admin/order/list}">Admin OrderList</a></li>
-                <li class="nav-item"><a class="nav-link me-3 " th:href="@{/auth/login}" th:text="${isAuthenticated ? username : 'Login'}">Login</a></li>
-                <li th:if="${isAuthenticated}"  class="nav-item"><a class="nav-link me-3 " th:href="@{/auth/logout}">Logout</a></li>
-                <li th:if="${!isAuthenticated}" class="nav-item"><a class="nav-link " th:href="@{/auth/register}">Register</a></li>
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" id="navbarDropdownPortfolio" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Welcome <span th:text="${isAuthenticated ? username : 'Guest'}"></span>!</a>
-                    <ul  class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdownPortfolio">
-                        <li><a class="dropdown-item" th:href="@{/cart/list}">Cart</a></li>
-                        <li><a class="dropdown-item" th:href="@{/auth/logout}">Logout</a></li>
-                    </ul>
-                </li>
+
+<div class="announcement-bar">
+    <div class="announcement-track fancy-font">
+        <span>Free Shipping on orders over $1000 • Free Shipping on orders over $1000 • Free Shipping on orders over $1000 •</span>
+    </div>
+</div>
+
+<nav class="navbar navbar-dark midbar">
+    <div class="container px-4 px-lg-5">
+
+        <div class="midbar-left">
+            <button class="icon-btn" type="button" data-bs-toggle="collapse" data-bs-target="#siteSearch" aria-expanded="false" aria-controls="siteSearch" aria-label="Search">
+                <i class="bi bi-search"></i>
+            </button>
+        </div>
+
+
+        <a class="navbar-brand brand-title fancy-font" th:href="@{/}">La Mode Verte</a>
+
+
+        <div class="midbar-right">
+            <a class="icon-link d-none d-md-inline" href="#" aria-label="Instagram"><i class="bi bi-instagram"></i></a>
+            <a class="icon-link d-none d-md-inline" href="#" aria-label="YouTube"><i class="bi bi-youtube"></i></a>
+
+
+            <a class="btn auth-btn me-2" th:if="${!isAuthenticated}" th:href="@{/auth/login}">Login</a>
+            <a class="btn auth-btn-outline me-2" th:if="${!isAuthenticated}" th:href="@{/auth/register}">Register</a>
+
+            <span class="username d-none d-lg-inline" th:if="${isAuthenticated}" th:text="${username}">User</span>
+            <a class="btn auth-btn me-2" th:if="${isAuthenticated}" th:href="@{/auth/logout}">Logout</a>
+
+
+            <a class="icon-link position-relative" th:href="@{/cart/list}" aria-label="Cart">
+                <i class="bi bi-bag"></i>
+                <span th:if="${isAuthenticated}" class="cart-badge" th:text="${cartCount}">0</span>
+            </a>
+        </div>
+    </div>
+
+    <div class="search-collapse collapse" id="siteSearch">
+        <div class="container px-4 px-lg-5">
+            <form id="navSearchForm" th:action="@{/products/list}" method="get" class="search-form">
+                <input class="form-control search-input" type="search" name="q" placeholder="Search products..." aria-label="Search">
+                <button class="btn search-btn" type="submit"><i class="bi bi-arrow-right"></i></button>
+            </form>
+        </div>
+    </div>
+</nav>
+
+<nav class="navbar navbar-expand-lg navbar-dark menubar sticky-top">
+    <div class="container px-4 px-lg-5">
+        <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#mainMenu"
+                aria-controls="mainMenu" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse justify-content-center" id="mainMenu">
+            <ul class="navbar-nav gap-lg-2">
+                <li class="nav-item"><a class="nav-link" th:href="@{/products/list}"
+                                        th:classappend="${#httpServletRequest.requestURI.startsWith('/products')} ? ' active'">HOME</a></li>
+
+                <li class="nav-item"><a class="nav-link" th:href="@{/clubs}"
+                                        th:classappend="${#httpServletRequest.requestURI.startsWith('/clubs')} ? ' active'">FIND CLUBS</a></li>
+
+                <li th:if="${hasAdminRole}" class="nav-item"><a class="nav-link" th:href="@{/category/new}"
+                                        th:classappend="${#httpServletRequest.requestURI.startsWith('/category')} ? ' active'">CREATE CATEGORY</a></li>
+
+                <li th:if="${hasAdminRole}" class="nav-item"><a class="nav-link" th:href="@{/admin/products/list}"
+                                                                th:classappend="${#httpServletRequest.requestURI.startsWith('/admin/products')} ? ' active'">ADMIN PRODUCTS</a></li>
+
+                <li th:if="${hasAdminRole}" class="nav-item"><a class="nav-link" th:href="@{/admin/order/list}"
+                                                                th:classappend="${#httpServletRequest.requestURI.startsWith('/admin/order')} ? ' active'">ADMIN ORDERS</a></li>
+
+                <li class="nav-item"><a class="nav-link" href="#">GALLERY</a></li>
+                <li class="nav-item"><a class="nav-link" href="#">FAQ</a></li>
+                <li class="nav-item"><a class="nav-link" href="#">BLOG</a></li>
+                <li class="nav-item"><a class="nav-link" th:href="@{/contact}">CONTACT</a></li>
             </ul>
         </div>
     </div>
 </nav>
+
 <body layout:fragment="body"></body>
 <section class="py-5 bg-light d-flex">
     <div class="container px-5 my-5">
@@ -74,4 +133,5 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <!-- Core theme JS-->
 <script th:src="@{/js/scripts.js}"></script>
+<script th:src="@{/js/navbar.js}"></script>
 </html>

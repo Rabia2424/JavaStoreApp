@@ -22,17 +22,6 @@
                 <div class="my-4">
                     <form method="get" th:action="@{/products/list}" id="filter-form" class="filter-form">
 
-                        <div class="d-flex align-items-center gap-3 w-100 mb-3">
-                            <input
-                                    name="q"
-                                    id="search"
-                                    class="search form-control flex-grow-1"
-                                    type="search"
-                                    placeholder="Search product name or description"
-                                    aria-label="Search"
-                                    th:value="${q}">
-                        </div>
-
                         <div class="form-group mb-3">
                             <label>Select Category: </label>
                             <select name="category_id" class="form-select">
@@ -78,21 +67,21 @@
                             </div>
                         </div>
 
-
+                        <input type="hidden" name="q">
                         <input type="hidden" name="size" th:value="${size}">
                         <input type="hidden" name="page_no" value="0">
 
                         <div class="mt-2 d-flex gap-2">
-                            <button type="submit" class="btn btn-success">Apply</button>
+                            <button type="submit" class="btn success-button">Apply</button>
 
-                            <a class="btn btn-danger" th:href="@{/products/list}">Reset All</a>
+                            <a class="btn danger-button" th:href="@{/products/list}">Reset All</a>
                         </div>
                     </form>
                 </div>
             </div>
 
 
-            <div id="product-container" class="row gx-5">
+            <div id="product-container" class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-5 mb-4">
 
             </div>
 
@@ -185,7 +174,7 @@
         const name = escapeHtml(p.name || '');
         const desc = escapeHtml(p.description || '');
         return `
-    <div class="col-lg-6 mb-4">
+    <div class="col">
       <div class="product-card">
         <div class="image-container">
           <img src="${img}" alt="${name}" class="mb-3"/>
@@ -195,14 +184,18 @@
           <div>${desc}</div>
           <div>${price}</div>
           <div class="view-add-buttons mt-2">
-            <a class="btn detail-button" href="/products/${p.id}">View Details</a>
+            <a class="btn detail-button" href="/products/${p.id}">
+            <i class="bi bi-eye"></i>
+            View Details</a>
             <form method="post" action="/cart/add/${p.id}" style="display:inline;">
-              <button class="btn detail-button" type="submit">Add To Cart</button>
+              <button class="btn detail-button" type="submit">
+              <i class="bi bi-cart-plus"></i>
+              Add To Cart</button>
             </form>
           </div>
         </div>
       </div>
-    </div>`;
+     </div>`;
     }
 
     function escapeHtml(s) {

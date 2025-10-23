@@ -6,6 +6,7 @@ import com.store.storeapp.Models.Product;
 import com.store.storeapp.Models.Reservation;
 import com.store.storeapp.Models.ReservationStatus;
 import com.store.storeapp.Repositories.InventoryRepository;
+import com.store.storeapp.Repositories.ProductRepository;
 import com.store.storeapp.Repositories.ReservationRepository;
 import org.springframework.stereotype.Service;
 
@@ -19,36 +20,38 @@ import java.util.Optional;
 public class InventoryService {
     private final InventoryRepository inventoryRepo;
     private final ReservationRepository reservationRepo;
+    private final ProductRepository productRepo;
 
-    public InventoryService(InventoryRepository inventoryRepo, ReservationRepository reservationRepo) {
+    public InventoryService(InventoryRepository inventoryRepo, ReservationRepository reservationRepo, ProductRepository productRepo) {
         this.inventoryRepo = inventoryRepo;
         this.reservationRepo = reservationRepo;
+        this.productRepo = productRepo;
     }
 
     @Transactional
-    public void saveOrUpdateInventory(Product product){
-        if(product.getId() == null){
-            throw new IllegalStateException("Product must be persisted!");
-        }
+    public void saveOrUpdateInventory(Long productId, Integer stockQty) {
+        if (productId == null) throw new IllegalStateException("Product must be persisted!");
 
-        int onHand  = product.getStockQuantity() != null ? product.getStockQuantity() : 0;
+        int onHand = (stockQty != null ? stockQty : 0);
 
-        Inventory inv = inventoryRepo.findForUpdate(product.getId())
-                .orElseGet(() ->{
+        Inventory inv = inventoryRepo.findForUpdate(productId)
+                .orElseGet(() -> {
                     Inventory i = new Inventory();
-                    i.setProduct(product);
+                    Product ref = productRepo.getReferenceById(productId);
+                    i.setProduct(ref);
                     i.setReserved(0);
                     return i;
                 });
 
         int reserved = inv.getReserved() != null ? inv.getReserved() : 0;
-        if(onHand < reserved){
-            throw new IllegalArgumentException("On-hand ("+onHand+") cannot be less than reserved ("+reserved+").");
+        if (onHand < reserved) {
+            throw new IllegalArgumentException("On-hand (" + onHand + ") cannot be less than reserved (" + reserved + ").");
         }
 
         inv.setOnHand(onHand);
         inventoryRepo.save(inv);
     }
+
 
     @Transactional
     public void reserveForOrder(Long orderId, Long productId, int qty, Duration ttl) {
