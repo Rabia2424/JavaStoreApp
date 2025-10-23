@@ -50,8 +50,7 @@ public class SpringSecurityConfig {
                 .authorizeRequests(authorize -> {
                     // Allow access to static resources
                     authorize.antMatchers("/assets/**", "/css/**", "/js/**", "/images/**").permitAll();
-                    authorize.antMatchers("/", "/auth/**", "/products/list", "/errorPage", "/admin/products/new").permitAll();
-                    authorize.antMatchers("/category/new", "/products/new").hasRole("ADMIN");
+                    authorize.antMatchers("/", "/auth/**", "/products/list", "/errorPage", "/products/api").permitAll();
                     authorize.antMatchers("/admin/**").hasRole("ADMIN");
                     authorize.antMatchers(HttpMethod.GET, "/api/**").hasAnyRole("ADMIN", "USER");
                     authorize.antMatchers(HttpMethod.PATCH, "/api/**").hasAnyRole("ADMIN", "USER");

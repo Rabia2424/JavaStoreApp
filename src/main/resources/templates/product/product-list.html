@@ -17,10 +17,12 @@
                 <h1 class="fw-bolder">Find Your Interest</h1>
                 <p class="lead fw-normal text-muted mb-0">Explore products tailored to your needs</p>
             </div>
+
             <div class="row gx-5">
                 <div class="my-4">
-                    <form method="get" th:action="@{/products/list}" class="form-inline my-2 my-lg-0 mb-3 filter-form">
-                        <div class="d-flex align-items-center gap-3 w-100">
+                    <form method="get" th:action="@{/products/list}" id="filter-form" class="filter-form">
+
+                        <div class="d-flex align-items-center gap-3 w-100 mb-3">
                             <input
                                     name="q"
                                     id="search"
@@ -29,28 +31,12 @@
                                     placeholder="Search product name or description"
                                     aria-label="Search"
                                     th:value="${q}">
-
-
-                            <input type="hidden" name="category_id" th:value="${categoryId}">
-                            <input type="hidden" name="minPrice" th:value="${minPrice}">
-                            <input type="hidden" name="maxPrice" th:value="${maxPrice}">
-                            <input type="hidden" name="size" th:value="${size}">
-                            <input type="hidden" name="sortBy" th:value="${sortBy}">
-                            <input type="hidden" name="direction" th:value="${direction}">
-
-                            <input type="hidden" name="page" value="0">
-
-                            <button class="btn ml-2 btn-color mt-1" type="submit">Search <i class="bi bi-search"></i></button>
-                            <button class="btn btn-color mt-1" type="button" onclick="clearSearch()">Reset <i class="bi bi-x-circle"></i></button>
                         </div>
-                    </form>
-                </div>
-                <div class="my-4">
-                    <form method="get" th:action="@{/products/list}" class="filter-form">
-                        <div class="form-group">
+
+                        <div class="form-group mb-3">
                             <label>Select Category: </label>
-                            <select name="category_id">
-                                <option value="">Select</option>
+                            <select name="category_id" class="form-select">
+                                <option value="">All</option>
                                 <option th:each="category : ${categories}"
                                         th:value="${category.id}"
                                         th:text="${category.name}"
@@ -58,256 +44,239 @@
                                 </option>
                             </select>
                         </div>
-                        <div class="form-group">
-                            <label>Min Price: </label>
-                            <input type="number" class="form-control" name="minPrice" th:value="${minPrice}">
-                        </div>
-                        <div class="form-group">
-                            <label>Max Price: </label>
-                            <input type="number" class="form-control" name="maxPrice" th:value="${maxPrice}">
+
+                        <div class="row g-3 mb-3">
+                            <div class="col-sm-6">
+                                <label>Min Price: </label>
+                                <input type="number" class="form-control" name="minPrice" th:value="${minPrice}">
+                            </div>
+                            <div class="col-sm-6">
+                                <label>Max Price: </label>
+                                <input type="number" class="form-control" name="maxPrice" th:value="${maxPrice}">
+                            </div>
                         </div>
 
-                        <input type="hidden" name="q" th:value="${q}">
+                        <div class="row g-3 mb-3 align-items-end">
+                            <div class="col-sm-6">
+                                <label class="me-2">Sort by:</label>
+                                <select name="sortBy" class="form-select"
+                                        th:value="${sortBy != null ? sortBy : ''}">
+                                    <option value="">Select option</option>
+                                    <option value="id"    th:selected="${sortBy=='id'}">ID</option>
+                                    <option value="price" th:selected="${sortBy=='price'}">Price</option>
+                                    <option value="name"  th:selected="${sortBy=='name'}">Name</option>
+                                </select>
+                            </div>
+                            <div class="col-sm-6">
+                                <label class="me-2">Direction:</label>
+                                <select name="direction" class="form-select"
+                                        th:value="${direction != null ? direction : ''}">
+                                    <option value="">Select direction</option>
+                                    <option value="asc"  th:selected="${direction=='asc'}">ASC</option>
+                                    <option value="desc" th:selected="${direction=='desc'}">DESC</option>
+                                </select>
+                            </div>
+                        </div>
+
+
                         <input type="hidden" name="size" th:value="${size}">
-                        <input type="hidden" name="sortBy" th:value="${sortBy}">
-                        <input type="hidden" name="direction" th:value="${direction}">
+                        <input type="hidden" name="page_no" value="0">
 
-                        <input type="hidden" name="page" value="0">
+                        <div class="mt-2 d-flex gap-2">
+                            <button type="submit" class="btn btn-success">Apply</button>
 
-                        <button type="submit">Filter <i class="bi bi-filter-circle"></i></button>
-                        <a class="filter-btn" th:href="@{/products/list}">Clear <i class="bi bi-x-circle"></i></a>
+                            <a class="btn btn-danger" th:href="@{/products/list}">Reset All</a>
+                        </div>
                     </form>
                 </div>
-                <div class="my-4">
-                    <form method="get" th:action="@{/products/list}" class="filter-form mb-3">
-                        <input type="hidden" name="q" th:value="${q}">
-                        <input type="hidden" name="category_id" th:value="${categoryId}">
-                        <input type="hidden" name="minPrice" th:value="${minPrice}">
-                        <input type="hidden" name="maxPrice" th:value="${maxPrice}">
-                        <input type="hidden" name="size" th:value="${size}">
-                        <input type="hidden" name="page" value="0">
+            </div>
 
-                        <label class="me-2">Sort by:</label>
-                        <select name="sortBy">
-                            <option value="id" th:selected="${sortBy=='id'}">ID</option>
-                            <option value="price" th:selected="${sortBy=='price'}">Price</option>
-                            <option value="name" th:selected="${sortBy=='name'}">Name</option>
-                        </select>
 
-                        <select name="direction">
-                            <option value="asc" th:selected="${direction=='asc'}">ASC</option>
-                            <option value="desc" th:selected="${direction=='desc'}">DESC</option>
-                        </select>
-
-                        <button type="submit" class="ms-2">Apply</button>
-                        <a class="filter-btn" th:href="@{/products/list}">Clear <i class="bi bi-x-circle"></i></a>
-                    </form>
-
-                </div>
-                <div th:each="product :${products}" class="col-lg-6 mb-4">
-                    <div class="product-card">
-                        <div class="image-container">
-                            <img th:src="${product.imageUrl}" alt="Product image" class="mb-3"/>
-                        </div>
-                        <div th:if="${!product.discountRate.equals(0.0)}" class="discount-info">
-                            <span class="discount-label" th:text="'%' + ${product.discountRate} + ' OFF'"></span>
-                            <span class="surprise-icon" title="Surprise Discount!">🎉</span>
-                        </div>
-                        <div class="content-info">
-                            <div class="product-name">
-                                <i>Product Name:</i> <span th:text="${product.name}">[Product Name]</span>
-                            </div>
-                            <div class="product-description">
-                                <i>Product Description:</i> <span th:text="${product.description}"></span>
-                            </div>
-                            <div class="product-price">
-                                <i>Product Price:</i> <span th:text="'$' + ${product.price}"></span>
-                            </div>
-                            <div class="view-add-buttons">
-                                <a class="btn detail-button" th:href="@{/products/{productId}(productId=${product.id})}">View
-                                    Details</a>
-                                <form method="post" th:action="@{/cart/add/{id}(id=${product.id})}">
-                                    <button class="btn detail-button">Add
-                                        To Cart <i class="bi bi-cart-plus-fill"></i>
-                                    </button>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+            <div id="product-container" class="row gx-5">
 
             </div>
+
+          </div>
         </div>
 
-        <div th:if="${totalPages > 1}" class="pagination">
-            <div class="row col-sm-12 align-items-center">
-                <div class="col-sm-3">
-                    Total Rows: [[${totalItems}]]
-                </div>
+        <div id="pagination" class="pagination mt-3">
 
-                <div class="col-sm-2">
-                    <a class="page-btn"
-                       th:if="${currentPage > 0}"
-                       th:href="@{/products/list(
-                     q=${q},
-                     category_id=${categoryId},
-                     minPrice=${minPrice},
-                     maxPrice=${maxPrice},
-                     page_no=${0},
-                     size=${size},
-                     sortBy=${sortBy},
-                     direction=${direction}
-                   )}">First</a>
-                    <span th:unless="${currentPage > 0}">First</span>
-                </div>
-
-                <div class="col-sm-2">
-                    <a class="page-btn"
-                       th:if="${currentPage > 0}"
-                       th:href="@{/products/list(
-                     q=${q},
-                     category_id=${categoryId},
-                     minPrice=${minPrice},
-                     maxPrice=${maxPrice},
-                     page_no=${currentPage - 1},
-                     size=${size},
-                     sortBy=${sortBy},
-                     direction=${direction}
-                   )}">Before</a>
-                    <span th:unless="${currentPage > 0}">Before</span>
-                </div>
-
-                <div class="col-sm-3">
-      <span th:each="i: ${#numbers.sequence(0, totalPages - 1)}">
-        <a class="page-btn"
-           th:if="${currentPage != i}"
-           th:href="@{/products/list(
-                       q=${q},
-                       category_id=${categoryId},
-                       minPrice=${minPrice},
-                       maxPrice=${maxPrice},
-                       page_no=${i},
-                       size=${size},
-                       sortBy=${sortBy},
-                       direction=${direction}
-                     )}"
-           th:text="${i + 1}"></a>
-        <span th:unless="${currentPage != i}" th:text="${i + 1}" class="active"></span>
-        &nbsp;
-      </span>
-                </div>
-
-                <div class="col-sm-2">
-                    <a class="page-btn"
-                       th:if="${currentPage < totalPages - 1}"
-                       th:href="@{/products/list(
-                     q=${q},
-                     category_id=${categoryId},
-                     minPrice=${minPrice},
-                     maxPrice=${maxPrice},
-                     page_no=${currentPage + 1},
-                     size=${size},
-                     sortBy=${sortBy},
-                     direction=${direction}
-                   )}">Next</a>
-                    <span th:unless="${currentPage < totalPages - 1}">Next</span>
-                </div>
-
-                <div class="col-sm-2">
-                    <a class="page-btn"
-                       th:if="${currentPage < totalPages - 1}"
-                       th:href="@{/products/list(
-                     q=${q},
-                     category_id=${categoryId},
-                     minPrice=${minPrice},
-                     maxPrice=${maxPrice},
-                     page_no=${totalPages - 1},
-                     size=${size},
-                     sortBy=${sortBy},
-                     direction=${direction}
-                   )}">Last</a>
-                    <span th:unless="${currentPage < totalPages - 1}">Last</span>
-                </div>
-            </div>
         </div>
 
-
-        <!--
-        <div th:if="${totalPages > 1}" class="pagination">
-            <div class="row col-sm-10">
-                <div class="col-sm-2">
-                    Total Rows: [[${totalItems}]]
-                </div>
-                <div class="col-sm-1">
-            <span th:each="i: ${#numbers.sequence(1, totalPages)}">
-      <a th:if="${currentPage != i - 1}"
-         th:href="@{/products/list(
-                     q=${q},
-                     category_id=${categoryId},
-                     minPrice=${minPrice},
-                     maxPrice=${maxPrice},
-                     page_no=${i - 1},
-                     size=${size},
-                     sortBy=${sortBy},
-                     direction=${direction}
-                   )}">[[${i}]]</a>
-      <span th:unless="${currentPage != i - 1}">[[${i}]]</span> &nbsp; &nbsp;
-            </span>
-                </div>
-                <div class="col-sm-1">
-                    <a th:if="${currentPage < totalPages && currentPage > 0}"
-                       th:href="@{/products/list(
-                     q=${q},
-                     category_id=${categoryId},
-                     minPrice=${minPrice},
-                     maxPrice=${maxPrice},
-                     page_no=${currentPage - 1},
-                     size=${size},
-                     sortBy=${sortBy},
-                     direction=${direction}
-                   )}">Before</a>
-                       <span th:unless="${currentPage < totalPages && currentPage > 0}">Before</span>
-                </div>
-
-                <div class="col-sm-1">
-                    <a th:if="${currentPage < totalPages - 1}"
-                       th:href="@{/products/list(
-                     q=${q},
-                     category_id=${categoryId},
-                     minPrice=${minPrice},
-                     maxPrice=${maxPrice},
-                     page_no=${currentPage + 1},
-                     size=${size},
-                     sortBy=${sortBy},
-                     direction=${direction}
-                   )}">Next</a>
-                       <span th:unless="${currentPage < totalPages - 1}">Next</span>
-                </div>
-
-                <div class="col-sm-1">
-                    <a th:if="${currentPage < totalPages - 1}"
-                       th:href="@{/products/list(
-                     q=${q},
-                     category_id=${categoryId},
-                     minPrice=${minPrice},
-                     maxPrice=${maxPrice},
-                     page_no=${totalPages - 1},
-                     size=${size},
-                     sortBy=${sortBy},
-                     direction=${direction}
-                   )}">Last</a>
-                    <span th:unless="${currentPage < totalPages - 1}">Last</span>
-                </div>
-            </div>
-        </div>
-        -->
     </section>
 </main>
 </body>
 </html>
 <script>
-    function clearSearch() {
-        document.querySelector(".search").value = "";
-        location.replace("/products/list");
+    document.addEventListener("DOMContentLoaded", () => {
+
+        hydrateFormFromURL();
+        applyFilters(false);
+
+        const form = document.getElementById("filter-form");
+        form.addEventListener("submit", (e) => {
+            e.preventDefault();
+
+            form.elements.namedItem('page_no').value = '0';
+            applyFilters(false);
+        });
+    });
+
+
+    function hydrateFormFromURL() {
+        const p = new URLSearchParams(window.location.search);
+        const form = document.getElementById('filter-form');
+        for (const [k, v] of p.entries()) {
+            const el = form.elements.namedItem(k);
+            if (el) el.value = v;
+        }
     }
+
+    function applyFilters(updateHistory = true) {
+        const form = document.getElementById('filter-form');
+        const params = new URLSearchParams(new FormData(form)).toString();
+
+
+        if (updateHistory) {
+            history.replaceState(null, '', window.location.pathname + '?' + params);
+        } else {
+
+            history.replaceState(null, '', window.location.pathname + '?' + params);
+        }
+
+        loadProducts(params);
+    }
+
+    async function loadProducts(params = '') {
+        const container = document.getElementById('product-container');
+        const pager = document.getElementById('pagination');
+
+        container.innerHTML = '<div class="p-3">Loading...</div>';
+        pager.innerHTML = '';
+
+        try {
+            const res = await fetch('/products/api?' + params, { credentials: 'same-origin' });
+            if (!res.ok) {
+                const text = await res.text();
+                container.innerHTML = `<div class="text-danger p-3">Failed (${res.status}).</div>`;
+                console.error('API error', res.status, text.slice(0, 200));
+                return;
+            }
+            const data = await res.json(); // Page<ProductDto>
+
+
+            if (!data.content || data.content.length === 0) {
+                container.innerHTML = '<div class="p-3">No products found.</div>';
+            } else {
+                container.innerHTML = data.content.map(p => productCard(p)).join('');
+            }
+
+
+            renderPagination(data);
+        } catch (e) {
+            container.innerHTML = '<div class="text-danger p-3">Error loading products.</div>';
+            console.error(e);
+        }
+    }
+
+    function productCard(p) {
+        const price = (p.price != null) ? `$${p.price}` : '';
+        const img = p.imageUrl || '/images/placeholder.png';
+        const name = escapeHtml(p.name || '');
+        const desc = escapeHtml(p.description || '');
+        return `
+    <div class="col-lg-6 mb-4">
+      <div class="product-card">
+        <div class="image-container">
+          <img src="${img}" alt="${name}" class="mb-3"/>
+        </div>
+        <div class="content-info">
+          <div><strong>${name}</strong></div>
+          <div>${desc}</div>
+          <div>${price}</div>
+          <div class="view-add-buttons mt-2">
+            <a class="btn detail-button" href="/products/${p.id}">View Details</a>
+            <form method="post" action="/cart/add/${p.id}" style="display:inline;">
+              <button class="btn detail-button" type="submit">Add To Cart</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>`;
+    }
+
+    function escapeHtml(s) {
+        return s.replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+    }
+
+
+    function renderPagination(page) {
+        const pager = document.getElementById('pagination');
+        const cur = page.number;
+        const total = page.totalPages;
+
+        if (!total || total <= 1) { pager.innerHTML = ''; return; }
+
+        const btn = (label, enabled, target) =>
+            enabled ? `<button class="page-btn mx-4" onclick="goToPage(${target})">${label}</button>`
+                : `<span class="page-btn disabled mx-4">${label}</span>`;
+
+
+        const range = [];
+        const start = Math.max(0, cur - 2);
+        const end = Math.min(total - 1, cur + 2);
+        for (let i = start; i <= end; i++) {
+            range.push(i === cur
+                ? `<span class="page-btn active mx-2">${i + 1}</span>`
+                : `<button class="page-btn mx-2" onclick="goToPage(${i})">${i + 1}</button>`);
+        }
+
+        pager.innerHTML = [
+            btn('First', cur > 0, 0),
+            btn('Prev', cur > 0, cur - 1),
+            ...range,
+            btn('Next', cur < total - 1, cur + 1),
+            btn('Last', cur < total - 1, total - 1)
+        ].join(' ');
+    }
+
+
+    function goToPage(n) {
+        const form = document.getElementById('filter-form');
+        const hidden = form.elements.namedItem('page_no') || form.elements.namedItem('page');
+        if (hidden) hidden.value = String(n);
+        applyFilters();
+    }
+    /*
+    document.addEventListener("DOMContentLoaded", () => {
+        const form = document.getElementById("filter-form");
+        form.addEventListener("submit", (e) => {
+            e.preventDefault();
+            const params = new URLSearchParams(new FormData(e.target)).toString();
+            loadProducts(params);
+        });
+    });
+
+    async function loadProducts(params = '') {
+        const response = await fetch('/products/api?' + params, { credentials: 'same-origin' });
+        const data = await response.json();
+
+        const container = document.getElementById('product-container');
+        container.innerHTML = '';
+        data.content.forEach(p => {
+            container.innerHTML += `
+      <div class="col-lg-6 mb-4">
+        <div class="product-card">
+          <div class="image-container">
+            <img src="${p.imageUrl}" alt="${p.name}" class="mb-3"/>
+          </div>
+          <div class="content-info">
+            <div><strong>${p.name}</strong></div>
+            <div>${p.description ?? ''}</div>
+            <div>$${p.price}</div>
+          </div>
+        </div>
+      </div>`;
+        });
+    } */
 </script>

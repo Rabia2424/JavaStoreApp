@@ -49,29 +49,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
 
-        String servletPath = request.getServletPath();
-
-        if (servletPath.equals("/") ||
-                servletPath.equals("/auth/login") ||
-                servletPath.equals("/auth/register") ||
-                servletPath.equals("/auth/logout") ||
-                servletPath.equals("/products/list") ||
-                servletPath.startsWith("/assets/") ||
-                servletPath.startsWith("/css/") ||
-                servletPath.startsWith("/js/") ||
-                servletPath.startsWith("/images/") ||
-                servletPath.startsWith("/admin/products/new") ||
-                servletPath.equals("/errorPage")) {
-            try {
-                isAuthenticatedWithJwtFromCookie(request);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-            filterChain.doFilter(request, response);
-            return;
-        }
-
-        System.out.println("JwtAuthenticationFilter çalıştı");
         // Get JWT token from HTTP request
         String token = getTokenFromCookie(request, response);
 
@@ -91,10 +68,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
             SecurityContextHolder.getContext().setAuthentication(authenticationToken);
-        }else {
-            throw new AuthenticationException("Unauthorized"){};
         }
-
         try {
             isAuthenticatedWithJwtFromCookie(request);//This is for checking isAuthenticated actually with control they have claims in jwt.
         } catch (Exception e) {

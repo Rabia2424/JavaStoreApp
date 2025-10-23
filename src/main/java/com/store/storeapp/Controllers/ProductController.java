@@ -8,10 +8,7 @@ import com.store.storeapp.Services.impl.CategoryService;
 import com.store.storeapp.Services.impl.ProductDiscountService;
 import com.store.storeapp.Services.impl.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -47,8 +44,8 @@ public class ProductController {
             @RequestParam(required = false) Double maxPrice,
             @RequestParam(defaultValue = "0") int page_no,
             @RequestParam(defaultValue = "4") int size,
-            @RequestParam(defaultValue = "id") String sortBy,
-            @RequestParam(defaultValue = "desc") String direction,
+            @RequestParam(required = false) String sortBy,
+            @RequestParam(required = false) String direction,
             Model model
     ) {
         Page<Product> pageResult = productService.searchFilterPage(
@@ -76,27 +73,28 @@ public class ProductController {
         return "product/product-list";
     }
 
-    @GetMapping("/list/{categoryId}")
-    public String listProductsByCategoryId(@PathVariable Long categoryId){
+    @GetMapping("/api")
+    @ResponseBody
+    public Page<ProductDto> getProductsApi(
+            @RequestParam(required = false) String q,
+            @RequestParam(name = "category_id", required = false) Long categoryId,
+            @RequestParam(required = false) Double minPrice,
+            @RequestParam(required = false) Double maxPrice,
+            @RequestParam(defaultValue = "0") int page_no,
+            @RequestParam(defaultValue = "4") int size,
+            @RequestParam(defaultValue = "id") String sortBy,
+            @RequestParam(defaultValue = "desc") String direction
+    ){
+        Page<Product> pageResult = productService.searchFilterPage(
+                q, categoryId, minPrice, maxPrice, page_no, size, sortBy, direction
+        );
 
-        return "redirect:/products/list?category_id=" + categoryId;
-    }
-
-    @GetMapping ("/search")
-    public String searchProducts(@RequestParam("query") String query){
-        return "redirect:/products/list?q=" + query;
-    }
-
-    @GetMapping("/filter")
-    public String filterProducts(@RequestParam(required = false) Long categoryId,
-                                 @RequestParam(required = false) Double minPrice,
-                                 @RequestParam(required = false) Double maxPrice){
-
-        StringBuilder sb = new StringBuilder("/products/list?");
-        if (categoryId != null) sb.append("category_id=").append(categoryId).append("&");
-        if (minPrice != null) sb.append("minPrice=").append(minPrice).append("&");
-        if (maxPrice != null) sb.append("maxPrice=").append(maxPrice).append("&");
-        return "redirect:" + sb;
+        List<ProductDto> products = productService.mapToProductDtoWithDiscounts(pageResult.getContent());
+        return new PageImpl<> (
+            products,
+            pageResult.getPageable(),
+            pageResult.getTotalElements()
+        );
     }
 
     @GetMapping("/{productId}")
