@@ -18,65 +18,117 @@
                 <p class="lead fw-normal text-muted mb-0">Explore products tailored to your needs</p>
             </div>
 
-            <div class="row gx-5">
-                <div class="my-4">
-                    <form method="get" th:action="@{/products/list}" id="filter-form" class="filter-form">
+            <div class="d-md-none mb-3">
+                <button class="btn btn-filter-toggle w-100" type="button"
+                        data-bs-toggle="collapse" data-bs-target="#filtersCollapse"
+                        aria-expanded="false" aria-controls="filtersCollapse">
+                    Filter Products
+                    <i class="bi bi-sliders"></i>
+                </button>
+            </div>
 
-                        <div class="form-group mb-3">
-                            <label>Select Category: </label>
-                            <select name="category_id" class="form-select">
-                                <option value="">All</option>
-                                <option th:each="category : ${categories}"
-                                        th:value="${category.id}"
-                                        th:text="${category.name}"
-                                        th:selected="${category.id == categoryId}">
-                                </option>
-                            </select>
-                        </div>
+            <!-- Slim Filter Bar (under navbar) -->
+            <div class="filter-bar border-bottom">
+                <div class="container-xxl px-4">
+                    <!-- desktop / tablet inline -->
+                    <form method="get" th:action="@{/products/list}" class="filter-inline d-none d-md-flex" id="filter-form">
 
-                        <div class="row g-3 mb-3">
-                            <div class="col-sm-6">
-                                <label>Min Price: </label>
-                                <input type="number" class="form-control" name="minPrice" th:value="${minPrice}">
-                            </div>
-                            <div class="col-sm-6">
-                                <label>Max Price: </label>
-                                <input type="number" class="form-control" name="maxPrice" th:value="${maxPrice}">
-                            </div>
-                        </div>
+                        <select name="category_id" class="form-select fld"
+                                aria-label="Category">
+                            <option value="">All</option>
+                            <option th:each="category : ${categories}"
+                                    th:value="${category.id}"
+                                    th:text="${category.name}"
+                                    th:selected="${category.id == categoryId}">
+                            </option>
+                        </select>
 
-                        <div class="row g-3 mb-3 align-items-end">
-                            <div class="col-sm-6">
-                                <label class="me-2">Sort by:</label>
-                                <select name="sortBy" class="form-select"
-                                        th:value="${sortBy != null ? sortBy : ''}">
-                                    <option value="">Select option</option>
-                                    <option value="id"    th:selected="${sortBy=='id'}">ID</option>
-                                    <option value="price" th:selected="${sortBy=='price'}">Price</option>
-                                    <option value="name"  th:selected="${sortBy=='name'}">Name</option>
-                                </select>
-                            </div>
-                            <div class="col-sm-6">
-                                <label class="me-2">Direction:</label>
-                                <select name="direction" class="form-select"
-                                        th:value="${direction != null ? direction : ''}">
-                                    <option value="">Select direction</option>
-                                    <option value="asc"  th:selected="${direction=='asc'}">ASC</option>
-                                    <option value="desc" th:selected="${direction=='desc'}">DESC</option>
-                                </select>
-                            </div>
+                        <input type="number" class="form-control fld" name="minPrice"
+                               th:value="${minPrice}" placeholder="Min">
+
+                        <input type="number" class="form-control fld" name="maxPrice"
+                               th:value="${maxPrice}" placeholder="Max">
+
+                        <select name="sortBy" class="form-select fld"
+                                th:value="${sortBy != null ? sortBy : ''}">
+                            <option value="">Sort</option>
+                            <option value="price" th:selected="${sortBy=='price'}">Price</option>
+                            <option value="name"  th:selected="${sortBy=='name'}">Name</option>
+                            <option value="id"    th:selected="${sortBy=='id'}">ID</option>
+                        </select>
+
+                        <div class="btn-group btn-group-sm fld-dir" role="group" aria-label="Direction">
+                            <input type="radio" class="btn-check" name="direction" id="dirAsc" value="asc"  th:checked="${direction=='asc'}">
+                            <label class="btn btn-dir" for="dirAsc">ASC</label>
+                            <input type="radio" class="btn-check" name="direction" id="dirDesc" value="desc" th:checked="${direction=='desc'}">
+                            <label class="btn btn-dir" for="dirDesc">DESC</label>
                         </div>
 
                         <input type="hidden" name="q">
                         <input type="hidden" name="size" th:value="${size}">
                         <input type="hidden" name="page_no" value="0">
 
-                        <div class="mt-2 d-flex gap-2">
-                            <button type="submit" class="btn success-button">Apply</button>
-
-                            <a class="btn danger-button" th:href="@{/products/list}">Reset All</a>
-                        </div>
+                        <button type="submit" class="btn btn-apply">Apply</button>
+                        <a th:href="@{/products/list}" class="btn btn-reset">Reset</a>
                     </form>
+
+                    <!-- mobile toggle -->
+                    <div class="d-md-none py-2">
+                        <button class="btn btn-filter-toggle w-100" data-bs-toggle="collapse" data-bs-target="#filtersPanel"
+                                aria-expanded="false" aria-controls="filtersPanel">
+                            Filters
+                            <i class="bi bi-sliders"></i>
+                        </button>
+                        <div id="filtersPanel" class="collapse mt-2">
+                            <form method="get" th:action="@{/products/list}" class="filter-panel" id="filter-form-mobile">
+                                <select name="category_id" class="form-select mb-2">
+                                    <option value="">All</option>
+                                    <option th:each="category : ${categories}"
+                                            th:value="${category.id}"
+                                            th:text="${category.name}"
+                                            th:selected="${category.id == categoryId}">
+                                    </option>
+                                </select>
+
+                                <div class="row g-2 mb-2">
+                                    <div class="col-6">
+                                        <input type="number" class="form-control" name="minPrice" th:value="${minPrice}" placeholder="Min">
+                                    </div>
+                                    <div class="col-6">
+                                        <input type="number" class="form-control" name="maxPrice" th:value="${maxPrice}" placeholder="Max">
+                                    </div>
+                                </div>
+
+                                <div class="row g-2 mb-2">
+                                    <div class="col-6">
+                                        <select name="sortBy" class="form-select" th:value="${sortBy != null ? sortBy : ''}">
+                                            <option value="">Sort</option>
+                                            <option value="price" th:selected="${sortBy=='price'}">Price</option>
+                                            <option value="name"  th:selected="${sortBy=='name'}">Name</option>
+                                            <option value="id"    th:selected="${sortBy=='id'}">ID</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="btn-group btn-group-sm w-100" role="group">
+                                            <input type="radio" class="btn-check" name="direction" id="mAsc" value="asc"  th:checked="${direction=='asc'}">
+                                            <label class="btn btn-dir w-50" for="mAsc">ASC</label>
+                                            <input type="radio" class="btn-check" name="direction" id="mDesc" value="desc" th:checked="${direction=='desc'}">
+                                            <label class="btn btn-dir w-50" for="mDesc">DESC</label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <input type="hidden" name="q">
+                                <input type="hidden" name="size" th:value="${size}">
+                                <input type="hidden" name="page_no" value="0">
+
+                                <div class="d-grid gap-2">
+                                    <button type="submit" class="btn btn-apply">Apply</button>
+                                    <a th:href="@{/products/list}" class="btn btn-reset">Reset</a>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -97,42 +149,50 @@
 </body>
 </html>
 <script>
+    function getActiveForm() {
+        return document.getElementById("filter-form")
+            || document.getElementById("filter-form-mobile")
+            || null;
+    }
+
     document.addEventListener("DOMContentLoaded", () => {
+        const form = getActiveForm();
+        hydrateFormFromURL(form);
+        applyFilters(false, form);
 
-        hydrateFormFromURL();
-        applyFilters(false);
-
-        const form = document.getElementById("filter-form");
-        form.addEventListener("submit", (e) => {
-            e.preventDefault();
-
-            form.elements.namedItem('page_no').value = '0';
-            applyFilters(false);
-        });
+        if (form) {
+            form.addEventListener("submit", (e) => {
+                e.preventDefault();
+                const pageNo = form.elements.namedItem('page_no');
+                if (pageNo) pageNo.value = '0';
+                applyFilters(false, form);
+            });
+        }
     });
 
-
-    function hydrateFormFromURL() {
-        const p = new URLSearchParams(window.location.search);
-        const form = document.getElementById('filter-form');
-        for (const [k, v] of p.entries()) {
+    function hydrateFormFromURL(form) {
+        if (!form) return;
+        const params = new URLSearchParams(window.location.search);
+        for (const [k, v] of params.entries()) {
             const el = form.elements.namedItem(k);
-            if (el) el.value = v;
+            if (!el) continue;
+            if (el.type === 'radio') {
+                const r = form.querySelector(`[name="${k}"][value="${v}"]`);
+                if (r) r.checked = true;
+            } else {
+                el.value = v;
+            }
         }
     }
 
-    function applyFilters(updateHistory = true) {
-        const form = document.getElementById('filter-form');
+    function applyFilters(updateHistory = true, form = getActiveForm()) {
+        if (!form) return;
         const params = new URLSearchParams(new FormData(form)).toString();
-
-
         if (updateHistory) {
             history.replaceState(null, '', window.location.pathname + '?' + params);
         } else {
-
             history.replaceState(null, '', window.location.pathname + '?' + params);
         }
-
         loadProducts(params);
     }
 
@@ -141,7 +201,7 @@
         const pager = document.getElementById('pagination');
 
         container.innerHTML = '<div class="p-3">Loading...</div>';
-        pager.innerHTML = '';
+        if (pager) pager.innerHTML = '';
 
         try {
             const res = await fetch('/products/api?' + params, { credentials: 'same-origin' });
@@ -153,13 +213,11 @@
             }
             const data = await res.json(); // Page<ProductDto>
 
-
             if (!data.content || data.content.length === 0) {
                 container.innerHTML = '<div class="p-3">No products found.</div>';
             } else {
                 container.innerHTML = data.content.map(p => productCard(p)).join('');
             }
-
 
             renderPagination(data);
         } catch (e) {
@@ -173,55 +231,58 @@
         const img = p.imageUrl || '/images/placeholder.png';
         const name = escapeHtml(p.name || '');
         const desc = escapeHtml(p.description || '');
+
         return `
-    <div class="col">
-      <div class="product-card">
-        <div class="image-container">
-          <img src="${img}" alt="${name}" class="mb-3"/>
-        </div>
-        <div class="content-info">
-          <div><strong>${name}</strong></div>
-          <div>${desc}</div>
-          <div>${price}</div>
-          <div class="view-add-buttons mt-2">
-            <a class="btn detail-button" href="/products/${p.id}">
-            <i class="bi bi-eye"></i>
-            View Details</a>
-            <form method="post" action="/cart/add/${p.id}" style="display:inline;">
-              <button class="btn detail-button" type="submit">
-              <i class="bi bi-cart-plus"></i>
-              Add To Cart</button>
-            </form>
+      <div class="col">
+        <div class="product-card h-100">
+          <div class="image-container">
+            <img src="${img}" alt="${name}" />
+          </div>
+          <div class="content-info">
+            <div class="product-name">${name}</div>
+            <div class="product-desc">${desc}</div>
+            <div class="product-price">${price}</div>
+            <div class="view-add-buttons mt-2">
+              <a class="btn detail-button" href="/products/${p.id}">
+                <i class="bi bi-eye"></i> View Details
+              </a>
+              <form method="post" action="/cart/add/${p.id}" style="display:inline;">
+                <button class="btn detail-button" type="submit">
+                  <i class="bi bi-cart-plus"></i> Add To Cart
+                </button>
+              </form>
+            </div>
           </div>
         </div>
-      </div>
-     </div>`;
+      </div>`;
     }
 
     function escapeHtml(s) {
-        return s.replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+        return String(s).replace(/[&<>"']/g, m => (
+            {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]
+        ));
     }
-
 
     function renderPagination(page) {
         const pager = document.getElementById('pagination');
-        const cur = page.number;
-        const total = page.totalPages;
+        if (!pager) return;
+
+        const cur = page.number ?? 0;
+        const total = page.totalPages ?? 0;
 
         if (!total || total <= 1) { pager.innerHTML = ''; return; }
 
         const btn = (label, enabled, target) =>
-            enabled ? `<button class="page-btn mx-4" onclick="goToPage(${target})">${label}</button>`
-                : `<span class="page-btn disabled mx-4">${label}</span>`;
-
+            enabled ? `<button class="page-btn mx-2" onclick="goToPage(${target})">${label}</button>`
+                : `<span class="page-btn disabled mx-2">${label}</span>`;
 
         const range = [];
         const start = Math.max(0, cur - 2);
         const end = Math.min(total - 1, cur + 2);
         for (let i = start; i <= end; i++) {
             range.push(i === cur
-                ? `<span class="page-btn active mx-2">${i + 1}</span>`
-                : `<button class="page-btn mx-2" onclick="goToPage(${i})">${i + 1}</button>`);
+                ? `<span class="page-btn active mx-1">${i + 1}</span>`
+                : `<button class="page-btn mx-1" onclick="goToPage(${i})">${i + 1}</button>`);
         }
 
         pager.innerHTML = [
@@ -233,9 +294,9 @@
         ].join(' ');
     }
 
-
     function goToPage(n) {
-        const form = document.getElementById('filter-form');
+        const form = getActiveForm();
+        if (!form) return;
         const hidden = form.elements.namedItem('page_no') || form.elements.namedItem('page');
         if (hidden) hidden.value = String(n);
         applyFilters();

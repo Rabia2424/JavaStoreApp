@@ -15,6 +15,7 @@ public class ProductDto {
     private Integer stockQuantity;
     private String imageUrl;
     private Double discountRate;
+    private Double discountedPrice;
     private LocalDateTime createdOn;
     private LocalDateTime updatedOn;
 

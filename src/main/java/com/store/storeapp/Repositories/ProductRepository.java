@@ -36,4 +36,15 @@ public interface ProductRepository extends JpaRepository<Product, Long>, JpaSpec
             "GROUP BY p.id " +
             "ORDER BY COUNT(o.id) DESC")
     Page<Product> getPopularProducts(Pageable pageable);
+
+    @Query("""
+  select p from Product p
+    join ProductDiscount d on d.product = p
+   where d.isActive = true
+     and d.startDate <= CURRENT_TIMESTAMP
+     and (d.endDate is null or d.endDate >= CURRENT_TIMESTAMP)
+   group by p.id
+   order by max(d.discountRate) desc
+""")
+    Page<Product> findDiscountedProducts(Pageable pageable);
 }

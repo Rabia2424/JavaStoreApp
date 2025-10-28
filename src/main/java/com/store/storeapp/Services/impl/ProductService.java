@@ -51,6 +51,7 @@ public class ProductService {
     }
 
 
+    @Transactional
     public void deleteProduct(Long productId){
         productRepository.deleteById(productId);
     }
@@ -75,11 +76,12 @@ public class ProductService {
                 .map((product) -> {
                     ProductDiscount productDiscount = discountService.getValidDiscountByProductId(product.getId());
                     ProductDto productDto =  mapToProductDto(product);
-                    if(productDiscount != null){
-                        productDto.setDiscountRate(productDiscount.getDiscountRate());
-                    }else{
-                        productDto.setDiscountRate(0.0);
-                    }
+                    double rate = (productDiscount != null) ? productDiscount.getDiscountRate() : 0.0;
+                    productDto.setDiscountRate(rate);
+
+                    double discountedPrice = product.getPrice() * (1 - rate / 100);;
+                    productDto.setDiscountedPrice(discountedPrice);
+
                     return productDto;
                 }).collect(Collectors.toList());
     }
@@ -124,6 +126,14 @@ public class ProductService {
 
         return productRepository.findAll(spec, pageable);
     }
+
+
+    public List<ProductDto> getTopDiscounted(int limit) {
+        Page<Product> page = productRepository.findDiscountedProducts(PageRequest.of(0, limit));
+        return mapToProductDtoWithDiscounts(page.getContent());
+    }
+
+
 
 //    public Page<Product> findAll(Pageable pageable) {
 //        return productRepository.findAll(pageable);

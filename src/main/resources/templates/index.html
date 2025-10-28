@@ -1,10 +1,44 @@
 <!DOCTYPE HTML>
-<html xmlns:th="http://www.thymeleaf.org">
+<html
+        xmlns:th="http://thymeleaf.org"
+        xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+        layout:decorate="~{layout}">
 <head>
     <title>Title</title>
 </head>
 <body>
-<div>Web Application. Passed parameter </div>
-<a class="btn btn-primary" th:href="@{/products/list}">Go To Product List </a>
+<!-- ======= POPULAR PRODUCTS (Hero altı) ======= -->
+<section layout:fragment="body" class="py-5" style="background:#060b0c;">
+    <div class="container px-5">
+        <div class="d-flex align-items-end justify-content-between mb-3">
+            <h4 class="m-0 text-white">Limited-Time Deals</h4>
+            <a th:href="@{/shop/discounts}" class="text-decoration-none" style="color:var(--accent);">See all →</a>
+        </div>
+
+        <div th:if="${#lists.isEmpty(discountedProducts)}" class="text-white-50">No active discounts right now.</div>
+
+        <div th:if="${!#lists.isEmpty(discountedProducts)}"
+             class="d-flex gap-3 overflow-auto pb-2 flex-nowrap" style="scroll-snap-type:x mandatory;">
+            <article th:each="p : ${discountedProducts}" class="card bg-dark text-white-50 border-0" style="min-width:220px; scroll-snap-align:start;">
+                <a th:href="@{/products/{id}(id=${p.id})}" class="text-decoration-none">
+                    <div class="position-relative">
+                        <img th:src="${p.imageUrl != null ? p.imageUrl : '/images/placeholder.png'}" class="card-img-top" th:alt="${p.name}" style="height:220px; object-fit:cover;">
+                        <span class="deal-badge">-<span th:text="${#numbers.formatDecimal(p.discountRate,0,'POINT',0,'POINT')}"></span>%</span>
+                    </div>
+                    <div class="card-body">
+                        <h6 class="card-title text-white mb-1" th:text="${p.name}">Product</h6>
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="fw-semibold text-white" th:text="${'₺' + #numbers.formatDecimal(p.discountedPrice,0,'POINT',2,'POINT')}">₺0.00</span>
+                            <small class="text-decoration-line-through text-white-50" th:text="${'₺' + #numbers.formatDecimal(p.price,0,'POINT',2,'POINT')}">₺0.00</small>
+                        </div>
+                    </div>
+                </a>
+            </article>
+        </div>
+    </div>
+</section>
+
+
+
 </body>
 </html>

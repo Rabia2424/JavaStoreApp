@@ -40,6 +40,36 @@
     font-size: 2.4rem !important;
 }
 
+/* ---- NAVBAR BRAND RESPONSIVE ---- */
+@media (max-width: 1200px) {
+    .brand-title {
+        margin-left: 6rem !important;
+        font-size: 2.2rem !important;
+    }
+}
+
+@media (max-width: 992px) {
+    .brand-title {
+        margin-left: 3rem !important;
+    }
+}
+
+@media (max-width: 768px) {
+    .brand-title {
+        margin-left: 0 !important;
+        text-align: center;
+        display: block;
+        width: 100%;
+    }
+}
+
+@media (max-width: 420px) {
+    .brand-title {
+        letter-spacing: 0.01em;
+    }
+}
+
+
 /* Sol & Sağ bloklar */
 .midbar-left, .midbar-right{ display:flex; align-items:center; gap:.6rem; }
 .midbar .icon-btn{
