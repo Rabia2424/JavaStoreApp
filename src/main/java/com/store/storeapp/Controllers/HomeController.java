@@ -16,7 +16,9 @@ public class HomeController {
 
     @GetMapping("/")
     public String showIndexPage(Model model){
-        List<ProductDto> discounted = productService.getTopDiscounted(4);
+        List<ProductDto> discounted = productService.getTopDiscounted(10);
+
+        System.out.println("Total discounted products: " + discounted.size());
         model.addAttribute("discountedProducts", discounted);
         return "index";
     }

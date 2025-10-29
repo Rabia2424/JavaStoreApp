@@ -1,0 +1,176 @@
+:root{
+    --accent:#117295;
+    --bg:#01090d;
+    --ink:#ffffff;
+    --muted:rgba(255,255,255,.75);
+    --line:rgba(255,255,255,.08);
+    --card:#0a171a;
+    --radius:16px;
+}
+
+/* ========== HERO ========== */
+.hero {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    background: url('/images/hero2.png') center center/cover no-repeat;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start; /* sola hizalama */
+    overflow: hidden;
+}
+
+/* Yazılar sol tarafta */
+.hero-text {
+    position: absolute;
+    top: 25%;
+    left: 8%;
+    color: #111;
+    max-width: 600px;
+}
+
+/* Üst küçük başlık */
+.hero-subtitle {
+    font-size: 1rem;
+    letter-spacing: 3px;
+    color: var(--ink);
+    text-transform: uppercase;
+    font-weight: 500;
+    margin-bottom: 1rem;
+}
+
+/* Ana başlık */
+.hero-title {
+    font-family: "Helvetica Neue", Arial, sans-serif;
+    font-size: 4.5rem;
+    line-height: 1.05;
+    letter-spacing: 1px;
+    color: var(--ink);
+    font-weight: 400;
+    margin-bottom: 2rem;
+}
+
+/* Buton */
+.hero-btn {
+    display: inline-block;
+    background-color: #1f3b48; /* örnekteki koyu zeytin tonu */
+    color: #fff;
+    padding: 0.8rem 2rem;
+    font-size: 1rem;
+    font-weight: 400;
+    border: none;
+    text-decoration: none;
+    transition: box-shadow 0.3s ease;
+}
+
+.hero-btn:hover {
+    color: #fff;
+    box-shadow: 0 0 5px rgba(78, 205, 196, 0.55); /* ışıltı */
+}
+
+/* Responsive düzen */
+@media (max-width: 992px) {
+    .hero {
+        justify-content: center;
+        height: 80vh;
+    }
+
+    .hero-text {
+        position: static;
+        text-align: center;
+        padding: 3rem 2rem;
+    }
+
+    .hero-title {
+        font-size: 2.8rem;
+    }
+}
+
+/* DISCOUNTED RAIL */
+.discounted-section {
+    background:#060b0c;
+    padding: clamp(1.5rem, 3vw, 2.5rem) 0 3rem 0;
+}
+
+.section-head {
+    display:flex;
+    align-items:end;
+    justify-content:space-between;
+    padding:0 1rem;
+    margin-bottom:.8rem;
+}
+.section-head h4 { color:#fff; margin:0; }
+
+.sh-controls { display:flex; gap:.5rem; }
+.sh-btn {
+    background:#0b1114;
+    color:#fff;
+    border:1px solid var(--line);
+    width:38px; height:38px;
+    border-radius:8px;
+}
+.sh-btn:hover { border-color:var(--accent); color:var(--accent); }
+
+/* scrollable row */
+.product-rail {
+    display:grid;
+    grid-auto-flow:column;
+    grid-auto-columns: clamp(220px, 24vw, 280px);
+    gap:1rem;
+    overflow-x:auto;
+    padding:.5rem 1rem 1rem;
+    scroll-snap-type:x mandatory;
+    scroll-behavior:smooth;
+}
+.product-rail::-webkit-scrollbar { height:8px; }
+.product-rail::-webkit-scrollbar-thumb { background:var(--line); border-radius:6px; }
+
+.d-card {
+    background: rgba(255,255,255,.03);
+    border:1px solid var(--line);
+    border-radius:14px;
+    scroll-snap-align:start;
+    display:flex;
+    flex-direction:column;
+    overflow:hidden;
+    transition:transform .2s ease, box-shadow .25s ease, border-color .2s ease;
+}
+.d-card:hover {
+    transform: translateY(-4px);
+    border-color: var(--accent);
+    box-shadow:0 8px 22px rgba(17,114,149,.22);
+}
+.d-img {
+    position:relative;
+    display:block;
+    aspect-ratio:4/5;
+    background:#0b1114;
+}
+.d-img img {
+    position:absolute;
+    inset:0;
+    width:100%; height:100%;
+    object-fit:cover;
+    transition:transform .3s ease;
+}
+.d-card:hover .d-img img { transform: scale(1.05); }
+
+.badge-off{
+    position:absolute; left:.75rem; top:.75rem;
+    background:var(--accent); color:#041217; font-weight:800;
+    padding:.25rem .5rem; border-radius:999px; font-size:.8rem;
+}
+
+.d-body{ padding:.8rem .9rem 1rem; color:var(--muted); display:flex; flex-direction:column; gap:.45rem; }
+.d-title{ color:#fff; margin:0; font-weight:600; letter-spacing:.2px; }
+.d-price{ display:flex; align-items:center; gap:.5rem; margin:0; }
+.d-price .new{ color:var(--accent); font-weight:800; }
+.d-price .old{ color:#9aa3a7; text-decoration: line-through; }
+
+.d-actions{ display:flex; gap:.5rem; }
+.btn.ghost{
+    background:transparent; color:var(--accent); border:1px solid var(--accent);
+    border-radius:10px; padding:.4rem .8rem; font-weight:600; font-size:.9rem;
+}
+.btn.ghost:hover{ background:var(--accent); color:#fff; }
+.empty-note{ color:#9aa3a7; padding:1rem; }

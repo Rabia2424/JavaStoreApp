@@ -5,40 +5,84 @@
         layout:decorate="~{layout}">
 <head>
     <title>Title</title>
+    <link rel="stylesheet" th:href="@{/css/home.css}">
 </head>
 <body>
-<!-- ======= POPULAR PRODUCTS (Hero altı) ======= -->
-<section layout:fragment="body" class="py-5" style="background:#060b0c;">
-    <div class="container px-5">
-        <div class="d-flex align-items-end justify-content-between mb-3">
-            <h4 class="m-0 text-white">Limited-Time Deals</h4>
-            <a th:href="@{/shop/discounts}" class="text-decoration-none" style="color:var(--accent);">See all →</a>
+<section layout:fragment="body">
+
+    <section class="hero">
+        <div class="hero-text">
+            <p class="hero-subtitle">LATEST TECH DEALS & GADGETS</p>
+            <h1 class="hero-title">
+                JUST LIKE<br>INNOVATION<br>INTENDED
+            </h1>
+            <a href="/products/list" class="hero-btn">Shop Now ></a>
         </div>
+    </section>
 
-        <div th:if="${#lists.isEmpty(discountedProducts)}" class="text-white-50">No active discounts right now.</div>
 
-        <div th:if="${!#lists.isEmpty(discountedProducts)}"
-             class="d-flex gap-3 overflow-auto pb-2 flex-nowrap" style="scroll-snap-type:x mandatory;">
-            <article th:each="p : ${discountedProducts}" class="card bg-dark text-white-50 border-0" style="min-width:220px; scroll-snap-align:start;">
-                <a th:href="@{/products/{id}(id=${p.id})}" class="text-decoration-none">
-                    <div class="position-relative">
-                        <img th:src="${p.imageUrl != null ? p.imageUrl : '/images/placeholder.png'}" class="card-img-top" th:alt="${p.name}" style="height:220px; object-fit:cover;">
-                        <span class="deal-badge">-<span th:text="${#numbers.formatDecimal(p.discountRate,0,'POINT',0,'POINT')}"></span>%</span>
-                    </div>
-                    <div class="card-body">
-                        <h6 class="card-title text-white mb-1" th:text="${p.name}">Product</h6>
-                        <div class="d-flex align-items-center gap-2">
-                            <span class="fw-semibold text-white" th:text="${'₺' + #numbers.formatDecimal(p.discountedPrice,0,'POINT',2,'POINT')}">₺0.00</span>
-                            <small class="text-decoration-line-through text-white-50" th:text="${'₺' + #numbers.formatDecimal(p.price,0,'POINT',2,'POINT')}">₺0.00</small>
+    <!-- ==== DISCOUNTED SLIDER ==== -->
+    <section class="discounted-section">
+        <div class="container-xxl">
+            <div class="section-head">
+                <h4>Discounted Picks</h4>
+                <div class="sh-controls">
+                    <button class="sh-btn prev" type="button" data-target="#discRail"><i class="bi bi-chevron-left"></i></button>
+                    <button class="sh-btn next" type="button" data-target="#discRail"><i class="bi bi-chevron-right"></i></button>
+                </div>
+            </div>
+
+            <div th:if="${#lists.isEmpty(discountedProducts)}" class="empty-note">No discounted products at the moment.</div>
+
+            <div id="discRail" class="product-rail" th:if="${!#lists.isEmpty(discountedProducts)}">
+                <article class="d-card" th:each="p : ${discountedProducts}">
+                    <a class="d-img" th:href="@{/products/{id}(id=${p.id})}">
+                        <img th:src="${p.imageUrl != null ? p.imageUrl : '/images/placeholder.png'}" th:alt="${p.name}">
+                        <span class="badge-off"
+                              th:if="${p.discountRate != null and p.discountRate > 0}"
+                              th:text="${'-' + #numbers.formatDecimal(p.discountRate, 0, 'POINT', 0, 'POINT') + '%'}">-20%</span>
+                    </a>
+                    <div class="d-body">
+                        <h6 class="d-title" th:text="${p.name}">Product name</h6>
+                        <p class="d-price">
+                            <span class="new" th:text="${'₺' + #numbers.formatDecimal(p.discountedPrice, 0, 'POINT', 2, 'POINT')}">₺999,00</span>
+                            <span class="old" th:if="${p.price != null}" th:text="${'₺' + #numbers.formatDecimal(p.price, 0, 'POINT', 2, 'POINT')}">₺1.199,00</span>
+                        </p>
+                        <div class="d-actions">
+                            <a class="btn ghost" th:href="@{/products/{id}(id=${p.id})}">
+                                <i class="bi bi-eye"></i> View
+                            </a>
+                            <form method="post" th:action="@{/cart/add/{id}(id=${p.id})}">
+                                <button class="btn ghost" type="submit"><i class="bi bi-cart-plus"></i> Add</button>
+                            </form>
                         </div>
                     </div>
-                </a>
-            </article>
+                </article>
+            </div>
         </div>
-    </div>
+    </section>
 </section>
-
 
 
 </body>
 </html>
+<script>
+
+    document.querySelectorAll('.sh-btn').forEach(btn => {
+        const targetSel = btn.getAttribute('data-target');
+        const rail = document.querySelector(targetSel);
+        if (!rail) return;
+        btn.addEventListener('click', () => {
+            const step = rail.clientWidth * 0.8;
+            rail.scrollBy({ left: btn.classList.contains('next') ? step : -step, behavior: 'smooth' });
+        });
+    });
+
+
+    const rail = document.querySelector('#discRail');
+    if (rail) {
+        let timer = setInterval(() => rail.scrollBy({ left: rail.clientWidth * 0.8, behavior: 'smooth' }), 5000);
+        rail.addEventListener('mouseenter', () => clearInterval(timer));
+        rail.addEventListener('mouseleave', () => { timer = setInterval(() => rail.scrollBy({ left: rail.clientWidth * 0.8, behavior: 'smooth' }), 5000);});
+    }
+</script>
