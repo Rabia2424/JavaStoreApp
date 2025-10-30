@@ -4,6 +4,7 @@ import com.store.storeapp.Models.Category;
 import com.store.storeapp.Models.Product;
 import com.store.storeapp.Repositories.CategoryRepository;
 import com.store.storeapp.Repositories.ProductRepository;
+import com.store.storeapp.Repositories.StockNotificationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -21,6 +22,9 @@ public class CatalogAppService {
 
     @Autowired
     private InventoryService inventoryService;
+
+    @Autowired
+    private StockNotificationService notificationService;
 
     @Autowired
     private ProductRepository productRepository;
@@ -58,7 +62,13 @@ public class CatalogAppService {
         existing.setName(patch.getName());
         existing.setDescription(patch.getDescription());
         existing.setPrice(patch.getPrice());
+
+        int oldStock = existing.getStockQuantity();
         existing.setStockQuantity(patch.getStockQuantity());
+
+        if(oldStock == 0 && patch.getStockQuantity() > 0){
+            notificationService.notifyUsersIfBackInStock(existing.getId());
+        }
 
         if (patch.getCategory() != null && patch.getCategory().getId() != null) {
             Category ref = categoryRepository.getReferenceById(patch.getCategory().getId());

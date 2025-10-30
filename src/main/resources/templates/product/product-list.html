@@ -148,6 +148,10 @@
 </main>
 </body>
 </html>
+
+<script th:inline="javascript">
+    const userEmail = /*[[${email}]]*/ null;
+</script>
 <script>
     function getActiveForm() {
         return document.getElementById("filter-form")
@@ -226,35 +230,49 @@
         }
     }
 
-    function productCard(p) {
+    function productCard(p){
+        const id    = Number(p.id);
+        const stock = Number(p.stockQuantity ?? 0);
         const price = (p.price != null) ? `$${p.price}` : '';
-        const img = p.imageUrl || '/images/placeholder.png';
-        const name = escapeHtml(p.name || '');
-        const desc = escapeHtml(p.description || '');
+        const img   = p.imageUrl || '/images/placeholder.png';
+        const name  = escapeHtml(p.name || '');
+        const desc  = escapeHtml(p.description || '');
 
         return `
-      <div class="col">
-        <div class="product-card h-100">
-          <div class="image-container">
-            <img src="${img}" alt="${name}" />
-          </div>
-          <div class="content-info">
-            <div class="product-name">${name}</div>
-            <div class="product-desc">${desc}</div>
-            <div class="product-price">${price}</div>
-            <div class="view-add-buttons mt-2">
-              <a class="btn detail-button" href="/products/${p.id}">
-                <i class="bi bi-eye"></i> View Details
-              </a>
-              <form method="post" action="/cart/add/${p.id}" style="display:inline;">
-                <button class="btn detail-button" type="submit">
-                  <i class="bi bi-cart-plus"></i> Add To Cart
-                </button>
-              </form>
-            </div>
+    <div class="col">
+      <div class="product-card h-100">
+        <div class="image-container">
+          <img src="${img}" alt="${name}">
+        </div>
+        <div class="content-info">
+          <div class="product-name">${name}</div>
+          <div class="product-desc">${desc}</div>
+          <div class="product-price">${price}</div>
+
+          <div class="view-add-buttons mt-2">
+            <a class="btn detail-button" href="/products/${encodeURIComponent(id)}">
+              <i class="bi bi-eye"></i> View Details
+            </a>
+
+            ${
+            stock > 0
+                ? `
+                  <form method="post" action="/cart/add/${encodeURIComponent(id)}" style="display:inline;">
+                    <button class="btn detail-button" type="submit">
+                      <i class="bi bi-cart-plus"></i> Add To Cart
+                    </button>
+                  </form>
+                `
+                : `
+                  <button class="btn btn-outline-dark" style="color:white" onclick="registerNotify(${id})">
+                    Notify Me
+                  </button>
+                `
+        }
           </div>
         </div>
-      </div>`;
+      </div>
+    </div>`;
     }
 
     function escapeHtml(s) {
@@ -301,6 +319,37 @@
         if (hidden) hidden.value = String(n);
         applyFilters();
     }
+
+
+    async function registerNotify(productId){
+        if (!userEmail){
+            alert('Please log in to use notifications.');
+            return;
+        }
+
+        try {
+            const params = new URLSearchParams({ productId, email: userEmail });
+            const res = await fetch('/notifications/register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: params.toString()
+            });
+
+            if (res.ok){
+                alert(await res.text());
+            } else if (res.status === 409) {
+                alert(await res.text());
+            } else {
+                alert('Failed to register notification.');
+            }
+        } catch (err){
+            console.error(err);
+            alert('Network error.');
+        }
+    }
+
+
+
     /*
     document.addEventListener("DOMContentLoaded", () => {
         const form = document.getElementById("filter-form");

@@ -4,9 +4,11 @@ import com.store.storeapp.DTOs.ProductDto;
 import com.store.storeapp.Models.Category;
 import com.store.storeapp.Models.Product;
 import com.store.storeapp.Models.ProductDiscount;
+import com.store.storeapp.Services.AuthService;
 import com.store.storeapp.Services.impl.CategoryService;
 import com.store.storeapp.Services.impl.ProductDiscountService;
 import com.store.storeapp.Services.impl.ProductService;
+import com.store.storeapp.Services.impl.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.*;
 import org.springframework.lang.Nullable;
@@ -32,6 +34,12 @@ public class ProductController {
     @Autowired
     private ProductDiscountService discountService;
 
+    @Autowired
+    private AuthService authService;
+
+    @Autowired
+    private UserService userService;
+
     public ProductController(ProductService productService){
         this.productService = productService;
     }
@@ -46,7 +54,8 @@ public class ProductController {
             @RequestParam(defaultValue = "6") int size,
             @RequestParam(required = false) String sortBy,
             @RequestParam(required = false) String direction,
-            Model model
+            Model model,
+            @CookieValue(name = "jwt", required = false) String token
     ) {
         Page<Product> pageResult = productService.searchFilterPage(
             q, categoryId, minPrice, maxPrice, page_no, size, sortBy, direction
@@ -54,6 +63,18 @@ public class ProductController {
 
         List<ProductDto> products = productService.mapToProductDtoWithDiscounts(pageResult.getContent());
         List<Category> categories = categoryService.findAllCategory();
+
+        String email = null;
+        if (token != null && !token.isBlank()) {
+            try {
+                Long userId = authService.getUserIdFromToken(token);
+                email = userService.findByUserId(userId)
+                        .map(user -> user.getEmail())
+                        .orElse(null);
+            } catch (Exception ex) { }
+        }
+
+        model.addAttribute("email", email);
 
         model.addAttribute("products", products);
         model.addAttribute("categories", categories);
@@ -97,7 +118,7 @@ public class ProductController {
         );
     }
 
-    @GetMapping("/{productId}")
+    @GetMapping("/detail/{productId}")
     public String getProductById(@PathVariable("productId") Long id,Model model){
         List<Category> categories = categoryService.findAllCategory();
         ProductDto productDto = productService.getProductById(id);
