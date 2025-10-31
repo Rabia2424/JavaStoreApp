@@ -108,7 +108,7 @@
 .search-input{
     background:#0b1317; border:1px solid var(--line); color:#eaeaea; border-radius:12px; height:44px;
 }
-.search-input:focus{ border-color: var(--accent); box-shadow:none; }
+.search-input:focus{ border-color: var(--accent); box-shadow:none; background: #0b0f11; color:#fff ;}
 .search-btn{
     background: var(--accent); color:#fff; border:none; border-radius:12px; padding:.5rem .9rem; height:44px;
 }

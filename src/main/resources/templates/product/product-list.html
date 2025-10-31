@@ -13,10 +13,6 @@
             <div th:if="${param.success}" class="alert alert-success">
                 You are registered successfully!
             </div>
-            <div class="text-center mb-5">
-                <h1 class="fw-bolder">Find Your Interest</h1>
-                <p class="lead fw-normal text-muted mb-0">Explore products tailored to your needs</p>
-            </div>
 
             <div class="d-md-none mb-3">
                 <button class="btn btn-filter-toggle w-100" type="button"
@@ -27,123 +23,97 @@
                 </button>
             </div>
 
-            <!-- Slim Filter Bar (under navbar) -->
-            <div class="filter-bar border-bottom">
-                <div class="container-xxl px-4">
-                    <!-- desktop / tablet inline -->
-                    <form method="get" th:action="@{/products/list}" class="filter-inline d-none d-md-flex" id="filter-form">
+            <nav class="breadcrumb-lite">
+                <a th:href="@{/}">Home</a>
+                <span class="sep">›</span>
+                <span id="crumb-tail"
+                      th:text="${activeCategory != null and activeCategory.name != null ? activeCategory.name : 'All Products'}">
+                </span>
+            </nav>
 
-                        <select name="category_id" class="form-select fld"
-                                aria-label="Category">
-                            <option value="">All</option>
-                            <option th:each="category : ${categories}"
-                                    th:value="${category.id}"
-                                    th:text="${category.name}"
-                                    th:selected="${category.id == categoryId}">
-                            </option>
-                        </select>
+            <!-- Header: Title + Sort -->
+            <div class="catalog-head">
+                <div class="title-block">
+                    <h1 class="page-title" id="listTitle"
+                        th:text="${activeCategory != null && activeCategory.name != null ? activeCategory.name : 'All Products'}">
+                        All Products
+                    </h1>
+                    <div id="product-count" class="count-pill" th:text=" ${totalItems} + ' products'">(12 products)</div>
+                </div>
 
-                        <input type="number" class="form-control fld" name="minPrice"
-                               th:value="${minPrice}" placeholder="Min">
+                <div class="sort-control" data-open="false">
+                    <button type="button" class="sort-btn" id="sortBtn">
+                        <span class="sort-label">Sort by: <span id="sortCurrent">Recommended</span></span>
+                        <i class="bi bi-chevron-down" style="color:#fff; font-size:1.1rem; position:relative; top:1px;"></i>
+                    </button>
 
-                        <input type="number" class="form-control fld" name="maxPrice"
-                               th:value="${maxPrice}" placeholder="Max">
-
-                        <select name="sortBy" class="form-select fld"
-                                th:value="${sortBy != null ? sortBy : ''}">
-                            <option value="">Sort</option>
-                            <option value="price" th:selected="${sortBy=='price'}">Price</option>
-                            <option value="name"  th:selected="${sortBy=='name'}">Name</option>
-                            <option value="id"    th:selected="${sortBy=='id'}">ID</option>
-                        </select>
-
-                        <div class="btn-group btn-group-sm fld-dir" role="group" aria-label="Direction">
-                            <input type="radio" class="btn-check" name="direction" id="dirAsc" value="asc"  th:checked="${direction=='asc'}">
-                            <label class="btn btn-dir" for="dirAsc">ASC</label>
-                            <input type="radio" class="btn-check" name="direction" id="dirDesc" value="desc" th:checked="${direction=='desc'}">
-                            <label class="btn btn-dir" for="dirDesc">DESC</label>
-                        </div>
-
-                        <input type="hidden" name="q">
-                        <input type="hidden" name="size" th:value="${size}">
-                        <input type="hidden" name="page_no" value="0">
-
-                        <button type="submit" class="btn btn-apply">Apply</button>
-                        <a th:href="@{/products/list}" class="btn btn-reset">Reset</a>
-                    </form>
-
-                    <!-- mobile toggle -->
-                    <div class="d-md-none py-2">
-                        <button class="btn btn-filter-toggle w-100" data-bs-toggle="collapse" data-bs-target="#filtersPanel"
-                                aria-expanded="false" aria-controls="filtersPanel">
-                            Filters
-                            <i class="bi bi-sliders"></i>
-                        </button>
-                        <div id="filtersPanel" class="collapse mt-2">
-                            <form method="get" th:action="@{/products/list}" class="filter-panel" id="filter-form-mobile">
-                                <select name="category_id" class="form-select mb-2">
-                                    <option value="">All</option>
-                                    <option th:each="category : ${categories}"
-                                            th:value="${category.id}"
-                                            th:text="${category.name}"
-                                            th:selected="${category.id == categoryId}">
-                                    </option>
-                                </select>
-
-                                <div class="row g-2 mb-2">
-                                    <div class="col-6">
-                                        <input type="number" class="form-control" name="minPrice" th:value="${minPrice}" placeholder="Min">
-                                    </div>
-                                    <div class="col-6">
-                                        <input type="number" class="form-control" name="maxPrice" th:value="${maxPrice}" placeholder="Max">
-                                    </div>
-                                </div>
-
-                                <div class="row g-2 mb-2">
-                                    <div class="col-6">
-                                        <select name="sortBy" class="form-select" th:value="${sortBy != null ? sortBy : ''}">
-                                            <option value="">Sort</option>
-                                            <option value="price" th:selected="${sortBy=='price'}">Price</option>
-                                            <option value="name"  th:selected="${sortBy=='name'}">Name</option>
-                                            <option value="id"    th:selected="${sortBy=='id'}">ID</option>
-                                        </select>
-                                    </div>
-                                    <div class="col-6">
-                                        <div class="btn-group btn-group-sm w-100" role="group">
-                                            <input type="radio" class="btn-check" name="direction" id="mAsc" value="asc"  th:checked="${direction=='asc'}">
-                                            <label class="btn btn-dir w-50" for="mAsc">ASC</label>
-                                            <input type="radio" class="btn-check" name="direction" id="mDesc" value="desc" th:checked="${direction=='desc'}">
-                                            <label class="btn btn-dir w-50" for="mDesc">DESC</label>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <input type="hidden" name="q">
-                                <input type="hidden" name="size" th:value="${size}">
-                                <input type="hidden" name="page_no" value="0">
-
-                                <div class="d-grid gap-2">
-                                    <button type="submit" class="btn btn-apply">Apply</button>
-                                    <a th:href="@{/products/list}" class="btn btn-reset">Reset</a>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
+                    <ul class="sort-menu" id="sortMenu">
+                        <li><button type="button" data-key="rec">Recommended</button></li>
+                        <li><button type="button" data-key="new">Newest</button></li>
+                        <li><button type="button" data-key="plh">Price (low to high)<i class="bi bi-arrow-up" style="color:#fff; font-size:1rem; margin-left:8px;"></i></button></li>
+                        <li><button type="button" data-key="phl">Price (high to low)<i class="bi bi-arrow-down" style="color:#fff; font-size:1rem; margin-left:8px;"></i></button></li>
+                        <li><button type="button" data-key="naz">Name A–Z</button></li>
+                        <li><button type="button" data-key="nza">Name Z–A</button></li>
+                    </ul>
                 </div>
             </div>
 
 
-            <div id="product-container" class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-5 mb-4">
+            <div class="catalog-layout">
+                <aside class="filter-sidebar slim">
+                    <form method="get" th:action="@{/products/list}" id="filter-form" class="side-filter">
+                        <h4 class="fs-title browse-title">Browse by</h4>
+                        <ul class="cat-list links">
+                            <li>
+                                <a th:href="@{/products/list}"
+                                   class="all-link"
+                                   th:classappend="${categoryId == null ? 'active' : ''}">
+                                    All Products
+                                </a>
+                            </li>
+                            <li th:each="c : ${categories}">
+                                <label class="cat-row" th:classappend="${c.id == categoryId ? 'active' : ''}">
+                                    <input type="radio" name="category_id" th:value="${c.id}" th:checked="${c.id == categoryId}">
+                                    <span th:text="${c.name}">Category</span>
+                                </label>
+                            </li>
+                        </ul>
 
+                        <h4 class="fs-title filter-title mt-4">Filter by</h4>
+
+                        <div class="price-block mt-3">
+                            <div class="price-row">
+                                <span class="field-label">Price</span>
+                                <span class="minus">–</span>
+                            </div>
+                            <div class="range-wrap">
+                                <input id="priceMin" type="range" min="0" max="5000" step="1" name="minPrice" th:value="${minPrice != null ? minPrice : 0}">
+                                <input id="priceMax" type="range" min="0" max="5000" step="1" name="maxPrice" th:value="${maxPrice != null ? maxPrice : 5000}">
+                                <div class="range-track"></div>
+                            </div>
+                            <div class="price-values">
+                                <span id="minVal" th:text="${minPrice != null ? '$' + minPrice : '$0'}">$0</span>
+                                <span id="maxVal" th:text="${maxPrice != null ? '$' + maxPrice : '$5000'}">$5000</span>
+                            </div>
+                        </div>
+
+                        <input type="hidden" name="sortBy" th:value="${sortBy}">
+                        <input type="hidden" name="direction" th:value="${direction}">
+                        <input type="hidden" name="q" th:value="${q}">
+                        <input type="hidden" name="size" th:value="${size}">
+                        <input type="hidden" name="page_no" value="0">
+                    </form>
+                </aside>
+
+                <section class="catalog-content">
+                    <div id="product-container" class="row row-cols-1 row-cols-sm-2 row-cols-md-2 g-5 mb-4"></div>
+                    <div id="pagination" class="pagination mt-3"></div>
+                </section>
             </div>
 
-          </div>
-        </div>
-
-        <div id="pagination" class="pagination mt-3">
 
         </div>
-
+        </div>
     </section>
 </main>
 </body>
@@ -216,6 +186,13 @@
                 return;
             }
             const data = await res.json(); // Page<ProductDto>
+
+            const countEl = document.getElementById('product-count');
+            if (countEl && typeof data.totalElements === 'number') {
+                const n = data.totalElements;
+                const fmt = new Intl.NumberFormat();
+                countEl.textContent = `${fmt.format(n)} ${n === 1 ? 'product' : 'products'}`;
+            }
 
             if (!data.content || data.content.length === 0) {
                 container.innerHTML = '<div class="p-3">No products found.</div>';
@@ -348,8 +325,191 @@
         }
     }
 
+    (function(){
+        const form  = document.getElementById('filter-form');
+        const minEl = document.getElementById('priceMin');
+        const maxEl = document.getElementById('priceMax');
+        const minVal= document.getElementById('minVal');
+        const maxVal= document.getElementById('maxVal');
+        const track = document.querySelector('.range-track');
+        if(!minEl || !maxEl || !track) return;
+
+        const MIN_GAP = 1;
+        const bg  = 'rgba(255,255,255,.18)';
+        const sel = 'rgba(255,255,255,.85)';
 
 
+        if (!minEl.value) minEl.value = minEl.min;
+        if (!maxEl.value) maxEl.value = maxEl.max;
+
+        function paint(a,b){
+            const min = +minEl.min, max = +maxEl.max;
+            const L = ((a - min) / (max - min)) * 100;
+            const R = ((b - min) / (max - min)) * 100;
+            track.style.background =
+                `linear-gradient(to right, ${bg} 0%, ${bg} ${L}%,
+                             ${sel} ${L}%, ${sel} ${R}%,
+                             ${bg} ${R}%, ${bg} 100%)`;
+        }
+
+        function clampAndPaint(){
+            let a = +minEl.value, b = +maxEl.value;
+            if (a > b - MIN_GAP) { a = b - MIN_GAP; minEl.value = a; }
+            if (b < a + MIN_GAP) { b = a + MIN_GAP; maxEl.value = b; }
+            minVal.textContent = `$${a}`;
+            maxVal.textContent = `$${b}`;
+            paint(a,b);
+        }
+
+
+        let t;
+        function autoApply(){
+            clearTimeout(t);
+            t = setTimeout(()=>{
+                const pageNo = form?.elements?.namedItem('page_no');
+                if(pageNo) pageNo.value = '0';
+                if (typeof applyFilters === 'function') applyFilters(true, form);
+            }, 160);
+        }
+
+        minEl.addEventListener('input', ()=>{ clampAndPaint(); autoApply(); });
+        maxEl.addEventListener('input', ()=>{ clampAndPaint(); autoApply(); });
+
+        clampAndPaint();
+
+
+        const categoryRadios = document.querySelectorAll('input[name="category_id"]');
+        const allLink = document.querySelector('.all-link');
+        const catRows = document.querySelectorAll('.cat-row');
+
+
+        categoryRadios.forEach(radio => {
+            radio.addEventListener('change', function() {
+
+                allLink.classList.remove('active');
+                catRows.forEach(row => row.classList.remove('active'));
+
+
+                this.closest('.cat-row').classList.add('active');
+                updateBreadcrumbFromState()
+
+                const pageNo = form?.elements?.namedItem('page_no');
+                if(pageNo) pageNo.value = '0';
+
+
+                if (typeof applyFilters === 'function') {
+                    applyFilters(true, form);
+                }
+            });
+        });
+
+
+        if(allLink) {
+            allLink.addEventListener('click', function(e) {
+                e.preventDefault();
+
+
+                categoryRadios.forEach(radio => radio.checked = false);
+                catRows.forEach(row => row.classList.remove('active'));
+                this.classList.add('active');
+
+                updateBreadcrumbFromState()
+
+                const categoryInputs = form.querySelectorAll('input[name="category_id"]');
+                categoryInputs.forEach(input => input.checked = false);
+
+                const pageNo = form?.elements?.namedItem('page_no');
+                if(pageNo) pageNo.value = '0';
+
+                if (typeof applyFilters === 'function') {
+                    applyFilters(true, form);
+                }
+            });
+        }
+    })();
+
+    function updateBreadcrumbFromState(){
+        const crumb = document.getElementById('crumb-tail');
+        const pageTitle = document.getElementById('listTitle');
+
+        if (!crumb) return;
+        if (!pageTitle) return;
+
+        let text = 'All Products';
+        const checked = document.querySelector('input[name="category_id"]:checked');
+        if (checked) {
+            const row = checked.closest('.cat-row');
+            const span = row?.querySelector('span');
+            if (span) text = span.textContent.trim();
+        }
+        crumb.textContent = text;
+        pageTitle.textContent = text;
+    }
+
+    updateBreadcrumbFromState();
+
+    (function(){
+        const form = document.getElementById('filter-form');
+        const sortBtn  = document.getElementById('sortBtn');
+        const sortMenu = document.getElementById('sortMenu');
+        const sortWrap = document.querySelector('.sort-control');
+        const sortCurrent = document.getElementById('sortCurrent');
+
+        if(!form || !sortBtn || !sortMenu || !sortWrap) return;
+
+        const sortByInput  = form.querySelector('input[name="sortBy"]')  || (()=>{ const i=document.createElement('input'); i.type='hidden'; i.name='sortBy'; form.appendChild(i); return i; })();
+        const dirInput     = form.querySelector('input[name="direction"]')|| (()=>{ const i=document.createElement('input'); i.type='hidden'; i.name='direction'; form.appendChild(i); return i; })();
+
+        const MAP = {
+            rec:  { label:'Recommended', sortBy:'',      dir:''     },
+            new:  { label:'Newest',      sortBy:'id',    dir:'desc' },
+            plh:  { label:'Price (low to high)', sortBy:'price', dir:'asc'  },
+            phl:  { label:'Price (high to low)', sortBy:'price', dir:'desc' },
+            naz:  { label:'Name A–Z',    sortBy:'name',  dir:'asc'  },
+            nza:  { label:'Name Z–A',    sortBy:'name',  dir:'desc' },
+        };
+
+        sortBtn.addEventListener('click', ()=> {
+            const open = sortWrap.getAttribute('data-open') === 'true';
+            sortWrap.setAttribute('data-open', open ? 'false' : 'true');
+        });
+        document.addEventListener('click', (e)=>{
+            if(!sortWrap.contains(e.target)) sortWrap.setAttribute('data-open','false');
+        });
+
+        sortMenu.querySelectorAll('button').forEach(btn=>{
+            btn.addEventListener('click', ()=>{
+                const key = btn.getAttribute('data-key');
+                const cfg = MAP[key]; if(!cfg) return;
+
+                sortCurrent.textContent = cfg.label;
+
+                sortByInput.value = cfg.sortBy;
+                dirInput.value    = cfg.dir;
+
+                const pageNo = form.elements.namedItem('page_no');
+                if (pageNo) pageNo.value = '0';
+
+                if (typeof applyFilters === 'function') applyFilters(true, form);
+                sortWrap.setAttribute('data-open','false');
+            });
+        });
+
+
+        (function initSortLabel(){
+            const s = (sortByInput.value || '').toLowerCase();
+            const d = (dirInput.value || '').toLowerCase();
+            let label = 'Recommended';
+
+            if (s === 'id' && d === 'desc') label = 'Newest';
+            else if (s === 'price' && d === 'asc')  label = 'Price (low to high)';
+            else if (s === 'price' && d === 'desc') label = 'Price (high to low)';
+            else if (s === 'name'  && d === 'asc')  label = 'Name A–Z';
+            else if (s === 'name'  && d === 'desc') label = 'Name Z–A';
+
+            sortCurrent.textContent = label;
+        })();
+    })();
     /*
     document.addEventListener("DOMContentLoaded", () => {
         const form = document.getElementById("filter-form");

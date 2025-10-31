@@ -26,8 +26,14 @@ footer {
 }
 
 .newsletter .form-control:focus {
+    background: #0b0f11;
     border-color: var(--accent);
     box-shadow: none;
+}
+
+.newsletter .form-control::placeholder {
+    color: #fff;
+    opacity: 0.8;
 }
 
 .newsletter .btn {
