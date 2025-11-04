@@ -331,6 +331,34 @@ body {
     box-shadow: 0 6px 18px rgba(17,114,149,0.25);
 }
 
+.product-card {
+    position: relative;
+    overflow: hidden;
+}
+
+.favorite-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: rgba(255,255,255,0.85);
+    border: none;
+    border-radius: 50%;
+    width: 38px;
+    height: 38px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ff4d6d;
+    transition: background .2s, transform .2s;
+}
+
+.favorite-btn:hover {
+    background: #ff4d6d;
+    color: #fff;
+    transform: scale(1.1);
+}
+
+
 /* ==== IMAGE ==== */
 .image-container{
     width:100%;

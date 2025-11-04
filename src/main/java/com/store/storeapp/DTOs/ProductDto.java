@@ -20,4 +20,7 @@ public class ProductDto {
     private LocalDateTime updatedOn;
 
     private Category category;
+
+    private boolean favorited;
+    private Long favoriteCount;
 }

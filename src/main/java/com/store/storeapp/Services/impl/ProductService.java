@@ -12,10 +12,13 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.repository.query.Param;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -26,7 +29,8 @@ public class ProductService {
 
     @Autowired
     private CategoryService categoryService;
-
+    @Autowired
+    private FavoriteService favoriteService;
     public ProductService(ProductRepository productRepository){
         this.productRepository = productRepository;
     }
@@ -85,6 +89,27 @@ public class ProductService {
                     return productDto;
                 }).collect(Collectors.toList());
     }
+
+    public List<ProductDto> mapToProductDtoWithDiscountsAndFavorited(
+            List<Product> products, @Nullable Long userId) {
+
+        List<ProductDto> dtos = mapToProductDtoWithDiscounts(products);
+
+        if (userId == null || products.isEmpty()) return dtos;
+        List<Long> productIds = products.stream()
+                .map(product -> product.getId())
+                .collect(Collectors.toList());
+
+        Set<Long> likedProductIds = new HashSet<>(
+                favoriteService.favoritesOfUserAsSet(userId)
+        );
+
+        for (ProductDto dto : dtos) {
+            dto.setFavorited(likedProductIds.contains(dto.getId()));
+        }
+        return dtos;
+    }
+
 
     public Product mapToProduct(ProductDto productDto){
         Product product = Product.builder()

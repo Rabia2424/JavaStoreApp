@@ -61,18 +61,19 @@ public class ProductController {
             q, categoryId, minPrice, maxPrice, page_no, size, sortBy, direction
         );
 
-        List<ProductDto> products = productService.mapToProductDtoWithDiscounts(pageResult.getContent());
-        List<Category> categories = categoryService.findAllCategory();
-
         String email = null;
+        Long userId = null;
         if (token != null && !token.isBlank()) {
             try {
-                Long userId = authService.getUserIdFromToken(token);
+                userId = authService.getUserIdFromToken(token);
                 email = userService.findByUserId(userId)
                         .map(user -> user.getEmail())
                         .orElse(null);
             } catch (Exception ex) { }
         }
+
+        List<ProductDto> products = productService.mapToProductDtoWithDiscountsAndFavorited(pageResult.getContent(), userId);
+        List<Category> categories = categoryService.findAllCategory();
 
         model.addAttribute("email", email);
 
@@ -104,13 +105,21 @@ public class ProductController {
             @RequestParam(defaultValue = "0") int page_no,
             @RequestParam(defaultValue = "4") int size,
             @RequestParam(defaultValue = "id") String sortBy,
-            @RequestParam(defaultValue = "desc") String direction
+            @RequestParam(defaultValue = "desc") String direction,
+            @CookieValue(name = "jwt", required = false) String token
     ){
         Page<Product> pageResult = productService.searchFilterPage(
                 q, categoryId, minPrice, maxPrice, page_no, size, sortBy, direction
         );
 
-        List<ProductDto> products = productService.mapToProductDtoWithDiscounts(pageResult.getContent());
+        Long userId = null;
+        if (token != null && !token.isBlank()) {
+            try {
+                userId = authService.getUserIdFromToken(token);
+            } catch (Exception ex) { }
+        }
+
+        List<ProductDto> products = productService.mapToProductDtoWithDiscountsAndFavorited(pageResult.getContent(), userId);
         return new PageImpl<> (
             products,
             pageResult.getPageable(),

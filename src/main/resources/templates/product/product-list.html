@@ -214,10 +214,17 @@
         const img   = p.imageUrl || '/images/placeholder.png';
         const name  = escapeHtml(p.name || '');
         const desc  = escapeHtml(p.description || '');
+        const favorite = !!p.favorited;
 
         return `
     <div class="col">
       <div class="product-card h-100">
+        <button class="btn btn-sm favorite-btn"
+                data-id="${id}"
+                aria-pressed="${favorite}"
+                title="Add to favorites">
+          <i class="bi ${favorite ? 'bi-heart-fill' : 'bi-heart'}"></i>
+        </button>
         <div class="image-container">
           <img src="${img}" alt="${name}">
         </div>
@@ -510,6 +517,31 @@
             sortCurrent.textContent = label;
         })();
     })();
+
+    document.addEventListener('click', async (e) => {
+        const btn = e.target.closest('.favorite-btn');
+        if (!btn) return;
+
+        const productId = btn.dataset.id;
+        const pressed = btn.getAttribute('aria-pressed') === 'true';
+
+        const method = pressed ? 'DELETE' : 'POST';
+        try {
+            const res = await fetch(`/favorites/${productId}` + (pressed ? '' : ''), {
+                method: pressed ? 'DELETE' : 'POST',
+                credentials: 'same-origin',
+                headers: {'X-Requested-With':'XMLHttpRequest'}
+            });
+
+            if (res.status === 401) { window.location.href = '/login'; return; }
+
+            const data = await res.json();
+            btn.setAttribute('aria-pressed', String(data.favorited));
+            btn.querySelector('i').className = data.favorited ? 'bi bi-heart-fill' : 'bi bi-heart';
+        } catch (err) {
+            console.error(err);
+        }
+    });
     /*
     document.addEventListener("DOMContentLoaded", () => {
         const form = document.getElementById("filter-form");
