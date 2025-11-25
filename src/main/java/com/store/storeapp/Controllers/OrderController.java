@@ -3,6 +3,7 @@ package com.store.storeapp.Controllers;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.store.storeapp.DTOs.OrderResponseDto;
 import com.store.storeapp.Models.*;
 import com.store.storeapp.Services.AuthService;
 import com.store.storeapp.Services.impl.AddressService;
@@ -103,6 +104,18 @@ public class OrderController {
 
         return "redirect:/payment/index?orderId=" + order.getOrderId();
     }
+
+    @GetMapping("/list")
+    public String listOrders(@CookieValue("jwt") String token, Model model) {
+
+        Long userId = authService.getUserIdFromToken(token);
+        List<OrderResponseDto> orders = orderService.getOrdersByUserId(userId);
+
+        model.addAttribute("orders", orders);
+        model.addAttribute("hasOrders", !orders.isEmpty());
+        return "order/order-list";
+    }
+
 
 
 }

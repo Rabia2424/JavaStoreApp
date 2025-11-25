@@ -8,6 +8,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -19,4 +21,9 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     @Modifying
     @Query("Update Order o set o.status = :status where o.orderId = :id")
     int updateStatus(@Param("id") Long id, @Param("status") OrderStatus status);
+
+    List<Order> findByUserIdOrderByOrderIdDesc(Long userId);
+
+    List<Order> findByStatusAndOrderDateBefore(OrderStatus status, LocalDateTime time);
+
 }

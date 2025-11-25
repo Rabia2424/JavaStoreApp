@@ -6,10 +6,8 @@ import com.store.storeapp.Services.impl.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -23,7 +21,7 @@ public class AdminOrderController {
     public String showOrders(Model model){
         List<Order> orders = orderService.findAllOrders();
         model.addAttribute("orders", orders);
-        return "order/order-list";
+        return "admin/order/order-list";
     }
 
     @PostMapping("/edit/{id}")
@@ -41,7 +39,7 @@ public class AdminOrderController {
         }catch(IllegalArgumentException e){
             model.addAttribute("order", optionalOrder.orElse(null));
             model.addAttribute("error", "Invalid status value!");
-            return "order/order-list";
+            return "admin/order/order-list";
         }
         return "redirect:/admin/order/list";
     }
