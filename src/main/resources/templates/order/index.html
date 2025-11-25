@@ -43,9 +43,11 @@
 
                     <div th:if="${shippingAddresses != null and !#lists.isEmpty(shippingAddresses)}" class="row row-cols-1 row-cols-md-2 g-3 mt-1">
                         <div class="col" th:each="addr : ${shippingAddresses}">
-                            <label class="addr-card p-3 d-block h-100">
+                            <label class="addr-card p-3 d-block h-100"
+                                   th:classappend="${addr.defaultShipping} ? ' active'" >
                                 <input class="form-check-input me-2 d-none" type="radio" name="shippingAddressId" required
                                        th:value="${addr.id}"
+                                       th:checked="${addr.defaultShipping}"
                                        th:attr="data-full=${addr.fullName},data-line1=${addr.line1},data-line2=${addr.line2},data-district=${addr.district},data-city=${addr.city},data-country=${addr.country},data-postal=${addr.postalCode},data-phone=${addr.phone}">
                                 <div class="d-flex align-items-start gap-3">
                                     <div class="chip"><i class="bi bi-house-door"></i> Address</div>
@@ -73,7 +75,7 @@
                     <div class="d-flex justify-content-between align-items-center mb-2">
                         <h4 class="section-title mb-0"><i class="bi bi-receipt me-2"></i>Billing Address</h4>
                         <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="sameAsShipping" name="sameAsShipping" checked>
+                            <input class="form-check-input" type="checkbox" id="sameAsShipping" name="sameAsShipping">
                             <label class="form-check-label" for="sameAsShipping">Billing same as shipping</label>
                         </div>
                     </div>
@@ -82,9 +84,11 @@
                     <div th:if="${billingAddresses != null and !#lists.isEmpty(billingAddresses)}" id="billingAddressList" class="mt-2">
                         <div class="row row-cols-1 row-cols-md-2 g-3">
                             <div class="col" th:each="addr : ${billingAddresses}">
-                                <label class="addr-card p-3 d-block h-100">
+                                <label class="addr-card p-3 d-block h-100"
+                                       th:classappend="${addr.defaultBilling} ? ' active'">
                                     <input class="form-check-input me-2 d-none" type="radio" name="billingAddressId"
                                            th:value="${addr.id}"
+                                           th:checked="${addr.defaultBilling}"
                                            th:attr="data-full=${addr.fullName},data-line1=${addr.line1},data-line2=${addr.line2},data-district=${addr.district},data-city=${addr.city},data-country=${addr.country},data-postal=${addr.postalCode},data-phone=${addr.phone}">
                                     <div class="d-flex align-items-start gap-3">
                                         <div class="chip"><i class="bi bi-file-earmark-text"></i> Billing</div>

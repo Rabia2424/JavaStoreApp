@@ -1,5 +1,6 @@
 package com.store.storeapp.Services.impl;
 
+import com.store.storeapp.DTOs.OrderDetailDto;
 import com.store.storeapp.DTOs.OrderItemResponseDto;
 import com.store.storeapp.DTOs.OrderResponseDto;
 import com.store.storeapp.Models.*;
@@ -105,6 +106,38 @@ public class OrderService {
             );
 
         }).toList();
+    }
+
+    @Transactional()
+    public OrderDetailDto getOrderDetail(Long orderId, Long userId) {
+
+        Order order = orderRepository.findByOrderIdAndUserId(orderId, userId)
+                .orElseThrow(() -> new IllegalArgumentException("Order not found"));
+
+        OrderStatusView statusView = OrderStatusMapper.toView(order.getStatus());
+
+        List<OrderItemResponseDto> items = order.getOrderItems().stream()
+                .map(item -> new OrderItemResponseDto(
+                        item.getProduct().getId(),
+                        item.getProductName(),
+                        item.getProduct().getImageUrl(),
+                        item.getQuantity(),
+                        item.getUnitPrice(),
+                        item.getTotalPrice()
+                ))
+                .toList();
+
+        return new OrderDetailDto(
+                order.getOrderId(),
+                order.getOrderDate(),
+                statusView,
+                order.getTotalAmount(),
+                order.getShippingCost(),
+                order.getNotes(),
+                order.getShipping(),
+                order.getBilling(),
+                items
+        );
     }
 
 }

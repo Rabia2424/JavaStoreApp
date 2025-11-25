@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+    <title>Order Detail</title>
+    <link rel="stylesheet" th:href="@{/css/order-list.css}">
+</head>
+<body>
+<div layout:fragment="body">
+
+    <div class="orders-page order-detail-page">
+
+        <div class="detail-header-bar">
+            <div class="detail-header-left">
+                <a th:href="@{/order/list}" class="back-link">Back to My Orders</a>
+                <h2 class="page-title" th:text="${'Order #' + order.orderId}"></h2>
+                <div class="detail-date"
+                     th:text="${#temporals.format(order.orderDate, 'dd MMM yyyy, HH:mm')}"></div>
+            </div>
+
+            <div class="detail-header-right">
+                <span class="status-badge"
+                      th:classappend="${' badge-' + order.status.color}">
+                    <span th:text="${order.status.label}"></span>
+                </span>
+            </div>
+        </div>
+
+        <div class="order-card">
+
+            <div class="order-stepper" th:if="${order.status.step != -1}">
+                <div class="step" th:classappend="${order.status.step} >= 0 ? ' active'">
+                    <div class="dot"></div>
+                    <div class="label">Order Placed</div>
+                </div>
+                <div class="line" th:classappend="${order.status.step} >= 1 ? ' active'"></div>
+
+                <div class="step" th:classappend="${order.status.step} >= 1 ? ' active'">
+                    <div class="dot"></div>
+                    <div class="label">Processing</div>
+                </div>
+                <div class="line" th:classappend="${order.status.step} >= 2 ? ' active'"></div>
+
+                <div class="step" th:classappend="${order.status.step} >= 2 ? ' active'">
+                    <div class="dot"></div>
+                    <div class="label">Shipped</div>
+                </div>
+                <div class="line" th:classappend="${order.status.step} >= 3 ? ' active'"></div>
+
+                <div class="step" th:classappend="${order.status.step} >= 3 ? ' active'">
+                    <div class="dot"></div>
+                    <div class="label">Delivered</div>
+                </div>
+            </div>
+
+            <div class="cancelled-box" th:if="${order.status.step == -1}">
+                This order has been cancelled.
+            </div>
+
+            <div class="detail-grid">
+
+                <div class="detail-left-column">
+                    <div class="summary-card">
+                        <h3 class="summary-title">Shipping Address</h3>
+                        <div class="summary-line" th:text="${order.shipping.fullName}"></div>
+                        <div class="summary-line" th:text="${order.shipping.line1}"></div>
+                        <div class="summary-line"
+                             th:if="${order.shipping.line2}"
+                             th:text="${order.shipping.line2}"></div>
+                        <div class="summary-line"
+                             th:text="${order.shipping.district + ', ' + order.shipping.city}"></div>
+                        <div class="summary-line"
+                             th:text="${order.shipping.country + ' ' + order.shipping.postalCode}"></div>
+                        <div class="summary-line" th:text="${order.shipping.phone}"></div>
+                    </div>
+
+                    <div class="summary-card">
+                        <h3 class="summary-title">Billing Address</h3>
+                        <div class="summary-line" th:text="${order.billing.fullName}"></div>
+                        <div class="summary-line" th:text="${order.billing.line1}"></div>
+                        <div class="summary-line"
+                             th:if="${order.billing.line2}"
+                             th:text="${order.billing.line2}"></div>
+                        <div class="summary-line"
+                             th:text="${order.billing.district + ', ' + order.billing.city}"></div>
+                        <div class="summary-line"
+                             th:text="${order.billing.country + ' ' + order.billing.postalCode}"></div>
+                        <div class="summary-line" th:text="${order.billing.phone}"></div>
+                    </div>
+
+                    <div class="summary-card">
+                        <h3 class="summary-title">Payment Summary</h3>
+
+                        <div class="summary-row">
+                            <span>Items Total</span>
+                            <span th:text="${(order.totalAmount - order.shippingCost) + '€'}"></span>
+                        </div>
+
+                        <div class="summary-row">
+                            <span>Shipping</span>
+                            <span th:text="${order.shippingCost + '€'}"></span>
+                        </div>
+
+                        <div class="summary-row summary-row-total">
+                            <span>Total</span>
+                            <span th:text="${order.totalAmount + '€'}"></span>
+                        </div>
+
+                        <div class="summary-notes" th:if="${order.notes}">
+                            <span class="summary-notes-label">Note:</span>
+                            <span th:text="${order.notes}"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="detail-right-column">
+                    <div class="items-card">
+                        <h3 class="summary-title">Order Items</h3>
+
+                        <div class="order-items">
+                            <div class="item-row" th:each="i : ${order.items}">
+                                <img class="item-img" th:src="${i.imageUrl}" alt="product">
+
+                                <div class="item-info">
+                                    <div class="item-name" th:text="${i.productName}"></div>
+                                    <div class="item-qty"
+                                         th:text="${i.quantity + ' x ' + i.unitPrice + '€'}"></div>
+                                </div>
+
+                                <div class="item-total" th:text="${i.lineTotal + '€'}"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+</body>
+</html>

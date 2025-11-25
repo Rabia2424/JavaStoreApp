@@ -7,6 +7,11 @@ document.addEventListener('DOMContentLoaded', function () {
     const shipPhone = document.getElementById('shippingPhoneField');
     const billField = document.getElementById('billingAddressField');
 
+    const shippingRadios = document.querySelectorAll('input[name="shippingAddressId"]');
+    const billingRadios  = document.querySelectorAll('input[name="billingAddressId"]');
+
+
+    const initialBilling = document.querySelector('input[name="billingAddressId"]:checked') || null;
 
     function toggleActive(radio) {
         const name = radio.getAttribute('name');
@@ -31,42 +36,55 @@ document.addEventListener('DOMContentLoaded', function () {
         return parts.join(', ');
     }
 
+    function updateShippingFromRadio(radio) {
+        if (!radio) return;
+        toggleActive(radio);
+        const txt = toText(radio);
+        shippingPreview.textContent = txt;
+        shipField.value = txt;
+        shipPhone.value = radio.getAttribute('data-phone') || '';
 
-    document.querySelectorAll('input[name="shippingAddressId"]').forEach(r => {
+        if (sameAsShipping && sameAsShipping.checked) {
+            billingPreview.textContent = txt;
+            billField.value = txt;
+        }
+    }
+
+    function updateBillingFromRadio(radio) {
+        if (!radio) return;
+        toggleActive(radio);
+        const txt = toText(radio);
+        billingPreview.textContent = txt;
+        billField.value = txt;
+    }
+
+    shippingRadios.forEach(r => {
         r.addEventListener('change', (e) => {
-            toggleActive(e.target);
-            const txt = toText(e.target);
-            shippingPreview.textContent = txt;
-            shipField.value = txt;
-            shipPhone.value = e.target.getAttribute('data-phone') || '';
-
-            if (sameAsShipping.checked) {
-                billingPreview.textContent = txt;
-                billField.value = txt;
-            }
+            updateShippingFromRadio(e.target);
         });
         const card = r.closest('.addr-card');
         card && card.addEventListener('click', () => r.click());
     });
 
-
-    document.querySelectorAll('input[name="billingAddressId"]').forEach(r => {
+    billingRadios.forEach(r => {
         r.addEventListener('change', (e) => {
-            toggleActive(e.target);
-            const txt = toText(e.target);
-            billingPreview.textContent = txt;
-            billField.value = txt;
+            if (sameAsShipping && sameAsShipping.checked) return;
+            updateBillingFromRadio(e.target);
         });
         const card = r.closest('.addr-card');
         card && card.addEventListener('click', () => r.click());
     });
 
     function applySameAsShippingState() {
-        const disabled = sameAsShipping.checked;
-        document.querySelectorAll('input[name="billingAddressId"]').forEach(r => {
+        const disabled = sameAsShipping && sameAsShipping.checked;
+
+        billingRadios.forEach(r => {
             r.disabled = disabled;
             r.required = !disabled;
-            if (disabled) r.checked = false;
+            const card = r.closest('.addr-card');
+            if (card && disabled) {
+                card.classList.remove('active');
+            }
         });
 
         if (disabled) {
@@ -75,22 +93,48 @@ document.addEventListener('DOMContentLoaded', function () {
                 const txt = toText(sel);
                 billingPreview.textContent = txt;
                 billField.value = txt;
-                document.querySelectorAll('input[name="billingAddressId"]').forEach(r => {
-                    r.disabled = disabled;
-                    const card = r.closest('.addr-card');
-                    if (card) card.classList.remove('active');
-                });
             } else {
                 billingPreview.textContent = 'Same as shipping';
                 billField.value = '';
             }
+        } else {
+            let billSel = document.querySelector('input[name="billingAddressId"]:checked');
+
+            if (!billSel && initialBilling) {
+                initialBilling.checked = true;
+                billSel = initialBilling;
+            }
+
+            if (billSel) {
+                updateBillingFromRadio(billSel);
+            } else {
+                billingPreview.textContent = 'Not selected';
+                billField.value = '';
+            }
+        }
+    }
+
+    if (sameAsShipping) {
+        sameAsShipping.addEventListener('change', applySameAsShippingState);
+    }
+
+    const initialShipping = document.querySelector('input[name="shippingAddressId"]:checked');
+    if (initialShipping) {
+        updateShippingFromRadio(initialShipping);
+    } else {
+        shippingPreview.textContent = 'Not selected';
+        shipField.value = '';
+        shipPhone.value = '';
+    }
+
+    if (!sameAsShipping || !sameAsShipping.checked) {
+        if (initialBilling) {
+            updateBillingFromRadio(initialBilling);
         } else {
             billingPreview.textContent = 'Not selected';
             billField.value = '';
         }
     }
 
-    sameAsShipping.addEventListener('change', applySameAsShippingState);
-    // init on load
     applySameAsShippingState();
-})
+});

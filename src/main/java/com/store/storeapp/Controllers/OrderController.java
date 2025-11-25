@@ -3,6 +3,7 @@ package com.store.storeapp.Controllers;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.store.storeapp.DTOs.OrderDetailDto;
 import com.store.storeapp.DTOs.OrderResponseDto;
 import com.store.storeapp.Models.*;
 import com.store.storeapp.Services.AuthService;
@@ -117,5 +118,17 @@ public class OrderController {
     }
 
 
+    @GetMapping("/detail/{id}")
+    public String orderDetail(@PathVariable("id") Long orderId,
+                              @CookieValue("jwt") String token,
+                              Model model) {
+
+        Long userId = authService.getUserIdFromToken(token);
+
+        OrderDetailDto detail = orderService.getOrderDetail(orderId, userId);
+
+        model.addAttribute("order", detail);
+        return "order/order-detail";
+    }
 
 }
