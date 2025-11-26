@@ -1,5 +1,6 @@
 package com.store.storeapp.Services.impl;
 
+import com.store.storeapp.DTOs.AccountStatsDto;
 import com.store.storeapp.DTOs.OrderDetailDto;
 import com.store.storeapp.DTOs.OrderItemResponseDto;
 import com.store.storeapp.DTOs.OrderResponseDto;
@@ -83,29 +84,9 @@ public class OrderService {
 
         List<Order> orders = orderRepository.findByUserIdOrderByOrderIdDesc(userId);
 
-        return orders.stream().map(order -> {
-
-            OrderStatusView view = OrderStatusMapper.toView(order.getStatus());
-
-            List<OrderItemResponseDto> items = order.getOrderItems().stream()
-                    .map(i -> new OrderItemResponseDto(
-                            i.getProduct().getId(),
-                            i.getProductName(),
-                            i.getProduct().getImageUrl(),
-                            i.getQuantity(),
-                            i.getUnitPrice(),
-                            i.getTotalPrice()
-                    )).toList();
-
-            return new OrderResponseDto(
-                    order.getOrderId(),
-                    order.getCreatedOn(),
-                    view,
-                    order.getTotalAmount(),
-                    items
-            );
-
-        }).toList();
+        return orders.stream()
+                .map(this::toOrderResponseDto)
+                .toList();
     }
 
     @Transactional()
@@ -139,5 +120,51 @@ public class OrderService {
                 items
         );
     }
+
+    private OrderResponseDto toOrderResponseDto(Order order) {
+        OrderStatusView view = OrderStatusMapper.toView(order.getStatus());
+
+        List<OrderItemResponseDto> items = order.getOrderItems().stream()
+                .map(i -> new OrderItemResponseDto(
+                        i.getProduct().getId(),
+                        i.getProductName(),
+                        i.getProduct().getImageUrl(),
+                        i.getQuantity(),
+                        i.getUnitPrice(),
+                        i.getTotalPrice()
+                )).toList();
+
+        return new OrderResponseDto(
+                order.getOrderId(),
+                order.getOrderDate(),
+                view,
+                order.getTotalAmount(),
+                items
+        );
+    }
+
+    public List<OrderResponseDto> getRecentOrders(Long userId, int limit) {
+        List<Order> orders = orderRepository.findByUserIdOrderByOrderIdDesc(userId);
+        return orders.stream()
+                .limit(limit)
+                .map(this::toOrderResponseDto)
+                .toList();
+    }
+
+    public AccountStatsDto getAccountStats(Long userId,
+                                           long addressCount,
+                                           long favoriteCount) {
+
+        List<Order> orders = orderRepository.findByUserIdOrderByOrderIdDesc(userId);
+
+        long total = orders.size();
+        long active = orders.stream()
+                .filter(o -> o.getStatus() != OrderStatus.CANCELLED
+                        && o.getStatus() != OrderStatus.DELIVERED)
+                .count();
+
+        return new AccountStatsDto(total, active, addressCount, favoriteCount);
+    }
+
 
 }

@@ -1,5 +1,6 @@
 package com.store.storeapp.Services.impl;
 
+import com.store.storeapp.DTOs.FavoriteProductDto;
 import com.store.storeapp.Models.Favorite;
 import com.store.storeapp.Models.Product;
 import com.store.storeapp.Repositories.FavoriteRepository;
@@ -49,13 +50,40 @@ public class FavoriteService {
         repo.deleteByUserIdAndProduct_Id(userId, productId);
     }
 
-    public Page<Product> listFavorites(Long userId, Pageable pageable){
-        Page<Favorite> page = repo.findByUserId(userId, pageable);
-        List<Product> products = page.map(Favorite::getProduct).toList();
-        return new PageImpl<>(products, pageable, page.getTotalElements());
-    }
+//    public Page<Product> listFavorites(Long userId, Pageable pageable){
+//        Page<Favorite> page = repo.findByUserId(userId, pageable);
+//        List<Product> products = page.map(Favorite::getProduct).toList();
+//        return new PageImpl<>(products, pageable, page.getTotalElements());
+//    }
 
     public long countForProduct(Long productId){
         return repo.countByProduct_Id(productId);
+    }
+
+    public long countByUserId(Long userId) {
+        return repo.countByUserId(userId);
+    }
+
+    public List<FavoriteProductDto> getPreview(Long userId, int limit) {
+        return repo.findByUserIdOrderByCreatedAtDesc(userId).stream()
+                .limit(limit)
+                .map(fav -> new FavoriteProductDto(
+                        fav.getProduct().getId(),
+                        fav.getProduct().getName(),
+                        fav.getProduct().getPrice(),
+                        fav.getProduct().getImageUrl()
+                ))
+                .toList();
+    }
+
+    public List<FavoriteProductDto> getAllByUser(Long userId) {
+        return repo.findByUserIdOrderByCreatedAtDesc(userId).stream()
+                .map(fav -> new FavoriteProductDto(
+                        fav.getProduct().getId(),
+                        fav.getProduct().getName(),
+                        fav.getProduct().getPrice(),
+                        fav.getProduct().getImageUrl()
+                ))
+                .toList();
     }
 }

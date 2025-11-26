@@ -59,12 +59,7 @@ public class AuthController {
 
     @GetMapping("/logout")
     public String logout(HttpServletResponse response){
-        Cookie cookie = new Cookie("jwt", null);
-        cookie.setHttpOnly(true);
-        cookie.setSecure(true);  // HTTPS kullanıyorsanız true olmalı
-        cookie.setPath("/"); // Cookie'nin geçerli olduğu path
-        cookie.setMaxAge(0); // Cookie'yi hemen silmek için Max-Age'i 0 yapıyoruz
-        response.addCookie(cookie);
+        authService.clearAuthCookie(response);
         return "redirect:/products/list";
     }
 

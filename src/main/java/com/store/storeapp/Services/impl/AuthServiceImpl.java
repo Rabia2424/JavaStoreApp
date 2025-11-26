@@ -17,6 +17,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.CookieValue;
 
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletResponse;
 import java.util.Arrays;
 
 @Service
@@ -61,6 +63,7 @@ public class AuthServiceImpl implements AuthService {
     public User register(RegisterDto registerDto) {
         User user = new User();
         user.setName(registerDto.getName());
+        user.setSurname(registerDto.getSurname());
         user.setUsername(registerDto.getUsername());
         user.setEmail(registerDto.getEmail());
         user.setPassword(passwordEn.encode(registerDto.getPassword()));
@@ -79,5 +82,15 @@ public class AuthServiceImpl implements AuthService {
         }
         return jwtTokenProvider.getUserId(token);
     }
+
+    public void clearAuthCookie(HttpServletResponse response) {
+        Cookie cookie = new Cookie("jwt", null);
+        cookie.setHttpOnly(true);
+        cookie.setSecure(false);
+        cookie.setPath("/");
+        cookie.setMaxAge(0);
+        response.addCookie(cookie);
+    }
+
 
 }

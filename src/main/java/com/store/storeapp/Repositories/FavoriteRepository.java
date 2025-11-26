@@ -16,10 +16,13 @@ public interface FavoriteRepository extends JpaRepository<Favorite, Long> {
     @Transactional
     void deleteByUserIdAndProduct_Id(Long userId, Long productId);
 
-    long countByProduct_Id(Long productId);
-
     @Query("select f.product.id from Favorite f where f.userId = :userId")
     List<Long> findProductIdsByUserId(Long userId);
 
-    Page<Favorite> findByUserId(Long userId, Pageable pageable);
+    //Page<Favorite> findByUserId(Long userId, Pageable pageable);
+    long countByProduct_Id(Long productId);
+
+    long countByUserId(Long userId);
+
+    List<Favorite> findByUserIdOrderByCreatedAtDesc(Long userId);
 }

@@ -1,0 +1,78 @@
+<div th:fragment="content">
+
+    <div class="panel-header mb-3">
+        <h2>Profile</h2>
+    </div>
+
+    <form th:action="@{/account/profile}"
+          method="post"
+          class="profile-form"
+          enctype="multipart/form-data">
+
+        <div class="row g-4 align-items-center">
+
+            <div class="col-md-3 d-flex flex-column align-items-start">
+                <div class="profile-avatar-wrapper">
+
+                    <img th:if="${profile.avatarUrl != null}"
+                         th:src="${profile.avatarUrl}"
+                         alt="Avatar"
+                         id="avatarPreview"
+                         class="profile-avatar-img"/>
+
+                    <div th:if="${profile.avatarUrl == null}"
+                         id="avatarPlaceholder"
+                         class="profile-avatar-placeholder">
+                        <span th:text="${#strings.substring(profile.firstName,0,1)}">E</span>
+                    </div>
+                </div>
+
+                <div class="mt-3">
+                    <label class="btn btn-outline-light btn-sm mb-0">
+                        Change photo
+                        <input type="file"
+                               name="avatar"
+                               id="avatarInput"
+                               class="d-none"
+                               accept="image/*">
+                    </label>
+                    <div class="form-text text-muted small">
+                        JPG/PNG, max 2MB.
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-9">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label">First Name</label>
+                        <input class="form-control" name="firstName"
+                               th:value="${profile.firstName}">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Last Name</label>
+                        <input class="form-control" name="lastName"
+                               th:value="${profile.lastName}">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Username</label>
+                        <input class="form-control" name="username"
+                               th:value="${profile.username}">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Email</label>
+                        <input class="form-control" name="email"
+                               th:value="${profile.email}">
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="mt-4 d-flex gap-2">
+            <button type="submit" class="btn btn-brand">Save changes</button>
+            <a th:href="@{/account}" class="btn btn-outline-light btn-sm">Cancel</a>
+        </div>
+    </form>
+
+</div>

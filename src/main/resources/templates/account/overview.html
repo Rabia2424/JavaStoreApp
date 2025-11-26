@@ -1,0 +1,105 @@
+<div th:fragment="content">
+
+    <header class="account-header">
+        <div>
+            <h2>My Account</h2>
+            <p>Overview of your orders, addresses, favorites and activity.</p>
+        </div>
+        <a th:href="@{/}" class="btn btn-sm btn-outline-light continue-shopping">
+            Continue shopping
+        </a>
+    </header>
+
+    <div class="row g-3 top-stats">
+        <div class="col-md-3 col-6">
+            <div class="stat-card">
+                <div class="label">Total Orders</div>
+                <div class="value" th:text="${stats.totalOrders}">0</div>
+            </div>
+        </div>
+        <div class="col-md-3 col-6">
+            <div class="stat-card">
+                <div class="label">Active Orders</div>
+                <div class="value" th:text="${stats.activeOrders}">0</div>
+            </div>
+        </div>
+        <div class="col-md-3 col-6">
+            <div class="stat-card">
+                <div class="label">Saved Addresses</div>
+                <div class="value" th:text="${stats.addressCount}">0</div>
+            </div>
+        </div>
+        <div class="col-md-3 col-6">
+            <div class="stat-card">
+                <div class="label">Favorites</div>
+                <div class="value" th:text="${stats.favoriteCount}">0</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4 mt-3">
+        <div class="col-lg-7">
+            <div class="panel-card">
+                <div class="panel-header">
+                    <h5>Recent Orders</h5>
+                    <a th:href="@{/order/list}" class="panel-link">View all</a>
+                </div>
+
+                <div th:if="${#lists.isEmpty(recentOrders)}" class="empty-state">
+                    You have no recent orders.
+                </div>
+
+                <div th:each="o : ${recentOrders}" class="recent-order">
+                    <div class="left">
+                        <div class="no" th:text="'Order #' + ${o.orderId}">Order #12</div>
+                        <div class="meta">
+                            <span th:text="${#temporals.format(o.orderDate,'dd MMM yyyy, HH:mm')}">
+                                25 Nov 2025, 12:53
+                            </span>
+                            <span>•</span>
+                            <span th:text="${o.status.label}">Awaiting Payment</span>
+                        </div>
+                    </div>
+                    <div class="right">
+                        <span class="amount"
+                              th:text="${#numbers.formatDecimal(o.totalPrice, 1, 'COMMA', 2, 'POINT')}">
+                            172.00
+                        </span>
+                        <a class="link-detail"
+                           th:href="@{/order/detail/{id}(id=${o.orderId})}">
+                            View details
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-5">
+            <div class="panel-card">
+                <div class="panel-header">
+                    <h5>Favorites</h5>
+                    <a th:href="@{/favorites}" class="panel-link">View all</a>
+                </div>
+
+                <div th:if="${#lists.isEmpty(favoritePreview)}" class="empty-state">
+                    You have no favorite products yet.
+                </div>
+
+                <div th:each="fav : ${favoritePreview}" class="fav-item">
+                    <div class="fav-thumb">
+                        <img th:src="${fav.imageUrl}" alt="product">
+                    </div>
+                    <div class="fav-info">
+                        <a th:href="@{/product/detail/{id}(id=${fav.id})}"
+                           th:text="${fav.name}">Product name</a>
+                        <div class="fav-price"
+                             th:text="${#numbers.formatDecimal(fav.price, 1, 'COMMA', 2, 'POINT')}">
+                            0.00
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>

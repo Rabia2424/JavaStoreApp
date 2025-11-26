@@ -31,15 +31,14 @@ public class CatalogAppService {
 
     @Autowired
     private CategoryRepository categoryRepository;
+    @Autowired
+    private FileStorageService fileStorageService;
 
     @Transactional
-    public void createProductWithInventory(Product p, MultipartFile f) throws IOException {
+    public void createProductWithInventory(Product p, MultipartFile f) {
         if (f != null && !f.isEmpty()) {
-            String UPLOAD_DIR = System.getProperty("user.dir") + "/src/main/resources/static/images";
-            Files.createDirectories(Paths.get(UPLOAD_DIR));
-            Path path = Paths.get(UPLOAD_DIR, f.getOriginalFilename());
-            Files.write(path, f.getBytes());
-            p.setImageUrl("/images/" + f.getOriginalFilename());
+            String imageUrl = fileStorageService.store(f, "products");
+            p.setImageUrl(imageUrl);
         }
 
         Product saved = productService.saveProduct(p);
@@ -48,15 +47,12 @@ public class CatalogAppService {
     }
 
     @Transactional
-    public void updateProductWithInventory(Long id, Product patch, MultipartFile f) throws IOException {
+    public void updateProductWithInventory(Long id, Product patch, MultipartFile f) {
         Product existing = productRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Product not found: " + id));
         if (f != null && !f.isEmpty()) {
-            String UPLOAD_DIR = System.getProperty("user.dir") + "/src/main/resources/static/images";
-            Files.createDirectories(Paths.get(UPLOAD_DIR));
-            Path path = Paths.get(UPLOAD_DIR, f.getOriginalFilename());
-            Files.write(path, f.getBytes());
-            existing.setImageUrl("/images/" + f.getOriginalFilename());
+            String imageUrl = fileStorageService.store(f, "products");
+            existing.setImageUrl(imageUrl);
         }
 
         existing.setName(patch.getName());

@@ -5,6 +5,7 @@ import com.store.storeapp.Models.Product;
 import com.store.storeapp.Services.AuthService;
 import com.store.storeapp.Services.impl.CartService;
 import com.store.storeapp.Services.impl.ProductService;
+import com.store.storeapp.Services.impl.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -22,6 +23,8 @@ public class GlobalModelAttributes {
 
     private AuthService authService;
     private CartService cartService;
+    @Autowired
+    private UserService userService;
     public GlobalModelAttributes(ProductService productService, AuthService authService, CartService cartService) {
         this.productService = productService;
         this.authService = authService;
@@ -47,4 +50,23 @@ public class GlobalModelAttributes {
             return 0;
         }
     }
+
+    @ModelAttribute("avatarUrl")
+    public String addNavbarAvatar(@CookieValue(value="jwt", required=false) String token) {
+
+        if (token == null || token.isBlank()) return null;
+
+        try {
+            Long userId = authService.getUserIdFromToken(token);
+            if (userId == null) return null;
+
+            return userService.getUserById(userId)
+                    .map(user -> user.getAvatarUrl())
+                    .orElse(null);
+
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
 }

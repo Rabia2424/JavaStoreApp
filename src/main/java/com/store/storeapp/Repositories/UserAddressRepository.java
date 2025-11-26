@@ -23,4 +23,6 @@ public interface UserAddressRepository extends JpaRepository<UserAddress, Long> 
     @Transactional
     @Query("UPDATE UserAddress a SET a.defaultBilling = false WHERE a.userId = :userId and a.defaultBilling = true")
     void clearDefaultBilling(@Param("userId") Long userId);
+
+    long countByUserId(Long userId);
 }

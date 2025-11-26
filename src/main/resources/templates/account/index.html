@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+    <title>My Account</title>
+    <link rel="stylesheet" th:href="@{/css/account.css}">
+</head>
+
+<body>
+<div layout:fragment="body" class="account-wrapper">
+    <div class="container-xl">
+        <div class="row gx-4 gy-4">
+
+            <div class="col-lg-3">
+                <aside class="account-sidebar">
+                    <div class="account-user">
+                        <div class="profile-avatar-wrapper-index">
+                            <div th:if="${currentAvatarUrl != null}" >
+                                <img th:src="${currentAvatarUrl}"
+                                     alt="Avatar"
+                                     id="avatarPreview"
+                                     class="profile-avatar-img"/>
+                            </div>
+                        </div>
+                        <div th:if="${currentAvatarUrl == null}" class="avatar-circle">
+                            <span th:text="${#strings.substring(currentUserFirstName,0,1)}">E</span>
+                        </div>
+                        <div>
+                            <div class="hello">Hello,</div>
+                            <div class="name" th:text="${currentUserFullName}">Emir Şanlı</div>
+                        </div>
+                    </div>
+
+                    <nav class="account-nav">
+                        <a href="#" data-section="overview"
+                           class="account-link active">
+                            <i class="bi bi-grid-1x2"></i>
+                            <span>Overview</span>
+                        </a>
+                        <a href="#" data-section="orders"
+                           class="account-link">
+                            <i class="bi bi-bag-check"></i>
+                            <span>My Orders</span>
+                        </a>
+                        <a href="#" data-section="addresses"
+                           class="account-link">
+                            <i class="bi bi-geo-alt"></i>
+                            <span>My Addresses</span>
+                        </a>
+                        <a href="#" data-section="favorites"
+                           class="account-link">
+                            <i class="bi bi-heart"></i>
+                            <span>Favorites</span>
+                        </a>
+                        <a href="#" data-section="profile"
+                           class="account-link">
+                            <i class="bi bi-person-lines-fill"></i>
+                            <span>Profile</span>
+                        </a>
+                    </nav>
+                </aside>
+            </div>
+
+            <div class="col-lg-9">
+                <section id="accountContent" class="account-main"
+                         th:insert="~{account/overview :: content}">
+
+                </section>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<th:block layout:fragment="scripts">
+    <script th:src="@{/js/account.js}"></script>
+</th:block>
+</body>
+</html>

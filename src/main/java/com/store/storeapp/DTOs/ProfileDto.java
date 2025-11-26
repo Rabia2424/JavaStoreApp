@@ -1,18 +1,16 @@
 package com.store.storeapp.DTOs;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
-@Getter
-@Setter
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class RegisterDto {
-    private String name;
-    private String surname;
+public class ProfileDto {
+    private String firstName;
+    private String lastName;
+    private String avatarUrl;
     private String username;
     private String email;
-    private String password;
 }

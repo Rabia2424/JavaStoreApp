@@ -35,4 +35,8 @@ public class AddressService {
     public void clearDefaultBilling(Long userId) {
         repo.clearDefaultBilling(userId);
     }
+
+    public long countByUserId(Long userId) {
+        return repo.countByUserId(userId);
+    }
 }

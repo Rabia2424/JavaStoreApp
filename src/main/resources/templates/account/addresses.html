@@ -1,0 +1,54 @@
+<div th:fragment="content">
+
+    <div class="panel-header mb-3">
+        <h2>My Addresses</h2>
+        <button class="btn btn-sm btn-brand"
+                data-bs-toggle="modal"
+                data-bs-target="#newAddressModal">
+            Add new address
+        </button>
+    </div>
+
+    <div th:if="${#lists.isEmpty(addresses)}" class="empty-state">
+        You have no saved addresses yet.
+    </div>
+
+    <div class="row g-3" th:if="${!#lists.isEmpty(addresses)}">
+        <div class="col-md-6" th:each="addr : ${addresses}">
+            <div class="addr-card-full">
+                <div class="addr-header">
+                    <div class="addr-name" th:text="${addr.fullName}">Full Name</div>
+                    <div class="addr-tags">
+                        <span class="badge badge-soft" th:if="${addr.defaultShipping}">Default shipping</span>
+                        <span class="badge badge-soft" th:if="${addr.defaultBilling}">Default billing</span>
+                    </div>
+                </div>
+
+                <div class="addr-line"
+                     th:text="${addr.line1 + (#strings.isEmpty(addr.line2) ? '' : ' ' + addr.line2)}">
+                    Address line
+                </div>
+                <div class="addr-line">
+                    <span th:text="${addr.district}">District</span>,
+                    <span th:text="${addr.city}">City</span>,
+                    <span th:text="${addr.country}">Country</span>
+                    (<span th:text="${addr.postalCode}">ZIP</span>)
+                </div>
+                <div class="addr-line" th:text="${addr.phone}">Phone</div>
+
+                <div class="addr-actions">
+                    <a th:href="@{/address/edit/{id}(id=${addr.id})}"
+                       class="btn btn-sm btn-outline-light">Edit</a>
+
+                    <form th:action="@{/address/delete/{id}(id=${addr.id})}"
+                          method="post" class="d-inline">
+                        <button type="submit" class="btn btn-sm btn-outline-danger">
+                            Delete
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
