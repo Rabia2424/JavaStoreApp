@@ -1,12 +1,87 @@
 <div th:fragment="content">
-
     <div class="panel-header mb-3">
         <h2>My Addresses</h2>
-        <button class="btn btn-sm btn-brand"
-                data-bs-toggle="modal"
-                data-bs-target="#newAddressModal">
-            Add new address
+        <button class="btn-add-address" id="openAddressModal">
+            <i class="bi bi-plus"></i> Add new address
         </button>
+
+        <!-- Add/Edit Address Modal -->
+        <div class="address-modal" id="addressModal">
+            <div class="modal-overlay"></div>
+            <div class="modal-content">
+                <div class="modal-header">
+                    <div class="modal-title">
+                        <i class="bi bi-plus-lg"></i>
+                        <span id="modalTitle">Add New Address</span>
+                    </div>
+                    <button class="modal-close" id="closeModal">
+                        <i class="bi bi-x-lg"></i>
+                    </button>
+                </div>
+
+                <form id="addressForm" class="address-form">
+                    <input type="hidden" id="addressId" name="addressId">
+
+                    <div class="form-group">
+                        <label for="fullName">Full Name</label>
+                        <input type="text" id="fullName" name="fullName" class="form-control" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="line1">Address Line 1</label>
+                        <input type="text" id="line1" name="line1" class="form-control" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="line2">Address Line 2 <span class="optional">(optional)</span></label>
+                        <input type="text" id="line2" name="line2" class="form-control">
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="district">District</label>
+                            <input type="text" id="district" name="district" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="city">City</label>
+                            <input type="text" id="city" name="city" class="form-control" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="country">Country</label>
+                            <input type="text" id="country" name="country" class="form-control" value="Turkey" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="postalCode">Postal Code</label>
+                            <input type="text" id="postalCode" name="postalCode" class="form-control" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="phone">Phone</label>
+                        <input type="tel" id="phone" name="phone" class="form-control" required>
+                    </div>
+
+                    <div class="form-checkboxes">
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="defaultShipping" id="defaultShipping">
+                            <span>Default shipping</span>
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="defaultBilling" id="defaultBilling">
+                            <span>Default billing</span>
+                        </label>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-cancel" id="cancelBtn">Cancel</button>
+                        <button type="submit" class="btn btn-save">Save Address</button>
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
 
     <div th:if="${#lists.isEmpty(addresses)}" class="empty-state">
@@ -37,18 +112,27 @@
                 <div class="addr-line" th:text="${addr.phone}">Phone</div>
 
                 <div class="addr-actions">
-                    <a th:href="@{/address/edit/{id}(id=${addr.id})}"
-                       class="btn btn-sm btn-outline-light">Edit</a>
+                    <button class="btn btn-sm btn-outline-light edit-address-btn"
+                            th:data-id="${addr.id}"
+                            th:data-fullname="${addr.fullName}"
+                            th:data-line1="${addr.line1}"
+                            th:data-line2="${addr.line2}"
+                            th:data-district="${addr.district}"
+                            th:data-city="${addr.city}"
+                            th:data-country="${addr.country}"
+                            th:data-postalcode="${addr.postalCode}"
+                            th:data-phone="${addr.phone}"
+                            th:data-defaultshipping="${addr.defaultShipping}"
+                            th:data-defaultbilling="${addr.defaultBilling}">
+                        Edit
+                    </button>
 
-                    <form th:action="@{/address/delete/{id}(id=${addr.id})}"
-                          method="post" class="d-inline">
-                        <button type="submit" class="btn btn-sm btn-outline-danger">
-                            Delete
-                        </button>
-                    </form>
+                    <button class="btn btn-sm btn-outline-danger delete-address-btn"
+                            th:data-id="${addr.id}">
+                        Delete
+                    </button>
                 </div>
             </div>
         </div>
     </div>
-
 </div>

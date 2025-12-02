@@ -27,6 +27,17 @@ public class AddressService {
             throw new RuntimeException("Error saving address: " + e.getMessage(), e);
         }
     }
+    public UserAddress update(UserAddress address){
+        try{
+            return repo.save(address);
+        }catch(Exception e){
+            throw new RuntimeException("Error saving address: " + e.getMessage(), e);
+        }
+    }
+
+    public UserAddress findById(Long id){ return repo.findById(id).orElse(null); }
+
+    public void delete(Long id){  repo.deleteById(id); }
 
     public void clearDefaultShipping(Long userId) {
         repo.clearDefaultShipping(userId);

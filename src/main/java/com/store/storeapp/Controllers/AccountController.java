@@ -84,7 +84,9 @@ public class AccountController {
     @GetMapping("/section/orders")
     public String ordersFragment(@CookieValue("jwt") String token, Model model) {
         Long userId = authService.getUserIdFromToken(token);
-        model.addAttribute("orders", orderService.getOrdersByUserId(userId));
+        List<OrderResponseDto> orders = orderService.getOrdersByUserId(userId);
+        model.addAttribute("orders", orders);
+        model.addAttribute("hasOrders", !orders.isEmpty());
         return "account/orders :: content";
     }
 

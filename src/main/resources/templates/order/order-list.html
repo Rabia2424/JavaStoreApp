@@ -8,8 +8,9 @@
 </head>
 <body>
 <div layout:fragment="body">
-
-    <div class="orders-page">
+    <div th:replace="~{order/order-list :: content}"></div>
+</div>
+    <div th:fragment="content" class="orders-page">
 
         <h2 class="page-title">My Orders</h2>
 
@@ -90,6 +91,5 @@
 
     </div>
 
-</div>
 </body>
 </html>
