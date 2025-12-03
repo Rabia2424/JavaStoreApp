@@ -3,6 +3,7 @@ package com.store.storeapp.Controllers;
 import com.store.storeapp.Services.AuthService;
 import com.store.storeapp.Services.impl.FavoriteService;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -38,6 +39,23 @@ public class FavoriteController {
         Long userId = requireUser(token);
         favoriteService.remove(userId, productId);
         return Map.of("favorited", false, "count", favoriteService.countForProduct(productId));
+    }
+
+    @PostMapping("/remove/{productId}")
+    @ResponseBody
+    public ResponseEntity<?> removeFavorite(@PathVariable Long productId, @CookieValue("jwt") String token) {
+        try {
+            Long userId = authService.getUserIdFromToken(token);
+            favoriteService.remove(userId, productId);
+
+            return ResponseEntity.ok().body(Map.of(
+                    "success", true,
+                    "message", "Product removed from favorites"
+            ));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("success", false, "message", e.getMessage()));
+        }
     }
 
 }

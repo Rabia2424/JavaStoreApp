@@ -12,6 +12,12 @@ document.addEventListener('DOMContentLoaded', function () {
         return;
     }
 
+    // Initialize links when overview loads
+    const initialSection = document.querySelector('.account-link.active')?.getAttribute('data-section');
+    if (initialSection === 'overview') {
+        initOverviewLinks();
+    }
+
     links.forEach(link => {
         link.addEventListener('click', function (e) {
             e.preventDefault();
@@ -40,6 +46,12 @@ document.addEventListener('DOMContentLoaded', function () {
                     if (section === 'addresses') {
                         console.log('Addresses section loaded, calling initAddressModal...');
                         initAddressModal();
+                    } else if(section === 'overview'){
+                        console.log('Overview section loaded, initializing links...');
+                        initOverviewLinks();
+                    } else if (section === 'favorites') {
+                        console.log('Favorites section loaded, initializing buttons...');
+                        initFavorites();
                     }
                 })
                 .catch(err => {
@@ -231,5 +243,153 @@ document.addEventListener('DOMContentLoaded', function () {
 
             console.log('Address modal initialized successfully!');
         }, 150);
+    }
+
+
+    function initOverviewLinks() {
+        const viewFavoritesLink = document.querySelector('.view-favorites-link');
+        if (viewFavoritesLink) {
+            viewFavoritesLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                console.log('View all favorites clicked');
+
+                links.forEach(link => {
+                    if (link.getAttribute('data-section') === 'favorites') {
+                        link.click();
+                    }
+                });
+            });
+        }
+    }
+
+    function initFavorites() {
+        console.log('initFavorites called');
+
+        setTimeout(() => {
+            document.querySelectorAll('.remove-favorite-btn').forEach(btn => {
+                btn.addEventListener('click', async function(e) {
+                    e.preventDefault();
+
+                    const productId = this.dataset.id;
+                    const productName = this.dataset.name;
+
+                    if (!confirm(`Remove "${productName}" from favorites?`)) {
+                        return;
+                    }
+
+                    console.log('Removing favorite:', productId);
+
+                    this.disabled = true;
+                    this.textContent = 'Removing...';
+
+                    try {
+                        const response = await fetch(`/favorites/remove/${productId}`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            }
+                        });
+
+                        if (response.ok) {
+                            const result = await response.json();
+
+                            links.forEach(l => {
+                                if (l.getAttribute('data-section') === 'favorites') {
+                                    l.click();
+                                }
+                            });
+                        } else {
+                            const errorData = await response.json().catch(() => ({
+                                message: 'Unknown error'
+                            }));
+                            alert('Error: ' + (errorData.message || 'Could not remove from favorites'));
+
+                            this.disabled = false;
+                            this.textContent = 'Remove';
+                        }
+                    } catch (error) {
+                        console.error('Network error:', error);
+                        alert('Network error: ' + error.message);
+
+                        this.disabled = false;
+                        this.textContent = 'Remove';
+                    }
+                });
+            });
+
+            document.querySelectorAll('.add-to-cart-btn').forEach(btn => {
+                btn.addEventListener('click', async function(e) {
+                    e.preventDefault();
+
+                    const productId = this.dataset.id;
+                    const productName = this.dataset.name;
+
+                    console.log('Adding to cart:', productId);
+
+                    const originalText = this.textContent;
+                    this.disabled = true;
+                    this.textContent = 'Adding...';
+
+                    try {
+                        const response = await fetch(`/cart/add-json/${productId}`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            }
+                        });
+
+                        if (response.ok) {
+                            const result = await response.json();
+
+                            this.textContent = '✓ Added!';
+                            this.classList.add('add-to-cart-btn:hover');
+
+                            setTimeout(() => {
+                                this.disabled = false;
+                                this.textContent = originalText;
+                                this.classList.remove('add-to-cart-btn:hover');
+                            }, 2000);
+
+                            updateCartCount();
+
+                        } else {
+                            const errorData = await response.json().catch(() => ({
+                                message: 'Unknown error'
+                            }));
+                            alert('Error: ' + (errorData.message || 'Could not add to cart'));
+
+                            this.disabled = false;
+                            this.textContent = originalText;
+                        }
+                    } catch (error) {
+                        console.error('Network error:', error);
+                        alert('Network error: ' + error.message);
+
+                        this.disabled = false;
+                        this.textContent = originalText;
+                    }
+                });
+            });
+
+            console.log('Favorites buttons initialized:', {
+                removeButtons: document.querySelectorAll('.remove-favorite-btn').length,
+                addToCartButtons: document.querySelectorAll('.add-to-cart-btn').length
+            });
+        }, 100);
+    }
+
+    function updateCartCount() {
+        const cartCountEl = document.querySelector('.cart-badge');
+        if (cartCountEl) {
+            fetch('/cart/count')
+                .then(res => res.json())
+                .then(data => {
+                    if (data.count !== undefined) {
+                        cartCountEl.textContent = data.count;
+                        cartCountEl.style.display = data.count > 0 ? 'inline' : 'none';
+                    }
+                })
+                .catch(err => console.error('Could not update cart count:', err));
+        }
     }
 });

@@ -45,7 +45,12 @@ public class GlobalModelAttributes {
         try{
             Long userId = authService.getUserIdFromToken(token);
             Cart cart = cartService.getCartByUserId(userId);
-            return cart != null && cart.getCartItems() != null ? cart.getCartItems().size() : 0;
+
+            return cart != null && cart.getCartItems() != null
+                    ? cart.getCartItems().stream()
+                    .mapToInt(c -> c.getQuantity())
+                    .sum()
+                    : 0;
         }catch(Exception e){
             return 0;
         }

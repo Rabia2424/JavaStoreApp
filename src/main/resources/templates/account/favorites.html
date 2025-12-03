@@ -21,19 +21,21 @@
                     0.00
                 </div>
                 <div class="fav-card-actions">
-                    <form th:action="@{/favorites/remove/{id}(id=${fav.id})}"
-                          method="post">
-                        <button type="submit" class="btn btn-sm btn-outline-light">
-                            Remove
-                        </button>
-                    </form>
-                    <a th:href="@{/cart/add/{id}(id=${fav.id})}"
-                       class="btn btn-sm btn-brand">
+                    <button type="button"
+                            class=" remove-favorite-btn"
+                            th:data-id="${fav.id}"
+                            th:data-name="${fav.name}">
+                        Remove
+                    </button>
+
+                    <button type="button"
+                            class=" add-to-cart-btn"
+                            th:data-id="${fav.id}"
+                            th:data-name="${fav.name}">
                         Add to cart
-                    </a>
+                    </button>
                 </div>
             </div>
         </div>
     </div>
-
 </div>

@@ -1,5 +1,7 @@
 package com.store.storeapp.Services.impl;
 
+import com.store.storeapp.DTOs.ProductDto;
+import com.store.storeapp.DTOs.ProductInfoBundle;
 import com.store.storeapp.Models.Cart;
 import com.store.storeapp.Models.CartItem;
 import com.store.storeapp.Models.CartStatus;
@@ -27,6 +29,8 @@ public class CartService {
 
     @Autowired
     private AuthService authService;
+    @Autowired
+    private ProductService productService;
 
     public Cart getCartByUserId(Long userId){
         return cartRepository.getCartByUserId(userId)
@@ -127,6 +131,20 @@ public class CartService {
             return cart.getCartItems().stream()
                     .filter(cartItem -> cartItem.getProduct().getId().equals(product.getId()))
                     .findFirst();
+    }
+
+    public int getCartItemCount(Long userId) {
+        Cart cart = cartRepository.findByUserId(userId);
+        return cart == null ? 0 : cart.getCartItems().stream()
+                .mapToInt(CartItem::getQuantity)
+                .sum();
+    }
+
+    public ProductInfoBundle getProductInfo(String token, Long productId){
+        Long userId = authService.getUserIdFromToken(token);
+        ProductDto productDto = productService.getProductById(productId);
+        Product product = productService.mapToProduct(productDto);
+        return new ProductInfoBundle(userId, product);
     }
 
 }
