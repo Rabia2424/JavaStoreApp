@@ -49,7 +49,7 @@ public class SpringSecurityConfig {
                 .and()
                 .authorizeRequests(authorize -> {
                     // Allow access to static resources
-                    authorize.antMatchers("/assets/**", "/css/**", "/js/**", "/images/**", "/uploads/**").permitAll();
+                    authorize.antMatchers("/assets/**", "/css/**", "/js/**", "/images/**", "/uploads/**" ).permitAll();
                     authorize.antMatchers("/", "/auth/**", "/products/list", "/errorPage", "/products/api").permitAll();
                     authorize.antMatchers("/admin/**").hasRole("ADMIN");
                     authorize.antMatchers(HttpMethod.GET, "/api/**").hasAnyRole("ADMIN", "USER");

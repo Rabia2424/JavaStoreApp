@@ -1,0 +1,194 @@
+:root {
+    --indigo: #6366f1;
+    --indigo-soft: rgba(99,102,241,0.16);
+    --emerald: #22c55e;
+    --danger-soft: rgba(248,113,113,0.14);
+    --danger-border: rgba(248,113,113,0.6);
+    --bg-card: #020617;
+    --border-card: #111827;
+    --text-main: #e5e7eb;
+    --text-soft: #cbd5f5;
+    --text-subtle: #9ca3af;
+}
+
+.stat-card {
+    border-radius: 1rem;
+    padding: 1rem 1.25rem;
+    border: 1px solid rgba(31,41,55,0.9);
+    background: radial-gradient(circle at top left, #020617, #020617);
+    box-shadow:
+            0 18px 40px rgba(15,23,42,0.9),
+            0 0 0 1px rgba(15,23,42,0.9);
+}
+
+.stat-label {
+    font-size: .8rem;
+    color: var(--text-soft);
+    margin-bottom: .25rem;
+    letter-spacing: .02em;
+}
+
+.stat-value {
+    font-size: 1.4rem;
+    font-weight: 600;
+    color: var(--text-main);
+}
+
+.stat-trend {
+    font-size: .75rem;
+    color: var(--text-subtle);
+}
+
+.chart-card {
+    border-radius: 1.25rem;
+    border: 1px solid rgba(31,41,55,1);
+    background: radial-gradient(circle at top left, #020617, #020617);
+    box-shadow:
+            0 24px 60px rgba(0,0,0,1),
+            0 0 0 1px rgba(15,23,42,1);
+}
+
+.chart-wrapper {
+    position: relative;
+    height: 320px;
+}
+
+.table-card {
+    border-radius: 1.1rem;
+    border: 1px solid rgba(31,41,55,0.95);
+    background: radial-gradient(circle at top left, #020617, #020617);
+    box-shadow:
+            0 18px 40px rgba(0,0,0,0.95),
+            0 0 0 1px rgba(15,23,42,0.95);
+    padding: 1.25rem 1.5rem;
+}
+
+.table-dashboard {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: .85rem;
+}
+
+.table-dashboard thead th {
+    font-size: .72rem;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    padding: .35rem .25rem .55rem;
+    color: #9ca3af;
+    border-bottom: 1px solid rgba(31,41,55,1);
+}
+
+.table-dashboard tbody tr {
+    border-bottom: 1px solid rgba(15,23,42,0.8);
+    transition: background .16s ease-out, transform .12s ease-out,
+    box-shadow .16s ease-out;
+}
+
+.table-dashboard tbody tr:last-child {
+    border-bottom: none;
+}
+
+.table-dashboard tbody tr:hover {
+    background: radial-gradient(circle at top left,
+    rgba(36,50,99,0.45), rgba(15,23,42,0.95));
+    transform: translateY(-2px);
+    box-shadow: 0 12px 30px rgba(0,0,0,0.75);
+}
+
+.table-dashboard tbody td {
+    padding: .55rem .25rem;
+    color: #e5e7eb;
+    vertical-align: middle;
+}
+
+.badge-soft {
+    border-radius: 999px;
+    padding: .15rem .55rem;
+    font-size: .7rem;
+    border: 1px solid rgba(55,65,81,0.95);
+    background: radial-gradient(circle at top left, #020617, #020617);
+    color: var(--text-soft);
+}
+
+.dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 999px;
+    display: inline-block;
+}
+
+.product-main {
+    font-size: .85rem;
+    font-weight: 500;
+    color: #e5e7eb;
+}
+
+.product-sub {
+    font-size: .74rem;
+    color: #6b7280;
+}
+
+.cell-right {
+    text-align: right;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+}
+
+.badge-low-stock {
+    border-radius: 999px;
+    padding: .18rem .65rem;
+    font-size: .72rem;
+    border: 1px solid rgba(248,113,113,0.55);
+    background: rgba(127,29,29,0.35);
+    color: #fecaca;
+    display: inline-flex;
+    align-items: center;
+    gap: .3rem;
+}
+
+.btn-add-product {
+    color: var(--emerald);
+    border-color: var(--emerald);
+}
+
+.btn-add-product:hover {
+    color: #fff;
+    background-color: rgba(34, 197, 94, 0.29);
+    border-color: var(--emerald);
+}
+
+.admin-content,
+.admin-content h1,
+.admin-content h2,
+.admin-content h3,
+.admin-content h4,
+.admin-content h5,
+.admin-content h6 {
+    color: var(--text-main);
+}
+
+.admin-content .text-muted {
+    color: var(--text-subtle) !important;
+}
+
+.btn-outline-light {
+    border-color: #6366f1;
+    color: var(--text-soft);
+}
+
+.btn-outline-light:hover {
+    background: var(--indigo-soft);
+    border-color: var(--indigo);
+    color: #fff;
+}
+
+.btn-outline-warning {
+    border-color: rgba(234,179,8,0.4);
+    color: #fde68a;
+}
+
+.btn-outline-warning:hover {
+    background: rgba(234,179,8,0.15);
+    border-color: #facc15;
+    color: #fef3c7;
+}

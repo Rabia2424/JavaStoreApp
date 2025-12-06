@@ -1,5 +1,7 @@
 package com.store.storeapp.Repositories;
 
+import com.store.storeapp.DTOs.TopSellingProductDto;
+import com.store.storeapp.Models.OrderStatus;
 import com.store.storeapp.Models.Product;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -47,4 +49,22 @@ public interface ProductRepository extends JpaRepository<Product, Long>, JpaSpec
    order by max(d.discountRate) desc
 """)
     Page<Product> findDiscountedProducts(Pageable pageable);
+
+    @Query("""
+       select new com.store.storeapp.DTOs.TopSellingProductDto(
+            p.sku,
+            p.name,
+            p.price,
+            sum(oi.quantity),
+            sum(oi.totalPrice)
+       )
+       from OrderItem oi
+       join oi.product p
+       join oi.order o
+       where o.status <> :cancelled
+       group by p.sku, p.name, p.price
+       order by sum(oi.quantity) desc
+       """)
+    Page<TopSellingProductDto> findTopSellingProducts(@Param("cancelled") OrderStatus cancelled,
+                                                      Pageable pageable);
 }

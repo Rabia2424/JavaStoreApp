@@ -1,9 +1,13 @@
 package com.store.storeapp.Services.impl;
 
+import com.store.storeapp.DTOs.LowStockProductDto;
 import com.store.storeapp.DTOs.ProductDto;
+import com.store.storeapp.DTOs.TopSellingProductDto;
+import com.store.storeapp.Models.OrderStatus;
 import com.store.storeapp.Models.Product;
 import com.store.storeapp.Models.ProductDiscount;
 import com.store.storeapp.Models.ProductSpecs;
+import com.store.storeapp.Repositories.InventoryRepository;
 import com.store.storeapp.Repositories.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -31,6 +35,11 @@ public class ProductService {
     private CategoryService categoryService;
     @Autowired
     private FavoriteService favoriteService;
+    @Autowired
+    private InventoryRepository inventoryRepository;
+
+    private static final int LOW_STOCK_THRESHOLD = 10;
+
     public ProductService(ProductRepository productRepository){
         this.productRepository = productRepository;
     }
@@ -159,19 +168,30 @@ public class ProductService {
     }
 
 
+    public long getLowStockCount() {
+        return inventoryRepository.countByOnHandLessThan(LOW_STOCK_THRESHOLD);
+    }
 
-//    public Page<Product> findAll(Pageable pageable) {
-//        return productRepository.findAll(pageable);
-//    }
-//
-//    public Page<Product> findAllByCategoryId(Pageable pageable, Long categoryId) { return productRepository.getProductsByCategoryId(categoryId,pageable);}
-//
-//    public Page<Product> findFilteredProducts(Pageable pageable,
-//                                              @Param("categoryId") Long categoryId,
-//                                              @Param("minPrice") Double minPrice,
-//                                              @Param("maxPrice") Double maxPrice){
-//        return productRepository.findFilteredProducts(categoryId, minPrice, maxPrice, pageable);
-//    }
+    public List<LowStockProductDto> getLowStockProducts(int limit) {
+        return inventoryRepository
+                .findByOnHandLessThanOrderByOnHandAsc(
+                        LOW_STOCK_THRESHOLD,
+                        PageRequest.of(0, limit)
+                )
+                .stream()
+                .map(inv -> new LowStockProductDto(
+                        inv.getProduct().getSku(),
+                        inv.getProduct().getName(),
+                        inv.getOnHand()
+                ))
+                .collect(Collectors.toList());
+    }
+
+    public List<TopSellingProductDto> getTopSellingProducts(int limit) {
+        return productRepository
+                .findTopSellingProducts(OrderStatus.CANCELLED, PageRequest.of(0, limit))
+                .getContent();
+    }
 
 
 }

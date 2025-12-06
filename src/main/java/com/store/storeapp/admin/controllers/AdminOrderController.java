@@ -1,4 +1,4 @@
-package com.store.storeapp.Admin.Controllers;
+package com.store.storeapp.admin.controllers;
 
 import com.store.storeapp.Models.Order;
 import com.store.storeapp.Models.OrderStatus;

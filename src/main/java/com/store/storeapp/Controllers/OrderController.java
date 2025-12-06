@@ -88,8 +88,8 @@ public class OrderController {
         Cart cart = cartService.getCartByUserId(userId);
         double subtotal = cart.getCartItems().stream()
                 .mapToDouble(CartItem::getTotalPrice).sum();
+
         double shippingCost = subtotal >= 1000 ? 0 : 10;
-        double total = subtotal + shippingCost;
 
         Order order = new Order();
         order.setUserId(userId);
@@ -97,7 +97,7 @@ public class OrderController {
         order.setStatus(OrderStatus.CREATED);
         order.setNotes(notes);
         order.setShippingCost(shippingCost);
-        order.setTotalAmount(total);
+        order.setTotalAmount(subtotal);
         order.setShipping(AddressMapper.toSnapshot(shipUA));
         order.setBilling(AddressMapper.toSnapshot(billUA));
 

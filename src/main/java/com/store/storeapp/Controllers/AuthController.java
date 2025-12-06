@@ -7,6 +7,7 @@ import com.store.storeapp.Services.AuthService;
 import com.store.storeapp.security.JwtTokenProvider;
 
 import lombok.AllArgsConstructor;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -54,7 +55,17 @@ public class AuthController {
         jwtCookie.setMaxAge((int) jwtTokenProvider.getExpirationDate(token).getTime() / 1000);
         response.addCookie(jwtCookie);
 
-        return "redirect:/products/list";
+        var authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        boolean isAdmin = authentication != null &&
+                authentication.getAuthorities().stream()
+                        .anyMatch(a -> "ROLE_ADMIN".equals(a.getAuthority()));
+
+        if (isAdmin) {
+            return "redirect:/admin/dashboard";
+        } else {
+            return "redirect:/";
+        }
     }
 
     @GetMapping("/logout")

@@ -149,7 +149,7 @@ public class PaymentService {
         payment.setOrder(order);
         payment.setPaymentDate(LocalDateTime.now());
         payment.setPaymentMethod(PaymentMethod.CREDIT_CARD);
-        payment.setTotalPaid(order.getTotalAmount());
+        payment.setTotalPaid(order.getTotalAmount() + order.getShippingCost());
         payment.setCurrency(iyzicoPaymentResponse.getCurrency());
         payment.setConversationId(iyzicoPaymentResponse.getConversationId());
 

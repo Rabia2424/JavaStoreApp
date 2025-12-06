@@ -19,4 +19,7 @@ public class UserService {
 
     public User updateUser(User user){ return userRepository.save(user); }
 
+    public Optional<User> getUserByUsername(String username) {
+        return userRepository.getUserByUsername(username);
+    }
 }

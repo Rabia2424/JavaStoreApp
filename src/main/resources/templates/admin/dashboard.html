@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="tr"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{admin/layout}">
+
+<head>
+    <title>Dashboard</title>
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link th:href="@{/css/admin-dashboard.css}" rel="stylesheet" />
+</head>
+
+<body>
+<section layout:fragment="content">
+
+    <div class="row g-3 mb-3">
+        <div class="col-12 col-md-3">
+            <div class="stat-card">
+                <div class="d-flex justify-content-between align-items-center mb-1">
+                    <span class="stat-label">Today Orders</span>
+                    <span class="badge-soft">
+                        <i class="bi bi-calendar-day me-1"></i>Today
+                    </span>
+                </div>
+                <div class="stat-value" th:text="${todayOrders} ?: 0">0</div>
+                <div class="stat-trend">
+                    <span class="text-success">
+                        <i class="bi bi-arrow-up-right"></i>
+                        <span th:text="${todayOrdersChangeText} ?: '+0% vs yesterday'">+0% vs yesterday</span>
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-md-3">
+            <div class="stat-card">
+                <div class="d-flex justify-content-between align-items-center mb-1">
+                    <span class="stat-label">Revenue Today</span>
+                    <i class="bi bi-currency-dollar text-warning"></i>
+                </div>
+                <div class="stat-value">
+                    ₺<span th:text="${todayRevenue} ?: 0">0</span>
+                </div>
+                <div class="stat-trend">
+                    <span class="text-success">
+                        <i class="bi bi-graph-up"></i>
+                        <span th:text="${todayRevenueChangeText} ?: '+0% vs yesterday'">+0% vs yesterday</span>
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-md-3">
+            <div class="stat-card">
+                <div class="d-flex justify-content-between align-items-center mb-1">
+                    <span class="stat-label">Pending Orders</span>
+                    <i class="bi bi-hourglass-split text-warning"></i>
+                </div>
+                <div class="stat-value" th:text="${pendingOrders} ?: 0">0</div>
+                <div class="stat-trend">
+                    <i class="bi bi-info-circle"></i>
+                    <span class="text-subtle">Need attention</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-md-3">
+            <div class="stat-card">
+                <div class="d-flex justify-content-between align-items-center mb-1">
+                    <span class="stat-label">Low Stock Count</span>
+                    <i class="bi bi-exclamation-triangle text-danger"></i>
+                </div>
+                <div class="stat-value" th:text="${lowStockCount} ?: 0">0</div>
+                <div class="stat-trend text-danger">
+                    <i class="bi bi-battery warning"></i>
+                    Re-stock required
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-3 mb-3">
+        <div class="col-12 col-lg-8">
+            <div class="chart-card p-3 p-md-4 h-100">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <div>
+                        <div class="text-muted" style="font-size:.78rem;">Last 14 days</div>
+                        <h2 class="h6 mb-0">Daily Revenue & Orders</h2>
+                    </div>
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="d-flex align-items-center gap-1">
+                            <span class="dot" style="background:#6366f1;"></span>
+                            <span style="font-size:.75rem;" class="text-muted">Revenue</span>
+                        </div>
+                        <div class="d-flex align-items-center gap-1">
+                            <span class="dot" style="background:#22c55e;"></span>
+                            <span style="font-size:.75rem;" class="text-muted">Orders</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="chart-wrapper">
+                    <canvas id="dailySalesChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-lg-4">
+            <div class="table-card p-3 mb-3">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <h2 class="h6 mb-0">Today Summary</h2>
+                    <span class="badge-soft">
+                        <i class="bi bi-clock-history me-1"></i>
+                        Real-time
+                    </span>
+                </div>
+                <ul class="list-unstyled mb-0" style="font-size:.85rem;">
+                    <li class="d-flex justify-content-between mb-1">
+                        <span class="text-muted">Average order value</span>
+                        <strong>₺<span th:text="${avgOrderValueToday} ?: 0">0</span></strong>
+                    </li>
+                    <li class="d-flex justify-content-between mb-1">
+                        <span class="text-muted">Conversion rate</span>
+                        <strong th:text="${conversionRateToday} ?: '0.0%'">0.0%</strong>
+                    </li>
+                    <li class="d-flex justify-content-between">
+                        <span class="text-muted">Cancelled orders</span>
+                        <strong th:text="${cancelledCountToday} ?: 0">0</strong>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="table-card p-3">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <h2 class="h6 mb-0">Quick Actions</h2>
+                </div>
+                <div class="d-grid gap-2">
+                    <a th:href="@{/admin/orders(status='PENDING')}" class="btn btn-sm btn-outline-light">
+                        <i class="bi bi-lightning-charge me-1"></i> Review pending orders
+                    </a>
+                    <a th:href="@{/admin/products(filter='low-stock')}" class="btn btn-sm btn-outline-warning">
+                        <i class="bi bi-exclamation-circle me-1"></i> Check low stock products
+                    </a>
+                    <a th:href="@{/admin/products/new}" class="btn btn-sm btn-add-product">
+                        <i class="bi bi-plus-circle me-1"></i> Add new product
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-3 mt-1">
+        <div class="col-12 col-lg-7">
+            <div class="table-card h-100">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h2 class="h6 mb-0">Top Selling Products</h2>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table-dashboard">
+                        <thead>
+                        <tr>
+                            <th scope="col">Product</th>
+                            <th scope="col" class="text-end">Units sold</th>
+                            <th scope="col" class="text-end">Revenue</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="p : ${topSellingProducts}">
+                            <td>
+                                <div class="product-main" th:text="${p.name}">Product name</div>
+                                <div class="product-sub text-muted">
+                                    SKU: <span th:text="${p.sku}">ABC-123</span>
+                                </div>
+                            </td>
+                            <td class="cell-right" th:text="${p.totalSold}">120</td>
+                            <td class="cell-right">
+                                ₺<span th:text="${p.totalRevenue}">0</span>
+                            </td>
+                        </tr>
+                        <tr th:if="${topSellingProducts == null or #lists.isEmpty(topSellingProducts)}">
+                            <td colspan="3" class="text-center text-muted py-3" style="font-size:.8rem;">
+                                No sales data yet.
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="col-12 col-lg-5">
+            <div class="table-card h-100">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h2 class="h6 mb-0">Low Stock</h2>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table-dashboard">
+                        <thead>
+                        <tr>
+                            <th scope="col">Product</th>
+                            <th scope="col" class="text-end">In stock</th>
+                            <th scope="col" class="text-end">Status</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="p : ${lowStockProducts}">
+                            <td>
+                                <div class="product-main" th:text="${p.name}">Product name</div>
+                                <div class="product-sub text-muted">
+                                    SKU: <span th:text="${p.sku}">XYZ-22</span>
+                                </div>
+                            </td>
+                            <td class="cell-right" th:text="${p.onHand}">5</td>
+                            <td class="cell-right">
+                            <span class="badge-low-stock">
+                                <i class="bi bi-exclamation-triangle"></i>
+                                Low
+                            </span>
+                            </td>
+                        </tr>
+                        <tr th:if="${lowStockProducts == null or #lists.isEmpty(lowStockProducts)}">
+                            <td colspan="3" class="text-center text-muted py-3" style="font-size:.8rem;">
+                                No low stock products right now.
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        document.addEventListener('DOMContentLoaded', function () {
+
+            const dailySalesLabels      = /*[[${dailySalesLabels}]]*/ [];
+            const dailySalesRevenues    = /*[[${dailySalesRevenues}]]*/ [];
+            const dailySalesOrderCounts = /*[[${dailySalesOrderCounts}]]*/ [];
+
+            const canvas = document.getElementById('dailySalesChart');
+            if (!canvas) return;
+
+            const ctx = canvas.getContext('2d');
+
+            if (!dailySalesLabels || dailySalesLabels.length === 0) {
+                ctx.font = '14px Inter, system-ui';
+                ctx.fillStyle = '#6b7280';
+                ctx.fillText('No data for the last 14 days', 20, 30);
+                return;
+            }
+
+            const gradientRevenue = ctx.createLinearGradient(0, 0, 0, 260);
+            gradientRevenue.addColorStop(0, 'rgba(99,102,241,0.55)');
+            gradientRevenue.addColorStop(1, 'rgba(15,23,42,0)');
+
+            const gradientOrders = ctx.createLinearGradient(0, 0, 0, 260);
+            gradientOrders.addColorStop(0, 'rgba(34,197,94,0.50)');
+            gradientOrders.addColorStop(1, 'rgba(15,23,42,0)');
+
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: dailySalesLabels,
+                    datasets: [
+                        {
+                            label: 'Revenue',
+                            data: dailySalesRevenues,
+                            borderColor: '#6366f1',
+                            backgroundColor: gradientRevenue,
+                            borderWidth: 2,
+                            pointRadius: 2,
+                            tension: 0.35,
+                            yAxisID: 'y'
+                        },
+                        {
+                            label: 'Orders',
+                            data: dailySalesOrderCounts,
+                            borderColor: '#22c55e',
+                            backgroundColor: gradientOrders,
+                            borderWidth: 2,
+                            pointRadius: 2,
+                            borderDash: [4, 4],
+                            tension: 0.35,
+                            yAxisID: 'y1'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false,
+                            backgroundColor: 'rgba(15,23,42,0.95)',
+                            borderColor: 'rgba(55,65,81,1)',
+                            borderWidth: 1,
+                            titleColor: '#e5e7eb',
+                            bodyColor: '#e5e7eb'
+                        }
+                    },
+                    interaction: {
+                        mode: 'index',
+                        intersect: false
+                    },
+                    scales: {
+                        x: {
+                            grid: { display: false },
+                            ticks: {
+                                color: '#6b7280',
+                                maxTicksLimit: 7
+                            }
+                        },
+                        y: {
+                            type: 'linear',
+                            position: 'left',
+                            grid: { color: 'rgba(31,41,55,0.7)' },
+                            ticks: {
+                                color: '#6b7280',
+                                callback: value => '₺' + value
+                            }
+                        },
+                        y1: {
+                            type: 'linear',
+                            position: 'right',
+                            grid: { display: false },
+                            ticks: { color: '#6b7280' }
+                        }
+                    }
+                }
+            });
+        });
+        /*]]>*/
+    </script>
+
+    <div th:if="${dashboardError}" class="alert alert-danger mt-3">
+        <strong>Dashboard Error:</strong>
+        <span th:text="${dashboardError}"></span>
+    </div>
+
+</section>
+</body>
+</html>

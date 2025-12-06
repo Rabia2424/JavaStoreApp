@@ -2,6 +2,7 @@ package com.store.storeapp.Utils;
 
 import com.store.storeapp.Models.Cart;
 import com.store.storeapp.Models.Product;
+import com.store.storeapp.Models.User;
 import com.store.storeapp.Services.AuthService;
 import com.store.storeapp.Services.impl.CartService;
 import com.store.storeapp.Services.impl.ProductService;
@@ -10,6 +11,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -72,6 +77,54 @@ public class GlobalModelAttributes {
         } catch (Exception e) {
             return null;
         }
+    }
+
+    @ModelAttribute
+    public void addAdminInfo(Model model) {
+
+        var authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return;
+        }
+
+        Object principal = authentication.getPrincipal();
+        if (!(principal instanceof UserDetails userDetails)) {
+            return;
+        }
+
+        User user = userService.getUserByUsername(userDetails.getUsername())
+                .orElse(null);
+
+        if (user == null) {
+            return;
+        }
+
+        boolean isAdmin = user.getRoles() != null &&
+                user.getRoles().stream().anyMatch(r -> "ROLE_ADMIN".equals(r.getName()));
+
+        if (!isAdmin) {
+            return;
+        }
+
+        String fullName = ((user.getName() == null ? "" : user.getName()) + " " +
+                (user.getSurname() == null ? "" : user.getSurname())).trim();
+
+        String initials = buildInitials(user.getName(), user.getSurname());
+
+        model.addAttribute("adminName", fullName);
+        model.addAttribute("adminInitials", initials);
+    }
+
+    private String buildInitials(String name, String surname) {
+        String n = name == null ? "" : name.trim();
+        String s = surname == null ? "" : surname.trim();
+
+        StringBuilder sb = new StringBuilder();
+        if (!n.isEmpty()) sb.append(Character.toUpperCase(n.charAt(0)));
+        if (!s.isEmpty()) sb.append(Character.toUpperCase(s.charAt(0)));
+
+        return sb.toString();
     }
 
 }

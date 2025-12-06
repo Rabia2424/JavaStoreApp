@@ -122,16 +122,6 @@
                         <a class="nav-link" th:href="@{/products/list}"
                            th:classappend="${#strings.startsWith(path, '/products')} ? ' active' : ''"> FIND PRODUCTS </a>
                     </li>
-
-                <li th:if="${hasAdminRole}" class="nav-item"><a class="nav-link" th:href="@{/category/new}"
-                                        th:classappend="${#httpServletRequest.requestURI.startsWith('/category')} ? ' active'">CREATE CATEGORY</a></li>
-
-                <li th:if="${hasAdminRole}" class="nav-item"><a class="nav-link" th:href="@{/admin/products/list}"
-                                                                th:classappend="${#httpServletRequest.requestURI.startsWith('/admin/products')} ? ' active'">ADMIN PRODUCTS</a></li>
-
-                <li th:if="${hasAdminRole}" class="nav-item"><a class="nav-link" th:href="@{/admin/order/list}"
-                                                                th:classappend="${#httpServletRequest.requestURI.startsWith('/admin/order')} ? ' active'">ADMIN ORDERS</a></li>
-
                 <li class="nav-item"><a class="nav-link" href="#">GALLERY</a></li>
                 <li class="nav-item"><a class="nav-link" href="#">FAQ</a></li>
                 <li class="nav-item"><a class="nav-link" href="#">BLOG</a></li>

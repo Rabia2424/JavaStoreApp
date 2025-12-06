@@ -1,9 +1,6 @@
 package com.store.storeapp.Services.impl;
 
-import com.store.storeapp.DTOs.AccountStatsDto;
-import com.store.storeapp.DTOs.OrderDetailDto;
-import com.store.storeapp.DTOs.OrderItemResponseDto;
-import com.store.storeapp.DTOs.OrderResponseDto;
+import com.store.storeapp.DTOs.*;
 import com.store.storeapp.Models.*;
 import com.store.storeapp.Repositories.OrderRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -166,5 +163,46 @@ public class OrderService {
         return new AccountStatsDto(total, active, addressCount, favoriteCount);
     }
 
+    public List<DailySalesSummary> getLastNDaysSummary(int days) {
+        LocalDate from = LocalDate.now().minusDays(days);
+        List<Object[]> results = orderRepository.getDailySalesSummaryNative(from);
+
+        return results.stream()
+                .map(row -> new DailySalesSummary(
+                        LocalDate.parse(row[0].toString()),  // date
+                        ((Number) row[1]).longValue(),            // orderCount
+                        ((Number) row[2]).doubleValue()           // totalRevenue
+                ))
+                .collect(Collectors.toList());
+    }
+
+    public long getTodayOrderCount() {
+        LocalDate today = LocalDate.now();
+        LocalDateTime start = today.atStartOfDay();
+        LocalDateTime end = today.plusDays(1).atStartOfDay();
+        return orderRepository.countByOrderDateBetweenAndStatusNot(
+                start, end, OrderStatus.CANCELLED);
+    }
+
+    public double getTodayRevenue() {
+        LocalDate today = LocalDate.now();
+        LocalDateTime start = today.atStartOfDay();
+        LocalDateTime end = today.plusDays(1).atStartOfDay();
+        Double value = orderRepository.sumRevenueBetween(
+                start, end, OrderStatus.CANCELLED);
+        return value != null ? value : 0.0;
+    }
+
+    public long getPendingOrderCount() {
+        return orderRepository.countByStatus(OrderStatus.PENDING);
+    }
+
+    public long getTodayCancelledCount() {
+        LocalDate today = LocalDate.now();
+        LocalDateTime start = today.atStartOfDay();
+        LocalDateTime end = today.plusDays(1).atStartOfDay();
+        return orderRepository.countByStatusAndOrderDateBetween(
+                OrderStatus.CANCELLED, start, end);
+    }
 
 }

@@ -1,6 +1,8 @@
 package com.store.storeapp.Repositories;
 
 import com.store.storeapp.Models.Inventory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Modifying;
@@ -26,4 +28,8 @@ public interface InventoryRepository extends JpaRepository<Inventory, Long> {
           and (i.onHand - i.reserved) >= :qty
     """)
     int tryReserve(@Param("productId") Long productId, @Param("qty") int qty);
+
+    long countByOnHandLessThan(Integer onHand);
+
+    Page<Inventory> findByOnHandLessThanOrderByOnHandAsc(Integer onHand, Pageable pageable);
 }

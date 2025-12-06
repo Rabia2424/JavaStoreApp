@@ -1,11 +1,10 @@
-package com.store.storeapp.Admin.Controllers;
+package com.store.storeapp.admin.controllers;
 
 import com.store.storeapp.DTOs.ProductDto;
 import com.store.storeapp.Models.Category;
 import com.store.storeapp.Models.Product;
 import com.store.storeapp.Services.impl.CatalogAppService;
 import com.store.storeapp.Services.impl.CategoryService;
-import com.store.storeapp.Services.impl.InventoryService;
 import com.store.storeapp.Services.impl.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -15,9 +14,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 
 @Controller
@@ -38,7 +34,8 @@ public class AdminProductController {
     public String listProducts(Model model){
         List<ProductDto> products = productService.findAllProducts();
         model.addAttribute("products", products);
-        return "product/admin-product-list";
+        model.addAttribute("activePage", "products");
+        return "admin/product/product-list";
     }
 
     @GetMapping("/new")
@@ -47,7 +44,7 @@ public class AdminProductController {
         List<Category> categories = categoryService.findAllCategory();
         model.addAttribute("product", product);
         model.addAttribute("categories", categories);
-        return "product/product-create";
+        return "admin/product/product-create";
     }
 
     @PostMapping("/new")
@@ -62,7 +59,7 @@ public class AdminProductController {
         List<Category> categories = categoryService.findAllCategory();
         model.addAttribute("product", product);
         model.addAttribute("categories", categories);
-        return "product/product-update";
+        return "admin/product/product-update";
     }
 
     @PostMapping("/edit/{id}")

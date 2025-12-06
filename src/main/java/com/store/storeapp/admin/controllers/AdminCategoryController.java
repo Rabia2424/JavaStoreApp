@@ -1,4 +1,4 @@
-package com.store.storeapp.Controllers;
+package com.store.storeapp.admin.controllers;
 
 import com.store.storeapp.Models.Category;
 import com.store.storeapp.Services.impl.CategoryService;
@@ -10,8 +10,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
-@RequestMapping("category")
-public class CategoryController {
+@RequestMapping("/admin/category")
+public class AdminCategoryController {
     @Autowired
     private CategoryService categoryService;
 
@@ -19,7 +19,7 @@ public class CategoryController {
     public String createCategoryForm(Model model){
         Category category = new Category();
         model.addAttribute("category", category);
-        return "category/category-create";
+        return "admin/category/category-create";
     }
 
     @PostMapping("/new")
